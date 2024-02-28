@@ -25,7 +25,21 @@ app.use((err, req, res, next) => {
     res.status(500).json({ message: err.message });
 });
 
-app.listen(port,"192.168.10.13",() => {
+const server=app.listen(port,"192.168.10.13",() => {
     console.log(`server running in ${port}`)
     console.log("ok all right everything")
-})
+});
+
+const io = require("socket.io")(server, {
+    pingTimeout: 60000,
+    cors: {
+        origin: "http://localhost:5173",
+        // credentials: true,
+    },
+});
+
+
+// Socket.IO
+io.on('connection', (socket) => {
+    console.log(`Socket ${socket.id} connected`);
+});
