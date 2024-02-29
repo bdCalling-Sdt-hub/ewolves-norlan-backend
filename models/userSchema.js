@@ -2,13 +2,7 @@ const mongoose = require("mongoose")
 
 const userSchema = new mongoose.Schema({
 
-    
-    fName: {
-        type: String,
-        required: true,
-        trim:true
-    },
-    lName: {
+   fullName: {
         type: String,
         required: true,
         trim:true
@@ -19,16 +13,6 @@ const userSchema = new mongoose.Schema({
         trim: true,
         unique:true
     },
-    userName: {
-        type: String,
-        required: true,
-        trim:true
-    },
-    dateOfBirth: {
-        type: String,
-        required: true,
-        trim:true
-    },
     password: {
         type: String,
         required: true,
@@ -36,12 +20,25 @@ const userSchema = new mongoose.Schema({
     },
     image: {
         type: String,
-        required: true,
         trim:true
     },
-    role: { type: String, enum: ['UNKNOWN','USER', 'ARTIST',"ADMIN"], default: 'UNKNOWN' },
-    emailVerified: { type: Boolean, default: false },
-    emailVerifyCode: { type: String, required: false },
+    mobileNumber: {
+        type: String,
+        required: false,
+        trim:true
+    },
+    location: {
+        type: String,
+        required: false,
+        trim:true
+    },
+    instagramLink:{type:String,trim:true,required:false},
+    accountStatus:{type:Boolean,default:false,required:false},
+    aboutUs:{type:String,trim:true,required:false},
+    termAndCondition:{type:Boolean,default:false,required:false},
+    role: { type: String,required:false, enum: ['UNKNOWN','USER', 'ARTIST',"ADMIN"], default: 'UNKNOWN' },
+    emailVerified: { type: Boolean, default: false,required:false },
+    emailVerifyCode: { type: String, required: false,required:false },
    
 
 },{ timestamps: true })
