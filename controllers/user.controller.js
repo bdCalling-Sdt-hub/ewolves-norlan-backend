@@ -36,12 +36,14 @@ exports.userRegister = async (req,res) => {
                     //console.log(req.files.image[0]);
                     //return res.json(req.files.image[0].filename)
                     let imageFileName = '';
-
-                    if (req.files.image[0]) {
+                       console.log(imageFileName)
+                       if (req.files && req.files.image && req.files.image[0]) {
                         // Add public/uploads link to the image file
 
                         imageFileName = `/upload/image/${req.files.image[0].filename}`;
-                    }
+                       }
+                       
+                
                   
                     const emailVerifyCode = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
                    
@@ -51,7 +53,7 @@ exports.userRegister = async (req,res) => {
                         password: hashpassword,
                         termAndCondition:JSON.parse(termAndCondition),
                         emailVerifyCode,
-                        
+                        image: !imageFileName?"https://img.freepik.com/free-photo/young-bearded-man-with-striped-shirt_273609-5677.jpg?size=626&ext=jpg&ga=GA1.1.1700460183.1708560000&semt=sph":imageFileName
                       
                      });
 

@@ -24,21 +24,21 @@ const configureFileUpload = () => {
     });
 
     const fileFilter = (req, file, cb) => {
-
         const allowedFieldnames = ['image'];
 
-        if (allowedFieldnames.includes(file.fieldname)) {
-
-            if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg') {
-
-
-                cb(null, true)
-
-
+        if (file.fieldname === undefined) {
+            // Allow requests without any files
+            cb(null, true);
+        } else if (allowedFieldnames.includes(file.fieldname)) {
+            if (
+                file.mimetype === 'image/jpeg' ||
+                file.mimetype === 'image/png' ||
+                file.mimetype === 'image/jpg'
+            ) {
+                cb(null, true);
             } else {
                 cb(new Error('Invalid file type'));
             }
-
         } else {
             cb(new Error('Invalid fieldname'));
         }
