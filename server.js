@@ -33,7 +33,7 @@ app.use((err, req, res, next) => {
 
 
 
-const server = app.listen(port,"192.168.0.104",() => {
+const server = app.listen(port,"192.168.10.13",() => {
     console.log(`server running in ${port}`)
     console.log("ok all right everything")
 });

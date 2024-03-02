@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema({
     accountStatus:{type:Boolean,default:false,required:false},
     aboutUs:{type:String,trim:true,required:false},
     termAndCondition:{type:Boolean,default:false,required:false},
-    role: { type: String,required:false, enum: ['UNKNOWN','USER', 'ARTIST',"ADMIN"], default: 'UNKNOWN' },
+    role: { type: String,required:false, enum: ['UNKNOWN','USER', 'ARTIST',"ADMIN"], default: 'USER' },
     emailVerified: { type: Boolean, default: false,required:false },
     emailVerifyCode: { type: String, required: false,required:false },
    
