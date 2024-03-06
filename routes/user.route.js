@@ -18,5 +18,5 @@ router.post('/forget-password', configureFileUpload(), userscontroller.forgetPas
 router.post('/reset-password',configureFileUpload(),userscontroller.resetPassword);
 
 router.post("/changepassword",userauthmiddleware.checkuser,configureFileUpload(),userscontroller.changeuserpassword)
-
+router.post("/editprofile",userauthmiddleware.checkuser,configureFileUpload(),userscontroller.profileEdit)
 module.exports = router

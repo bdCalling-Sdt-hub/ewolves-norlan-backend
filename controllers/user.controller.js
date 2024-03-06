@@ -368,3 +368,31 @@ exports.changeuserpassword = async (req, res) => {
       .send({ status: 400, messege: "All fields are required" });
   }
 };
+
+
+
+exports.profileEdit=async(req,res,next)=>{
+   
+    try{
+
+        if (req.fileValidationError) {
+            return res.status(400).json({ messege: req.fileValidationError });
+          }
+
+
+        const {fullName,profession,location,instagram,aboutUs,mobileNumber}=req.body
+        const userData = await UserModel.findById(req.user._id);
+        console.log(userData);
+
+
+        if(!fullName){
+            return res.status(400).json({"message":"Full name is required"})
+        }else{
+            
+        }
+
+    }catch(error){
+        next(error);  
+    }
+
+}

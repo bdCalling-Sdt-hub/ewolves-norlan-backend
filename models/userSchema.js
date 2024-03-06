@@ -34,6 +34,7 @@ const userSchema = new mongoose.Schema({
     },
     instagramLink:{type:String,trim:true,required:false},
     accountStatus:{type:Boolean,default:false,required:false},
+    profession:{type:String,trim:true,required:false},
     aboutUs:{type:String,trim:true,required:false},
     termAndCondition:{type:Boolean,default:false,required:false},
     role: { type: String,required:false, enum: ['UNKNOWN','USER', 'ARTIST',"ADMIN"], default: 'USER' },
