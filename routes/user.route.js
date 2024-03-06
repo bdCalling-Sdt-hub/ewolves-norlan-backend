@@ -10,4 +10,13 @@ router.post("/verifyemail",configureFileUpload(),userscontroller.verifyEmail)
 router.post("/login",configureFileUpload(),userscontroller.userLogin);
 
 
+//router.post("/changepassword",userscontroller.changeuserpassword)
+router.get("/loggeduser",userauthmiddleware.checkuser,userscontroller.loggeduserdata)
+
+router.post('/forget-password', configureFileUpload(), userscontroller.forgetPassword);
+
+router.post('/reset-password',configureFileUpload(),userscontroller.resetPassword);
+
+router.post("/changepassword",userauthmiddleware.checkuser,configureFileUpload(),userscontroller.changeuserpassword)
+
 module.exports = router
