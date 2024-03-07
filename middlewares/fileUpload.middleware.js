@@ -24,7 +24,7 @@ const configureFileUpload = () => {
     });
 
     const fileFilter = (req, file, cb) => {
-        const allowedFieldnames = ['image'];
+        const allowedFieldnames = ['image','slider'];
 
         if (file.fieldname === undefined) {
             // Allow requests without any files
@@ -50,6 +50,7 @@ const configureFileUpload = () => {
         
     }).fields([
         { name: 'image', maxCount: 1 },
+        { name: 'slider', maxCount: 3 }
         
     ]);;
 
