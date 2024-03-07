@@ -5,6 +5,7 @@ const configureFileUpload=require("../middlewares/fileUpload.middleware.js");
 
 router.post("/slider", configureFileUpload(), slidercontroller.addSlider);
 router.get("/slider", slidercontroller.getSlider);
-router.delete("/delete-slider:id", slidercontroller.deleteSlider);
+router.patch("/slider/:id", configureFileUpload(), slidercontroller.updateSlider);
+router.delete("/delete-slider/:id", slidercontroller.deleteSlider);
 
 module.exports = router;
