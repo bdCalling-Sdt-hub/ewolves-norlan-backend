@@ -2,6 +2,7 @@ const SliderModel = require("../models/sliderSchema"); // Corrected import state
 const fs = require('fs');
 const path =require("path");
 
+// add slider image
 exports.addSlider = async (req, res, next) => {
     try {
         let imageFileName = "";
@@ -17,7 +18,7 @@ exports.addSlider = async (req, res, next) => {
     }
 };
 
-
+// get all slider
 exports.getSlider=async(req, res, next)=>{
     try {
         const slider = await SliderModel.find({});
@@ -30,8 +31,7 @@ exports.getSlider=async(req, res, next)=>{
     }
 }
 
-
-
+// update single slider
 exports.updateSlider=async(req, res, next)=>{
     try {
         const {id} = req.params;
@@ -60,6 +60,7 @@ exports.updateSlider=async(req, res, next)=>{
     }
 }
 
+// delete a single slider
 exports.deleteSlider=async(req, res, next)=>{
     try {
         const {id} = req.params;

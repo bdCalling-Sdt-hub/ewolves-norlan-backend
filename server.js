@@ -5,6 +5,7 @@ const port = process.env.PORT || 5000
 const app = express()
 const userRoute = require("./routes/user.route")
 const sliderRoute = require("./routes/slider.route")
+const categoryRoute = require("./routes/category.routes")
 const dbconection = require("./config/dbconection")
 
 app.use(cors());
@@ -16,6 +17,7 @@ dbconection(dburl)
 
 app.use("/api/auth/", userRoute);
 app.use("/api/", sliderRoute);
+app.use("/api/", categoryRoute);
 
 
 app.use('/upload/image', express.static(__dirname + '/upload/image/'));
