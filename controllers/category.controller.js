@@ -39,8 +39,21 @@ exports.getCategory = async (req, res, next) => {
 };
 
 // get single category
-
 exports.getSingleCategory = async (req, res, next) => {
+    try {
+        const {id} = req.params;
+        const category = await CategoryModel.findOne({_id: id});
+        if(!category){
+            return res.status(204).send({ status: 204, message: "No Data Found"});
+        }
+        return res.status(200).send({ status: 200, message: "Category fetch Successfully", data: category});
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.deleteCategory = async (req, res, next) => {
     try {
         const {id} = req.params;
         const category = await CategoryModel.findOne({_id: id});
