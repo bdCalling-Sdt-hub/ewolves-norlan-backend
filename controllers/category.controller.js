@@ -66,3 +66,41 @@ exports.deleteCategory = async (req, res, next) => {
         next(error);
     }
 };
+
+
+// update category 
+exports.updateCategory = async (req, res, next) => {
+    try {
+        
+        const {id } = req.params;
+        const category= await CategoryModel.findOne({_id: id});
+        console.log(category);
+        if(!category){
+            return res.status(204).send({ status: 204, message: "No Data Found"});
+        }
+
+        const { name, primary_color, secondary_color } = req.body;
+        console.log(req.body);
+        let imageFileName = "";
+        if (req.files && req.files.image && req.files.image[0]) {
+            imageFileName = `/upload/image/${req.files.image[0].filename}`;
+        }
+
+        const fileName = category?.image?.split("/").pop();
+        const filePath = path.join(__dirname, '..', 'upload', 'image', fileName);
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+        }
+
+        category.name= name ? name : category.name,
+        category.primary_color= primary_color ? primary_color : category.primary_color,
+        category.secondary_color= secondary_color ? secondary_color : category.secondary_color,
+        category.image= imageFileName ? imageFileName : category.image
+        const result = await category.save();
+        
+        return res.status(200).send({ status: 200, message: "Category Updated Successfully", data: result});
+
+    } catch (error) {
+        next(error);
+    }
+};
