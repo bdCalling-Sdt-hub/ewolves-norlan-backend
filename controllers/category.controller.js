@@ -23,3 +23,33 @@ exports.addCategory = async (req, res, next) => {
         next(error);
     }
 };
+
+// fetch category
+exports.getCategory = async (req, res, next) => {
+    try {
+        const category = await CategoryModel.find({});
+        if(!category){
+            return res.status(204).send({ status: 204, message: "No Data Found"});
+        }
+        return res.status(200).send({ status: 200, message: "Category fetch Successfully", data: category});
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+// get single category
+
+exports.getSingleCategory = async (req, res, next) => {
+    try {
+        const {id} = req.query;
+        const category = await CategoryModel.find({});
+        if(!category){
+            return res.status(204).send({ status: 204, message: "No Data Found"});
+        }
+        return res.status(200).send({ status: 200, message: "Category fetch Successfully", data: category});
+
+    } catch (error) {
+        next(error);
+    }
+};
