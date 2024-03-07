@@ -6,6 +6,7 @@ const app = express()
 const userRoute = require("./routes/user.route")
 const sliderRoute = require("./routes/slider.route")
 const categoryRoute = require("./routes/category.routes")
+const subscriptionRoute = require("./routes/subscription.routes")
 const dbconection = require("./config/dbconection")
 
 app.use(cors());
@@ -18,6 +19,7 @@ dbconection(dburl)
 app.use("/api/auth/", userRoute);
 app.use("/api/", sliderRoute);
 app.use("/api/", categoryRoute);
+app.use("/api/", subscriptionRoute);
 
 
 app.use('/upload/image', express.static(__dirname + '/upload/image/'));
