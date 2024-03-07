@@ -12,7 +12,8 @@ router.patch("/update-category/:id", configureFileUpload(), categoryController.u
 
 // sub category
 router.post("/sub-category/:id", configureFileUpload(), categoryController.addSubCategory);
-router.delete("/delete-sub-category/:id", categoryController.deleteSubCategory);
-router.patch("/update-sub-category/:id", configureFileUpload(), categoryController.updateSubCategory);
+router.get("/sub-category/:catId/:subId", categoryController.getSubCategory);
+router.delete("/delete-sub-category/:catId/:subId", categoryController.deleteSubCategory);
+router.patch("/update-sub-category/:catId/:subId", configureFileUpload(), categoryController.updateSubCategory);
 
 module.exports = router;
