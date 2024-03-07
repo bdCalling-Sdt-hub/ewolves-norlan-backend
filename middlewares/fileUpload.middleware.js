@@ -49,7 +49,7 @@ const configureFileUpload = () => {
         fileFilter: fileFilter,
         
     }).fields([
-        { name: 'image', maxCount: 1 },
+        { name: 'image', maxCount: 4 },
         
     ]);;
 

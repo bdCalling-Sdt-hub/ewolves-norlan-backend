@@ -10,20 +10,8 @@ exports.userRegister = async (req, res) => {
     if (req.fileValidationError) {
       return res.status(400).json({ messege: req.fileValidationError });
     }
-    //res.json("tushar")
-    //console.log(typeof(JSON.parse(req.body.termAndCondition)))
-    const {
-      fullName,
-      email,
-      password,
-      confirmPass,
-      mobileNumber,
-      location,
-      instagramLink,
-      aboutUs,
-      termAndCondition,
-      role,
-    } = req.body;
+
+    const { fullName, email, password, confirmPass, mobileNumber, location, instagramLink, aboutUs, termAndCondition, role, } = req.body;
     console.log(fullName, email, password, confirmPass, termAndCondition);
 
     const user = await UserModel.findOne({ email: email });
@@ -32,18 +20,12 @@ exports.userRegister = async (req, res) => {
     } else {
       if (fullName && email && password && confirmPass) {
         if (password !== confirmPass) {
-          return res
-            .status(400)
-            .send({
-              status: 400,
-              messege: "password and confirm password does not match",
-            });
+          return res.status(400).send({ status: 400, messege: "password and confirm password does not match"});
         } else {
           try {
             const salt = await bcrypt.genSalt(10);
             const hashpassword = await bcrypt.hash(password, salt);
-            //console.log(req.files.image[0]);
-            //return res.json(req.files.image[0].filename)
+            
             let imageFileName = "";
             console.log(imageFileName);
             if (req.files && req.files.image && req.files.image[0]) {
@@ -88,7 +70,6 @@ exports.userRegister = async (req, res) => {
             // Store the timer reference in the map
             userTimers.set(user?._id, userTimer);
             //console.log(user._id);
-            // const secretid = process.env.JWT_SECRET;
             //console.log(secretid);
             // const token = jwt.sign({ userID: user?._id }, secretid, { expiresIn: "30m" })
 

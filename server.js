@@ -4,6 +4,7 @@ require("dotenv").config();
 const port = process.env.PORT || 5000
 const app = express()
 const userRoute = require("./routes/user.route")
+const sliderRoute = require("./routes/slider.route")
 const dbconection = require("./config/dbconection")
 
 app.use(cors());
@@ -14,6 +15,7 @@ const dburl = process.env.DB_URL
 dbconection(dburl)
 
 app.use("/api/auth/", userRoute);
+app.use("/api/", sliderRoute);
 
 
 app.use('/upload/image', express.static(__dirname + '/upload/image/'));
@@ -33,7 +35,7 @@ app.use((err, req, res, next) => {
 
 
 
-const server = app.listen(port,"192.168.10.13",() => {
+const server = app.listen(port,"192.168.10.102",() => {
     console.log(`server running in ${port}`)
     console.log("ok all right everything")
 });

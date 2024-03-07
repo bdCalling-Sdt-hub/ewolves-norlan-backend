@@ -40,6 +40,19 @@ const userSchema = new mongoose.Schema({
     role: { type: String,required:false, enum: ['UNKNOWN','USER', 'ARTIST',"ADMIN"], default: 'USER' },
     emailVerified: { type: Boolean, default: false,required:false },
     emailVerifyCode: { type: String, required: false,required:false },
+    following: [
+        {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+       }
+    ],
+    followers: [
+        {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+       }
+    ],
+
    
 
 },{ timestamps: true })
