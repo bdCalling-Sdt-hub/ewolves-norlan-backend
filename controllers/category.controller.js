@@ -74,13 +74,11 @@ exports.updateCategory = async (req, res, next) => {
         
         const {id } = req.params;
         const category= await CategoryModel.findOne({_id: id});
-        console.log(category);
         if(!category){
             return res.status(204).send({ status: 204, message: "No Data Found"});
         }
 
         const { name, primary_color, secondary_color } = req.body;
-        console.log(req.body);
         let imageFileName = "";
         if (req.files && req.files.image && req.files.image[0]) {
             imageFileName = `/upload/image/${req.files.image[0].filename}`;

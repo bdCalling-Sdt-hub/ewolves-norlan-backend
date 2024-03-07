@@ -13,7 +13,6 @@ exports.addSubscription = async (req, res, next) => {
             gig_count: parseInt(gig_count),
             package_features 
         });
-        console.log(result)
         return res.status(200).send({ status: 200, message: "Subscription Added Successfully", data: result});
 
     } catch (error) {
