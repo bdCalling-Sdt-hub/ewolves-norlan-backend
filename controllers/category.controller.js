@@ -42,8 +42,8 @@ exports.getCategory = async (req, res, next) => {
 
 exports.getSingleCategory = async (req, res, next) => {
     try {
-        const {id} = req.query;
-        const category = await CategoryModel.find({});
+        const {id} = req.params;
+        const category = await CategoryModel.findOne({_id: id});
         if(!category){
             return res.status(204).send({ status: 204, message: "No Data Found"});
         }
