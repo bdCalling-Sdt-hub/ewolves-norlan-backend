@@ -8,7 +8,7 @@ exports.addCategory = async (req, res, next) => {
         const { name, primary_color, secondary_color } = req.body;
         let imageFileName = "";
         if (req.files && req.files.image && req.files.image[0]) {
-            imageFileName = `/upload/image/${req.files.image[0].filename}`;
+            imageFileName = `/uploads/image/${req.files.image[0].filename}`;
         }
 
         const result = await CategoryModel.create({ 
@@ -81,11 +81,11 @@ exports.updateCategory = async (req, res, next) => {
         const { name, primary_color, secondary_color } = req.body;
         let imageFileName = "";
         if (req.files && req.files.image && req.files.image[0]) {
-            imageFileName = `/upload/image/${req.files.image[0].filename}`;
+            imageFileName = `/uploads/image/${req.files.image[0].filename}`;
         }
 
         const fileName = category?.image?.split("/").pop();
-        const filePath = path.join(__dirname, '..', 'upload', 'image', fileName);
+        const filePath = path.join(__dirname, '..', 'uploads', 'image', fileName);
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
         }
@@ -115,7 +115,7 @@ exports.addSubCategory = async (req, res, next) => {
 
         let imageFileName = "";
         if (req.files && req.files.image && req.files.image[0]) {
-            imageFileName = `/upload/image/${req.files.image[0].filename}`;
+            imageFileName = `/uploads/image/${req.files.image[0].filename}`;
         }
 
         const value = { 
@@ -160,7 +160,7 @@ exports.deleteSubCategory = async (req, res, next) => {
         }
 
         const fileName = subCategory?.image?.split("/").pop();
-        const filePath = path.join(__dirname, '..', 'upload', 'image', fileName);
+        const filePath = path.join(__dirname, '..', 'uploads', 'image', fileName);
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
         }
@@ -189,11 +189,11 @@ exports.updateSubCategory = async (req, res, next) => {
 
         let imageFileName = "";
         if (req.files && req.files.image && req.files.image[0]) {
-            imageFileName = `/upload/image/${req.files.image[0].filename}`;
+            imageFileName = `/uploads/image/${req.files.image[0].filename}`;
         }
 
         const fileName = category?.image?.split("/").pop();
-        const filePath = path.join(__dirname, '..', 'upload', 'image', fileName);
+        const filePath = path.join(__dirname, '..', 'uploads', 'image', fileName);
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
         }

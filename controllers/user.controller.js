@@ -31,7 +31,7 @@ exports.userRegister = async (req, res) => {
             if (req.files && req.files.image && req.files.image[0]) {
               // Add public/uploads link to the image file
 
-              imageFileName = `/upload/image/${req.files.image[0].filename}`;
+              imageFileName = `/uploads/image/${req.files.image[0].filename}`;
             }
 
             const emailVerifyCode =

@@ -7,7 +7,7 @@ exports.addSlider = async (req, res, next) => {
     try {
         let imageFileName = "";
         if (req.files && req.files.image && req.files.image[0]) {
-            imageFileName = `/upload/image/${req.files.image[0].filename}`;
+            imageFileName = `/uploads/image/${req.files.image[0].filename}`;
         }
 
         const result = await SliderModel.create({ slider: imageFileName });
@@ -41,14 +41,14 @@ exports.updateSlider=async(req, res, next)=>{
         }
 
         const fileName = result?.slider?.split("/").pop();
-        const filePath = path.join(__dirname, '..', 'upload', 'image', fileName);
+        const filePath = path.join(__dirname, '..', 'uploads', 'image', fileName);
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
         }
 
         let imageFileName = "";
         if (req.files && req.files.image && req.files.image[0]) {
-            imageFileName = `/upload/image/${req.files.image[0].filename}`;
+            imageFileName = `/uploads/image/${req.files.image[0].filename}`;
         }
         
         result.slider= imageFileName;
@@ -71,7 +71,7 @@ exports.deleteSlider=async(req, res, next)=>{
 
         
         const fileName = result?.slider?.split("/").pop();
-        const filePath = path.join(__dirname, '..', 'upload', 'image', fileName);
+        const filePath = path.join(__dirname, '..', 'uploads', 'image', fileName);
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
             await SliderModel.findByIdAndDelete({_id : id});

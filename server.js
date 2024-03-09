@@ -27,7 +27,6 @@ app.use("/api/privacy/", privacyRoute)
 
 
 app.use('/upload/image', express.static(__dirname + '/upload/image/'));
-
 app.get("/",(req,res)=>{
     res.json({
         "message":"hello"
