@@ -84,9 +84,20 @@ const gigSchema = new Schema(
     },
     artist: {
       type: Schema.Types.ObjectId,
-      ref: "UserModel",
+      ref: "User",
       required: true,
     },
+    comments: [
+      {
+        user: {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+        },
+        comment: {
+          type: String,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );

@@ -1,6 +1,6 @@
-const ApiError = require("../erorrs/ApiError");
-const handleValidationError = require("../erorrs/handleValidationError");
-const handleValidation = require("../erorrs/handleValidationError");
+const ApiError = require("../errors/ApiError");
+const handleValidationError = require("../errors/handleValidationError");
+const handleValidation = require("../errors/handleValidationError");
 
 const globalErrorHandler = (error, req, res, next) => {
   let statusCode = 500;

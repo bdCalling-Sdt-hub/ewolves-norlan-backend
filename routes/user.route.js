@@ -1,42 +1,35 @@
 const express = require("express");
 const router = express.Router();
-const userscontroller = require("../controllers/user.controller.js");
-const userauthmiddleware = require("../middlewares/checkUser.js");
+const userController = require("../controllers/user.controller.js");
 const configureFileUpload = require("../middlewares/fileUpload.js");
+const { checkUser } = require("../middlewares/checkUser.js");
 
-router.post("/register", configureFileUpload(), userscontroller.userRegister);
-router.post("/verifyemail", configureFileUpload(), userscontroller.verifyEmail);
-router.post("/login", configureFileUpload(), userscontroller.userLogin);
-
-//router.post("/changepassword",userscontroller.changeuserpassword)
-router.get(
-  "/loggeduser",
-  userauthmiddleware.checkUser,
-  userscontroller.loggeduserdata
-);
+router.post("/register", configureFileUpload(), userController.userRegister);
+router.post("/verify-email", configureFileUpload(), userController.verifyEmail);
+router.post("/login", configureFileUpload(), userController.userLogin);
 
 router.post(
   "/forget-password",
   configureFileUpload(),
-  userscontroller.forgetPassword
+  userController.forgetPassword
 );
 
 router.post(
   "/reset-password",
   configureFileUpload(),
-  userscontroller.resetPassword
+  userController.resetPassword
 );
 
 router.post(
-  "/changepassword",
-  userauthmiddleware.checkUser,
+  "/change-password",
+  checkUser,
   configureFileUpload(),
-  userscontroller.changeuserpassword
+  userController.changeuserpassword
 );
 router.post(
-  "/editprofile",
-  userauthmiddleware.checkUser,
+  "/edit-profile",
+  checkUser,
   configureFileUpload(),
-  userscontroller.profileEdit
+  userController.profileEdit
 );
 module.exports = router;

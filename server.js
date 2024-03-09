@@ -9,18 +9,16 @@ const categoryRoute = require("./routes/category.routes");
 const subscriptionRoute = require("./routes/subscription.routes");
 const aboutRoute = require("./routes/about.routes");
 const privacyRoute = require("./routes/privacy.routes");
-const dbconection = require("./config/dbconection");
+const termsRoute = require("./routes/terms.routes");
 const gigRouter = require("./routes/gig.route");
-const bodyParser = require("body-parser");
 const globalErrorHandler = require("./middlewares/globalErrorHandler");
+const dbConnection = require("./config/db");
 
 app.use(cors());
-app.use(bodyParser());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-const dburl = process.env.DB_URL;
-
-dbconection(dburl);
+app.use(express.urlencoded({ extended: false }));
+const dbUrl = process.env.DB_URL;
+dbConnection(dbUrl);
 
 app.use("/api/auth/", userRoute);
 app.use("/api/", sliderRoute);
@@ -29,6 +27,7 @@ app.use("/api/", subscriptionRoute);
 app.use("/api/about/", aboutRoute);
 app.use("/api/privacy/", privacyRoute);
 app.use("/api/gig/", gigRouter);
+app.use("/api/terms-and-condition/", termsRoute);
 
 //image get
 app.use(express.static("uploads"));

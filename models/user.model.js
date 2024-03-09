@@ -45,16 +45,21 @@ const userSchema = new mongoose.Schema(
     },
     emailVerified: { type: Boolean, default: false, required: false },
     emailVerifyCode: { type: String, required: false, required: false },
+    following: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    followers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true }
 );
 
-const UserModel = mongoose.model("user", userSchema);
-module.exports = UserModel;
-
-//pagination helper
-//catch async > try catch <next)
-//global error handler > response
-//sendResponse>
-
-//pick ()
+const User = mongoose.model("user", userSchema);
+module.exports = User;

@@ -10,5 +10,5 @@ const termsSchema = new mongoose.Schema({
     }
 },{ timestamps: true });
 
-const TermsSchema = mongoose.model("about", termsSchema);
+const TermsSchema = mongoose.model("terms", termsSchema);
 module.exports = TermsSchema; 
