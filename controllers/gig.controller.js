@@ -1,9 +1,12 @@
+const httpStatus = require("http-status");
 const ApiError = require("../errors/ApiError");
 const Gig = require("../models/gig.model");
-const CathcAsync = require("../shared/CatchAsync");
 const sendResponse = require("../shared/sendResponse");
+const catchAsync = require("../shared/catchAsync");
+const pick = require("../shared/pick");
+const paginationCalculate = require("../helper/paginationHelper");
 
-exports.createGigToDB = CathcAsync(async (req, res, next) => {
+exports.createGigToDB = catchAsync(async (req, res, next) => {
   const basicPackage = {
     serviceDescription: req.body.basicDes,
     price: req.body.basicPrice,
@@ -37,5 +40,35 @@ exports.createGigToDB = CathcAsync(async (req, res, next) => {
   if (!result) {
     throw new ApiError(400, "Failed to created gig");
   }
-  return sendResponse(res, 200, "Gig created Successfully");
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Gig created Successfully",
+    data: result,
+  });
+});
+
+exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
+  const paginationOptions = pick(req.query, ["limit", "page"]);
+  const { limit, page, skip } = paginationCalculate(paginationOptions);
+
+  const result = await Gig.find()
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Gig.countDocuments();
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All gig retrieved successfully",
+    pagination: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  });
 });
