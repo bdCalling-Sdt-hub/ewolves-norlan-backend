@@ -1,94 +1,150 @@
-const UserModel = require("../models/userSchema");
+const UserModel = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const emailWithNodemailer = require("../config/email.config");
 const catchAsync = require("../shared/CatchAsync");
 const sendResponse = require("../shared/sendResponse");
+const ApiError = require("../errors/ApiError");
+const httpStatus = require("http-status");
 const userTimers = new Map();
 
+exports.userRegister = catchAsync(async (req, res, next) => {
+  const { fullName, email, password, confirmPass, termAndCondition, role } =
+    req.body;
 
+  if (!fullName && !email && !password && !confirmPass && !termAndCondition) {
+    throw new ApiError(400, "All Field are required");
+  }
 
-exports.verifyEmail = async (req, res, next) => {
-  try {
-    const { emailVerifyCode, email } = req.body;
+  const isExist = await UserModel.findOne({ email: email });
+  if (isExist) {
+    throw new ApiError(409, "Email already exist!");
+  }
 
-    const user = await UserModel.findOne({ email: email });
-    if (!user) {
-      res.status(404).json({ message: "User Not Found" });
-    } else if (user.emailVerifyCode === emailVerifyCode) {
-      user.emailVerified = true;
+  if (password !== confirmPass) {
+    throw new ApiError(400, "Password and confirm password does not match");
+  }
+  const salt = await bcrypt.genSalt(10);
+  const hashPassword = await bcrypt.hash(password, salt);
+
+  let imageFileName = "";
+  if (req.files && req.files.image && req.files.image[0]) {
+    imageFileName = `/media/${req.files.image[0].filename}`;
+  }
+
+  const emailVerifyCode = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
+
+  const user = await UserModel.create({
+    fullName,
+    email,
+    password: hashPassword,
+    termAndCondition: JSON.parse(termAndCondition),
+    emailVerifyCode,
+    role: role,
+    image: !imageFileName
+      ? "https://img.freepik.com/free-photo/young-bearded-man-with-striped-shirt_273609-5677.jpg?size=626&ext=jpg&ga=GA1.1.1700460183.1708560000&semt=sph"
+      : imageFileName,
+  });
+
+  if (userTimers.has(user?._id)) {
+    clearTimeout(userTimers.get(user?._id));
+  }
+  const userTimer = setTimeout(async () => {
+    try {
+      user.oneTimeCode = null;
       await user.save();
-      res.status(200).json({ message: "Email veriified successfully" });
-    } else {
-      res.status(410).json({ message: "Failed to verify" });
+      // Remove the timer reference from the map
+      userTimers.delete(user?._id);
+    } catch (error) {
+      console.error(
+        `Error updating email verify code for user ${user?._id}:`,
+        error
+      );
     }
-  } catch (error) {
-    next(error);
-  }
-};
+  }, 180000); // 3 minutes in milliseconds
 
-exports.userLogin = async (req, res) => {
+  // Store the timer reference in the map
+  userTimers.set(user?._id, userTimer);
+
+  const emailData = {
+    email,
+    subject: "Account Activation Email",
+    html: `
+                <h1>Hello, ${user?.fullName}</h1>
+                <p>Your email verified code is <h3>${emailVerifyCode}</h3> to verify your email</p>
+                <small>This Code is valid for 3 minutes</small>
+              `,
+  };
+
+  emailWithNodemailer(emailData);
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Register successfully! Please check your E-mail to verify.",
+    data: user
+  });
+
+});
+
+exports.verifyEmail = catchAsync(async (req, res, next) => {
+  const { emailVerifyCode, email } = req.body;
+
+  if (!emailVerifyCode && !email ) {
+    throw new ApiError(400, "All Field are required");
+  }
+
+  const user = await UserModel.findOne({ email: email });
+  if (!user) {
+    throw new ApiError(404, "User Not Found")
+  }
+
+  if(user.emailVerifyCode !== emailVerifyCode){
+    throw new ApiError(410, "OTP Don't matched");
+  }
+
+  user.emailVerified = true;
+  await user.save();
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Email Verified Successfully",
+    data: user
+  });
+
+});
+
+exports.userLogin = catchAsync(async (req, res) => {
+
   const { email, password } = req.body;
-
-  try {
-    const user = await UserModel.findOne({ email: email });
-
-    if (user.role == "ADMIN" || user.role == "USER" || user.role == "ARTIST") {
-      if (email && password) {
-        if (user.emailVerified === false) {
-          return res
-            .status(401)
-            .send({ status: 401, messege: "your email is not verified" });
-        }
-
-        if (user.role === "UNKNOWN") {
-          return res
-            .status(401)
-            .send({ status: 401, messege: "Unathorized user" });
-        }
-
-        if (user !== null) {
-          const ismatch = await bcrypt.compare(password, user.password);
-          if (user.email === email && ismatch) {
-            const token = jwt.sign(
-              { userID: user._id },
-              process.env.JWT_SECRET,
-              { expiresIn: "3d" }
-            );
-
-            return res
-              .status(200)
-              .send({
-                status: 200,
-                messege: "you are logged in successfully",
-                token: token,
-                data: user
-              });
-          } else {
-            return res
-              .status(401)
-              .send({ status: 401, messege: "your credential doesn't match" });
-          }
-        } else {
-          return res
-            .status(401)
-            .send({ status: 401, messege: "your credential doesn't match" });
-        }
-      } else {
-        return res
-          .status(400)
-          .send({ status: 400, messege: "All fields are required" });
-      }
-    } else {
-      return res
-        .status(401)
-        .send({ status: 401, messege: "You are not authorized user" });
-    }
-  } catch (e) {
-    console.log(e);
-    return res.status(400).send({ status: 400, messege: "unable to login" });
+  if (!password && !email ) {
+    throw new ApiError(400, "All Field are required");
   }
-};
+
+  const user = await UserModel.findOne({ email: email });
+  if(!user){
+    throw new ApiError(204, "User not Found");
+  }
+
+  if (user.emailVerified === false) {
+    throw new ApiError(401, "your email is not verified");
+  }
+
+  const ismatch = await bcrypt.compare(password, user.password);
+  if(!ismatch){
+    throw new ApiError(401, "your credential doesn't match");
+  }
+
+  const token = jwt.sign( { userID: user._id }, process.env.JWT_SECRET, { expiresIn: "3d" });
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Your Are logged in successfully",
+    data: user,
+    token: token
+  });
+});
+
+
 
 exports.forgetPassword = catchAsync(async (req, res, next) => {
 
@@ -137,7 +193,12 @@ exports.forgetPassword = catchAsync(async (req, res, next) => {
       }
     }, 180000); // 3 minute in milliseconds
 
-  return sendResponse(res, 200, "Send email Verify Code Successfully");
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Send email Verify Code Successfully"
+  });
+
 });
 
 exports.resetPassword = catchAsync(async (req, res, next) => {
@@ -159,7 +220,13 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     user.password = hashpassword;
     user.emailVerifyCode = null;
     await user.save();
-    return sendResponse(res, 200, "Password Updated Successfully", user)
+
+    return sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Password Updated Successfully",
+      data: user
+    });
   }
 
 });
@@ -191,7 +258,11 @@ exports.changeuserpassword = catchAsync(async (req, res) => {
     $set: { password: hashpassword }
   });
 
-  return sendResponse(res, 400, "Password Changed Successfully");
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Password Changed Successfully"
+  });
 
 });
 
@@ -226,7 +297,11 @@ exports.profileEdit=catchAsync(async(req,res,next)=>{
   user.image = imageFileName ? imageFileName : user.image
   await user.save();
 
-  if(!fullName){
-    return sendResponse(res, 400, "Full Name is Required")
-  }
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Profile Updated Successfully",
+    data: user
+  });
+
 });

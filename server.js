@@ -38,7 +38,7 @@ app.get("/", (req, res) => {
   });
 });
 
-const server = app.listen(port, "192.168.10.16", () => {
+const server = app.listen(port, "192.168.10.102", () => {
   console.log(`server running in ${port}`);
   console.log("ok all right everything");
 });

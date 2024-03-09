@@ -11,20 +11,26 @@ exports.addTerms= catchAsync(async(req, res, next)=>{
             description: description
         });
     }
-    return sendResponse(res, 200, "Terms And condition Added Successfully", result);
+    return sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Terms And condition Added Successfully",
+        data: result
+    });
 });
 
 exports.getTerms = catchAsync(async(req, res, next)=>{
-    try {
-        const terms = await TermsModel.find({});
-        if(!terms){
-            return sendResponse(res, 204, "No Data Found", terms);
-        }
-
-        return sendResponse(res, 200, "Terms And Condition Fetch Data Successfully", terms);
-    } catch (error) {
-        next(error)
+    const terms = await TermsModel.find({});
+    if(!terms){
+        return sendResponse(res, 204, "No Data Found", terms);
     }
+    return sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Terms And Condition Fetch Data Successfully",
+        data: terms
+    });
+    
 });
 
 exports.updateTerms = catchAsync(async(req, res, next)=>{
@@ -39,5 +45,10 @@ exports.updateTerms = catchAsync(async(req, res, next)=>{
     terms.name = name ? name : terms.name;
     terms.description=  description ? description : terms.description;
     const result = await terms.save();
-    return sendResponse(res, 200, "Terms and Condition Updated Successfully", result);
+    return sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Terms and Condition Updated Successfully",
+        data: result
+    });
 });
