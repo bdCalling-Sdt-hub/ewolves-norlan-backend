@@ -28,3 +28,23 @@ exports.getAboutUs= async(req, res, next)=>{
         next(error)
     }
 }
+
+exports.updateAboutUs= async(req, res, next)=>{
+    try {
+        const { id } = req.params;
+        const about = await AboutModel.findById(id);
+        if(!about){
+            return res.status(204).send({status:204, message: "No Data Found", data: about})
+        }
+        const { name, description } = req.body;
+
+        about.name = name ? name : about.name;
+        about.description = description ? description : about.description;
+
+        const result = await about.save();
+        
+        return res.status(200).send({status:200, message: "About Us updated Successfully", data: result});
+    } catch (error) {
+        next(error)
+    }
+}
