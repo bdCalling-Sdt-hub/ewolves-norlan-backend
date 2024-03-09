@@ -8,6 +8,7 @@ const sliderRoute = require("./routes/slider.route")
 const categoryRoute = require("./routes/category.routes")
 const subscriptionRoute = require("./routes/subscription.routes")
 const aboutRoute = require("./routes/about.routes");
+const privacyRoute = require("./routes/privacy.routes")
 const dbconection = require("./config/dbconection")
 
 app.use(cors());
@@ -22,6 +23,7 @@ app.use("/api/", sliderRoute);
 app.use("/api/", categoryRoute);
 app.use("/api/", subscriptionRoute);
 app.use("/api/about/", aboutRoute);
+app.use("/api/privacy/", privacyRoute)
 
 
 app.use('/upload/image', express.static(__dirname + '/upload/image/'));

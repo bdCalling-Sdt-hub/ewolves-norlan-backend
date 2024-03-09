@@ -1,5 +1,5 @@
 const mongoose = require("mongoose")
-const aboutUsSchema = new mongoose.Schema({
+const privacySchema = new mongoose.Schema({
     name:{
         type: String,
         required: true
@@ -10,5 +10,5 @@ const aboutUsSchema = new mongoose.Schema({
     }
 },{ timestamps: true });
 
-const AboutUsSchema = mongoose.model("about", aboutUsSchema);
-module.exports = AboutUsSchema; 
+const PrivacySchema = mongoose.model("privacy", privacySchema);
+module.exports = PrivacySchema;
