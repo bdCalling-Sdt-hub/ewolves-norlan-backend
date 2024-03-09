@@ -87,6 +87,17 @@ const gigSchema = new Schema(
       ref: "UserModel",
       required: true,
     },
+    comments:[
+      {
+        user: {
+          type: Schema.Types.ObjectId,
+          ref: "UserModel"
+        },
+        comment: {
+          type: String
+        }
+      }
+    ]
   },
   { timestamps: true }
 );

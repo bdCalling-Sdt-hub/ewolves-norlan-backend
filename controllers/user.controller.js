@@ -2,7 +2,8 @@ const UserModel = require("../models/userSchema");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const emailWithNodemailer = require("../config/email.config");
-
+const catchAsync = require("../shared/CatchAsync");
+const sendResponse = require("../shared/sendResponse");
 const userTimers = new Map();
 
 exports.userRegister = async (req, res) => {
@@ -31,7 +32,7 @@ exports.userRegister = async (req, res) => {
             if (req.files && req.files.image && req.files.image[0]) {
               // Add public/uploads link to the image file
 
-              imageFileName = `/uploads/image/${req.files.image[0].filename}`;
+              imageFileName = `/media/${req.files.image[0].filename}`;
             }
 
             const emailVerifyCode =
@@ -56,7 +57,6 @@ exports.userRegister = async (req, res) => {
               try {
                 user.oneTimeCode = null;
                 await user.save();
-                //console.log(`email verify code for user ${user._id} reset to null after 3 minutes`);
                 // Remove the timer reference from the map
                 userTimers.delete(user?._id);
               } catch (error) {
@@ -69,30 +69,20 @@ exports.userRegister = async (req, res) => {
 
             // Store the timer reference in the map
             userTimers.set(user?._id, userTimer);
-            //console.log(user._id);
-            //console.log(secretid);
-            // const token = jwt.sign({ userID: user?._id }, secretid, { expiresIn: "30m" })
 
-            // const link = `http://192.168.10.13:5000/email-verify/${user?._id}/${token}`
 
             const emailData = {
               email,
               subject: "Account Activation Email",
               html: `
-                            <h1>Hello, ${user?.fullName}</h1>
-                            <p>Your email verified code is <h3>${emailVerifyCode}</h3> to verify your email</p>
-                            <small>This Code is valid for 3 minutes</small>
-                            `,
+                <h1>Hello, ${user?.fullName}</h1>
+                <p>Your email verified code is <h3>${emailVerifyCode}</h3> to verify your email</p>
+                <small>This Code is valid for 3 minutes</small>
+              `
             };
 
             emailWithNodemailer(emailData);
-            return res
-              .status(201)
-              .send({
-                status: 201,
-                messege:
-                  "Registerd successfully!Please check your E-mail to verify.",
-              });
+            return sendResponse(res, 201, "Registerd successfully!Please check your E-mail to verify.");
           } catch (err) {
             console.log(e);
             return res
@@ -165,6 +155,7 @@ exports.userLogin = async (req, res) => {
                 status: 200,
                 messege: "you are logged in successfully",
                 token: token,
+                data: user
               });
           } else {
             return res
@@ -192,42 +183,13 @@ exports.userLogin = async (req, res) => {
   }
 };
 
-exports.loggeduserdata = async (req, res, next) => {
-  try {
-    const userData = await UserModel.findById(req.user._id);
-    console.log("tushar", userData);
-    let identity = userData.role == "admin" ? true : false;
-    const user = await UserModel.findById({ _id: req.user?._id }).select([
-      "fullName",
-      "email",
-      "userName",
-      "image",
-      "role",
-    ]);
+exports.forgetPassword = catchAsync(async (req, res, next) => {
 
-    return res
-      .status(200)
-      .send({
-        status: 200,
-        messege: "User information Retrive successfully",
-        data: { userInfo: user },
-      });
-  } catch (e) {
-    next(e.message);
-  }
-};
-
-exports.forgetPassword = async (req, res, next) => {
-  try {
     const { email } = req.body;
 
-    console.log(email);
-
-    // Check if the user already exists
     const user = await UserModel.findOne({ email });
-    //return res.json(user)
     if (!user) {
-      return res.status(400).json({ message: "User not found" });
+      return sendResponse(res, 400, "User does not exist");
     }
 
     // Generate OTC (One-Time Code)
@@ -268,112 +230,96 @@ exports.forgetPassword = async (req, res, next) => {
       }
     }, 180000); // 3 minute in milliseconds
 
-    res.status(201).json({ message: "Sent email Verify Code successfully" });
-  } catch (error) {
-    next(error);
+  return sendResponse(res, 200, "Send email Verify Code Successfully");
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+
+  const { email, password, confirmPassword } = req.body;
+  const user = await UserModel.findOne({ email: email });
+
+  if (!user) {
+    return sendResponse(res, 400, "User does not exist");
   }
-};
 
-exports.resetPassword = async (req, res, next) => {
-  try {
-    const { email, password, confirmPassword } = req.body;
-
-    const user = await UserModel.findOne({ email: email });
-
-    if (!user) {
-      return res.status(400).json({ message: "User does not exist" });
-    } else {
-      if (password !== confirmPassword) {
-        return res
-          .status(400)
-          .send({ messege: "password and confirm password does not match" });
-      } else {
-        if (user.emailVerified === true) {
-          const salt = await bcrypt.genSalt(10);
-          const hashpassword = await bcrypt.hash(password, salt);
-          user.password = hashpassword;
-          user.emailVerifyCode = null;
-          await user.save();
-          res.status(200).json({ message: "Password updated successfully" });
-        } else {
-          res
-            .status(200)
-            .json({
-              message: "Something went wrong, try forget password again",
-            });
-        }
-      }
-    }
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({ message: "Error updating password" });
+  if(password !== confirmPassword){
+    return sendResponse(res, 400, "Password and confirm password does not match");
   }
-};
 
-exports.changeuserpassword = async (req, res) => {
+  if (user.emailVerified === true) {
+    const salt = await bcrypt.genSalt(10);
+    const hashpassword = await bcrypt.hash(password, salt);
+    user.password = hashpassword;
+    user.emailVerifyCode = null;
+    await user.save();
+    return sendResponse(res, 200, "Password Updated Successfully", user)
+  }
+
+});
+
+exports.changeuserpassword = catchAsync(async (req, res) => {
   const { currentPass, newPass, confirmPass } = req.body;
-  const userData = await UserModel.findById(req.user._id);
-  const ismatch = await bcrypt.compare(currentPass, userData.password);
+  const user = await UserModel.findById(req.user._id);
+
+  if(!currentPass && !newPass && !confirmPass){
+    return sendResponse(res, 400, "All Fields are required");
+  }
+
+  const ismatch = await bcrypt.compare(currentPass, user.password);
   if (!ismatch) {
-    return res
-      .status(400)
-      .send({ status: 400, messege: "Current password is wrong" });
+    return sendResponse(res, 400, "Current Password is Wrong");
   }
-  if(currentPass==newPass){
-    return res
-    .status(400)
-    .send({ status: 400, messege: "Current password and new password must be difference" });
+
+  if(currentPass === newPass){
+    return sendResponse(res, 400, "Current Password and new password must be different");
   }
-  if (newPass && confirmPass) {
-    if (newPass !== confirmPass) {
-      return res
-        .status(400)
-        .send({
-          status: 400,
-          messege: "password and confirm password doesnt match",
-        });
-    } else {
-      const salt = await bcrypt.genSalt(10);
-      const hashpassword = await bcrypt.hash(newPass, salt);
-      const passchange = await UserModel.findByIdAndUpdate(req.user._id, {
-        $set: { password: hashpassword },
-      });
-      //console.log(passchange)
-      return res
-        .status(200)
-        .send({ status: 200, messege: "password changed successfully" });
-    }
-  } else {
-    return res
-      .status(400)
-      .send({ status: 400, messege: "All fields are required" });
+  
+  if(newPass !== confirmPass){
+    return sendResponse(res, 400, "password and confirm password doesnt match");
   }
-};
+
+  const salt = await bcrypt.genSalt(10);
+  const hashpassword = await bcrypt.hash(newPass, salt);
+  await UserModel.findByIdAndUpdate(req.user._id, {
+    $set: { password: hashpassword }
+  });
+
+  return sendResponse(res, 400, "Password Changed Successfully");
+
+});
 
 
 
-exports.profileEdit=async(req,res,next)=>{
-   
-    try{
+exports.profileEdit=catchAsync(async(req,res,next)=>{
 
-        if (req.fileValidationError) {
-            return res.status(400).json({ messege: req.fileValidationError });
-          }
+  if (req.fileValidationError) {
+    return res.status(400).json({ messege: req.fileValidationError });
+  }
+  const user = await UserModel.findById(req.user._id);
+  if(!user){
+    return sendResponse(res, 204, "No User Found", user)
+  }
+  const {fullName, email, mobileNumber, location }=req.body;
 
+  let imageFileName = "";
+  if (req.files && req.files.image && req.files.image[0]) {
+    imageFileName = `/media/${req.files.image[0].filename}`;
+  }
 
-        const {fullName,profession,location,instagram,aboutUs,mobileNumber}=req.body
-        const userData = await UserModel.findById(req.user._id);
-        console.log(userData);
+  const fileName = user?.image?.split("/").pop();
+  const filePath = path.join(__dirname, '..', 'uploads', 'media', fileName);
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+  }
 
+  user.fullName= fullName ? fullName : user.fullName
+  user.email= email ? email : user?.email;
+  user.mobileNumber= mobileNumber ? mobileNumber : user.mobileNumber
+  user.location= location ? location : user.location;
+  user.image = imageFileName ? imageFileName : user.image
+  await user.save();
 
-        if(!fullName){
-            return res.status(400).json({"message":"Full name is required"})
-        }else{
-            
-        }
-
-    }catch(error){
-        next(error);  
-    }
-
-}
+  if(!fullName){
+    return sendResponse(res, 400, "Full Name is Required")
+  }
+});

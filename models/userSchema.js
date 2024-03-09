@@ -45,6 +45,18 @@ const userSchema = new mongoose.Schema(
     },
     emailVerified: { type: Boolean, default: false, required: false },
     emailVerifyCode: { type: String, required: false, required: false },
+    following: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "UserModel"
+      }
+    ],
+    followers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "UserModel"
+      }
+    ],
   },
   { timestamps: true }
 );

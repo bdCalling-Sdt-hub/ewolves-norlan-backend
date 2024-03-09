@@ -1,7 +1,8 @@
 const Gig = require("../models/gig.model");
+const CathcAsync = require("../shared/CatchAsync");
+const sendResponse = require("../shared/sendResponse");
 
-exports.createGigToDB = async (req, res, next) => {
-  try {
+exports.createGigToDB = CathcAsync(async (req, res, next) => {
     const basicPackage = {
       serviceDescription: req.body.basicDes,
       price: req.body.basicPrice,
@@ -35,13 +36,5 @@ exports.createGigToDB = async (req, res, next) => {
     if (!result) {
       throw new Error("Failed to created gig");
     }
-
-    return res.status(200).json({
-      success: true,
-      message: "Gig created successfully",
-      data: result,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+    return sendResponse(res, 200, "Gig created Successfully");
+});
