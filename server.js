@@ -8,7 +8,10 @@ const sliderRoute = require("./routes/slider.route")
 const categoryRoute = require("./routes/category.routes")
 const subscriptionRoute = require("./routes/subscription.routes")
 const aboutRoute = require("./routes/about.routes");
-const privacyRoute = require("./routes/privacy.routes")
+const privacyRoute = require("./routes/privacy.routes");
+const termsRoute = require("./routes/terms.routes");
+
+
 const dbconection = require("./config/dbconection")
 const gigRouter = require("./routes/gig.route");
 const bodyParser = require("body-parser");
@@ -28,6 +31,7 @@ app.use("/api/", subscriptionRoute);
 app.use("/api/about/", aboutRoute);
 app.use("/api/privacy/", privacyRoute)
 app.use("/api/gig/", gigRouter);
+app.use("/api/terms-and-condition/", termsRoute)
 
 //image get
 app.use(express.static("uploads"));

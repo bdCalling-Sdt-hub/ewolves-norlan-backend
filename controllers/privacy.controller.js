@@ -1,5 +1,5 @@
 const PrivacyModel = require("../models/privacy.model");
-const sendResponse = require("../utils/sendResponse");
+const sendResponse = require("../shared/sendResponse");
 
 exports.addPrivacy = async(req, res, next)=>{
     try {
