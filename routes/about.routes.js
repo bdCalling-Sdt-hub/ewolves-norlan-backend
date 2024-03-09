@@ -4,4 +4,5 @@ const aboutController = require("../controllers/about.controller");
 const configureFileUpload = require("../middlewares/fileUpload.middleware")
 
 router.post("/create-about", configureFileUpload(), aboutController.addAboutUs);
+router.get('/get-about', aboutController.getAboutUs);
 module.exports = router;
