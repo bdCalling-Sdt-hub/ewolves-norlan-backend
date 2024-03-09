@@ -11,7 +11,18 @@ exports.userRegister = async (req, res) => {
       return res.status(400).json({ messege: req.fileValidationError });
     }
 
-    const { fullName, email, password, confirmPass, mobileNumber, location, instagramLink, aboutUs, termAndCondition, role, } = req.body;
+    const {
+      fullName,
+      email,
+      password,
+      confirmPass,
+      mobileNumber,
+      location,
+      instagramLink,
+      aboutUs,
+      termAndCondition,
+      role,
+    } = req.body;
     console.log(fullName, email, password, confirmPass, termAndCondition);
 
     const user = await UserModel.findOne({ email: email });
@@ -20,18 +31,23 @@ exports.userRegister = async (req, res) => {
     } else {
       if (fullName && email && password && confirmPass) {
         if (password !== confirmPass) {
-          return res.status(400).send({ status: 400, messege: "password and confirm password does not match"});
+          return res
+            .status(400)
+            .send({
+              status: 400,
+              messege: "password and confirm password does not match",
+            });
         } else {
           try {
             const salt = await bcrypt.genSalt(10);
             const hashpassword = await bcrypt.hash(password, salt);
-            
+
             let imageFileName = "";
             console.log(imageFileName);
             if (req.files && req.files.image && req.files.image[0]) {
               // Add public/uploads link to the image file
 
-              imageFileName = `/uploads/image/${req.files.image[0].filename}`;
+              imageFileName = `/media/${req.files.image[0].filename}`;
             }
 
             const emailVerifyCode =
@@ -86,13 +102,11 @@ exports.userRegister = async (req, res) => {
             };
 
             emailWithNodemailer(emailData);
-            return res
-              .status(201)
-              .send({
-                status: 201,
-                messege:
-                  "Registerd successfully!Please check your E-mail to verify.",
-              });
+            return res.status(201).send({
+              status: 201,
+              messege:
+                "Registerd successfully!Please check your E-mail to verify.",
+            });
           } catch (err) {
             console.log(e);
             return res
@@ -159,13 +173,11 @@ exports.userLogin = async (req, res) => {
               { expiresIn: "3d" }
             );
 
-            return res
-              .status(200)
-              .send({
-                status: 200,
-                messege: "you are logged in successfully",
-                token: token,
-              });
+            return res.status(200).send({
+              status: 200,
+              messege: "you are logged in successfully",
+              token: token,
+            });
           } else {
             return res
               .status(401)
@@ -205,13 +217,11 @@ exports.loggeduserdata = async (req, res, next) => {
       "role",
     ]);
 
-    return res
-      .status(200)
-      .send({
-        status: 200,
-        messege: "User information Retrive successfully",
-        data: { userInfo: user },
-      });
+    return res.status(200).send({
+      status: 200,
+      messege: "User information Retrive successfully",
+      data: { userInfo: user },
+    });
   } catch (e) {
     next(e.message);
   }
@@ -296,11 +306,9 @@ exports.resetPassword = async (req, res, next) => {
           await user.save();
           res.status(200).json({ message: "Password updated successfully" });
         } else {
-          res
-            .status(200)
-            .json({
-              message: "Something went wrong, try forget password again",
-            });
+          res.status(200).json({
+            message: "Something went wrong, try forget password again",
+          });
         }
       }
     }
@@ -319,19 +327,20 @@ exports.changeuserpassword = async (req, res) => {
       .status(400)
       .send({ status: 400, messege: "Current password is wrong" });
   }
-  if(currentPass==newPass){
+  if (currentPass == newPass) {
     return res
-    .status(400)
-    .send({ status: 400, messege: "Current password and new password must be difference" });
+      .status(400)
+      .send({
+        status: 400,
+        messege: "Current password and new password must be difference",
+      });
   }
   if (newPass && confirmPass) {
     if (newPass !== confirmPass) {
-      return res
-        .status(400)
-        .send({
-          status: 400,
-          messege: "password and confirm password doesnt match",
-        });
+      return res.status(400).send({
+        status: 400,
+        messege: "password and confirm password doesnt match",
+      });
     } else {
       const salt = await bcrypt.genSalt(10);
       const hashpassword = await bcrypt.hash(newPass, salt);
@@ -350,30 +359,22 @@ exports.changeuserpassword = async (req, res) => {
   }
 };
 
-
-
-exports.profileEdit=async(req,res,next)=>{
-   
-    try{
-
-        if (req.fileValidationError) {
-            return res.status(400).json({ messege: req.fileValidationError });
-          }
-
-
-        const {fullName,profession,location,instagram,aboutUs,mobileNumber}=req.body
-        const userData = await UserModel.findById(req.user._id);
-        console.log(userData);
-
-
-        if(!fullName){
-            return res.status(400).json({"message":"Full name is required"})
-        }else{
-            
-        }
-
-    }catch(error){
-        next(error);  
+exports.profileEdit = async (req, res, next) => {
+  try {
+    if (req.fileValidationError) {
+      return res.status(400).json({ messege: req.fileValidationError });
     }
 
-}
+    const { fullName, profession, location, instagram, aboutUs, mobileNumber } =
+      req.body;
+    const userData = await UserModel.findById(req.user._id);
+    console.log(userData);
+
+    if (!fullName) {
+      return res.status(400).json({ message: "Full name is required" });
+    } else {
+    }
+  } catch (error) {
+    next(error);
+  }
+};

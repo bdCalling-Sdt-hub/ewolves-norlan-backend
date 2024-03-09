@@ -1,3 +1,4 @@
+const ApiError = require("../erorrs/ApiError");
 const Gig = require("../models/gig.model");
 
 exports.createGigToDB = async (req, res, next) => {
@@ -33,7 +34,7 @@ exports.createGigToDB = async (req, res, next) => {
     }
 
     if (!result) {
-      throw new Error("Failed to created gig");
+      throw new ApiError(400, "Failed to created gig");
     }
 
     return res.status(200).json({

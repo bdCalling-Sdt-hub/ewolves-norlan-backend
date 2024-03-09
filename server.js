@@ -1,17 +1,18 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-const port = process.env.PORT || 5000
-const app = express()
-const userRoute = require("./routes/user.route")
-const sliderRoute = require("./routes/slider.route")
-const categoryRoute = require("./routes/category.routes")
-const subscriptionRoute = require("./routes/subscription.routes")
+const port = process.env.PORT || 5000;
+const app = express();
+const userRoute = require("./routes/user.route");
+const sliderRoute = require("./routes/slider.route");
+const categoryRoute = require("./routes/category.routes");
+const subscriptionRoute = require("./routes/subscription.routes");
 const aboutRoute = require("./routes/about.routes");
-const privacyRoute = require("./routes/privacy.routes")
-const dbconection = require("./config/dbconection")
+const privacyRoute = require("./routes/privacy.routes");
+const dbconection = require("./config/dbconection");
 const gigRouter = require("./routes/gig.route");
 const bodyParser = require("body-parser");
+const globalErrorHandler = require("./middlewares/globalErrorHandler");
 
 app.use(cors());
 app.use(bodyParser());
@@ -26,7 +27,7 @@ app.use("/api/", sliderRoute);
 app.use("/api/", categoryRoute);
 app.use("/api/", subscriptionRoute);
 app.use("/api/about/", aboutRoute);
-app.use("/api/privacy/", privacyRoute)
+app.use("/api/privacy/", privacyRoute);
 app.use("/api/gig/", gigRouter);
 
 //image get
@@ -38,12 +39,7 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use((err, req, res, next) => {
-  //console.error("error tushar",err.message);
-  res.status(500).json({ message: err.message });
-});
-
-const server = app.listen(port, "192.168.10.102", () => {
+const server = app.listen(port, "192.168.10.16", () => {
   console.log(`server running in ${port}`);
   console.log("ok all right everything");
 });
@@ -60,3 +56,6 @@ const io = require("socket.io")(server, {
 io.on("connection", (socket) => {
   console.log(`Socket ${socket.id} connected`);
 });
+
+//global error handler
+app.use(globalErrorHandler);
