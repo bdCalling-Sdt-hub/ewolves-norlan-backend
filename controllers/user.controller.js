@@ -83,7 +83,7 @@ exports.userRegister = catchAsync(async (req, res) => {
   return sendResponse(
     res,
     201,
-    "Register successfully!Please check your E-mail to verify."
+    "Register successfully! Please check your E-mail to verify."
   );
 });
 
