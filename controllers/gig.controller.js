@@ -9,7 +9,7 @@ const Video = require("../models/video.model");
 
 exports.createGigToDB = CatchAsync(async (req, res, next) => {
   console.log("Connected");
-  
+
   const basicPackage = {
     serviceDescription: req.body.basicDes,
     price: req.body.basicPrice,
@@ -92,30 +92,38 @@ exports.getAllGigFromDB = CatchAsync(async (req, res, next) => {
   });
 });
 
-exports.updateGigToDB = CatchAsync(async(req, res, next)=>{
-  const {id} = req.params;
+exports.updateGigToDB = CatchAsync(async (req, res, next) => {
+  const { id } = req.params;
   const gig = await Gig.findById(id);
-  if(!gig){
-    throw new ApiError(204, "No Gig Found")
+  if (!gig) {
+    throw new ApiError(204, "No Gig Found");
   }
-  const { contentName, location, skillLevel, searchTags, subCategory, category, about } = req.body;
+  const {
+    contentName,
+    location,
+    skillLevel,
+    searchTags,
+    subCategory,
+    category,
+    about,
+  } = req.body;
 
   let media = "";
   let thumbnail = "";
 
-  if (req.files && req.files.thumbnail && req.files.thumbnail[0] ) {
+  if (req.files && req.files.thumbnail && req.files.thumbnail[0]) {
     thumbnail = `/media/${req.files.thumbnail[0].filename}`;
   }
 
-  if (req.files && req.files.media && req.files.media[0] ) {
+  if (req.files && req.files.media && req.files.media[0]) {
     media = `/media/${req.files.media[0].filename}`;
   }
 
-  if(media && thumbnail){
+  if (media && thumbnail) {
     const fileName = gig?.media?.split("/").pop();
     const fileName2 = gig?.thumbnail?.split("/").pop();
-    const filePath1 = path.join(__dirname, '..', 'uploads', 'media', fileName);
-    const filePath2 = path.join(__dirname, '..', 'uploads', 'media', fileName2);
+    const filePath1 = path.join(__dirname, "..", "uploads", "media", fileName);
+    const filePath2 = path.join(__dirname, "..", "uploads", "media", fileName2);
     if (fs.existsSync(filePath1) && fs.existsSync(filePath2)) {
       fs.unlinkSync(filePath1);
       fs.unlinkSync(filePath2);
@@ -125,7 +133,7 @@ exports.updateGigToDB = CatchAsync(async(req, res, next)=>{
   gig.contentName = contentName ? contentName : gig.contentName;
   gig.about = about ? about : gig.about;
   gig.location = location ? location : gig.location;
-  gig.skillLevel = skillLevel ? skillLevel :  gig.skillLevel;
+  gig.skillLevel = skillLevel ? skillLevel : gig.skillLevel;
   gig.searchTags = searchTags ? searchTags : gig.searchTags;
   gig.category = category ? category : gig.category;
   gig.subCategory = subCategory ? subCategory : gig.subCategory;
