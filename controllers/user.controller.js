@@ -2,13 +2,13 @@ const UserModel = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const emailWithNodemailer = require("../config/email.config");
-const catchAsync = require("../shared/CatchAsync");
 const sendResponse = require("../shared/sendResponse");
 const ApiError = require("../errors/ApiError");
 const httpStatus = require("http-status");
+const CatchAsync = require("../shared/CatchAsync");
 const userTimers = new Map();
 
-exports.userRegister = catchAsync(async (req, res, next) => {
+exports.userRegister = CatchAsync(async (req, res, next) => {
   const { fullName, email, password, confirmPass, termAndCondition, role } =
     req.body;
 
@@ -86,7 +86,7 @@ exports.userRegister = catchAsync(async (req, res, next) => {
 
 });
 
-exports.verifyEmail = catchAsync(async (req, res, next) => {
+exports.verifyEmail = CatchAsync(async (req, res, next) => {
   const { emailVerifyCode, email } = req.body;
 
   if (!emailVerifyCode && !email ) {
@@ -113,7 +113,7 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
 
 });
 
-exports.userLogin = catchAsync(async (req, res) => {
+exports.userLogin = CatchAsync(async (req, res) => {
 
   const { email, password } = req.body;
   if (!password && !email ) {
@@ -146,7 +146,7 @@ exports.userLogin = catchAsync(async (req, res) => {
 
 
 
-exports.forgetPassword = catchAsync(async (req, res, next) => {
+exports.forgetPassword = CatchAsync(async (req, res, next) => {
 
     const { email } = req.body;
 
@@ -201,7 +201,7 @@ exports.forgetPassword = catchAsync(async (req, res, next) => {
 
 });
 
-exports.resetPassword = catchAsync(async (req, res, next) => {
+exports.resetPassword = CatchAsync(async (req, res, next) => {
 
   const { email, password, confirmPassword } = req.body;
   const user = await UserModel.findOne({ email: email });
@@ -231,7 +231,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
 });
 
-exports.changeuserpassword = catchAsync(async (req, res) => {
+exports.changeuserpassword = CatchAsync(async (req, res) => {
   const { currentPass, newPass, confirmPass } = req.body;
   const user = await UserModel.findById(req.user._id);
 
@@ -268,7 +268,7 @@ exports.changeuserpassword = catchAsync(async (req, res) => {
 
 
 
-exports.profileEdit=catchAsync(async(req,res,next)=>{
+exports.profileEdit=CatchAsync(async(req,res,next)=>{
 
   if (req.fileValidationError) {
     return res.status(400).json({ messege: req.fileValidationError });
@@ -305,3 +305,30 @@ exports.profileEdit=catchAsync(async(req,res,next)=>{
   });
 
 });
+
+exports.makeFollower = CatchAsync(async(req, res, next)=>{
+  const {id} = req.params;
+
+  const followers = await UserModel.findById(id);
+  if(!followers){
+    throw new ApiError(204, "No User Found");
+  }
+
+  const {userId} = req.body;
+  const following = await UserModel.findById(userId);
+  if(!following){
+    throw new ApiError(204, "No User Found");
+  }
+
+  followers.followers.push(userId);
+  await followers.save();
+
+  following.following.push(id);
+  await following.save();
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Make Following Successfully"
+  });
+})

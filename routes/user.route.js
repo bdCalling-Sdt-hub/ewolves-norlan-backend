@@ -32,4 +32,6 @@ router.post(
   configureFileUpload(),
   userController.profileEdit
 );
+
+router.post("/make-follower/:id", configureFileUpload(), userController.makeFollower)
 module.exports = router;
