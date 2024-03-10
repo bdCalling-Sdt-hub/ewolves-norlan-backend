@@ -5,6 +5,7 @@ const sendResponse = (res, data) => {
     message: data.message,
     pagination: data.pagination,
     data: data.data,
+    token: data.token
   };
 
   return res.status(data.statusCode).json(responseData);

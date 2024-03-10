@@ -7,6 +7,8 @@ const ApiError = require("../errors/ApiError");
 const httpStatus = require("http-status");
 const CatchAsync = require("../shared/CatchAsync");
 const userTimers = new Map();
+const fs = require('fs');
+const path =require("path");
 
 exports.userRegister = CatchAsync(async (req, res, next) => {
   const { fullName, email, password, confirmPass, termAndCondition, role } =
@@ -106,8 +108,7 @@ exports.verifyEmail = CatchAsync(async (req, res, next) => {
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Email Verified Successfully",
-    data: user
+    message: "Email Verified Successfully"
   });
 
 });
@@ -145,13 +146,13 @@ exports.userLogin = CatchAsync(async (req, res) => {
 
 
 
-exports.forgetPassword = CatchAsync(async (req, res, next) => {
+exports.forgotPassword = CatchAsync(async (req, res, next) => {
 
     const { email } = req.body;
 
     const user = await UserModel.findOne({ email });
     if (!user) {
-      return sendResponse(res, 400, "User does not exist");
+      throw new ApiError(400, "User doesn't exists");
     }
 
     // Generate OTC (One-Time Code)
@@ -230,25 +231,25 @@ exports.resetPassword = CatchAsync(async (req, res, next) => {
 
 });
 
-exports.changeuserpassword = CatchAsync(async (req, res) => {
+exports.changePassword = CatchAsync(async (req, res) => {
   const { currentPass, newPass, confirmPass } = req.body;
   const user = await UserModel.findById(req.user._id);
 
-  if(!currentPass && !newPass && !confirmPass){
-    return sendResponse(res, 400, "All Fields are required");
+  if(!currentPass || !newPass || !confirmPass){
+    throw new ApiError(400, "All Fields are required");
   }
 
   const ismatch = await bcrypt.compare(currentPass, user.password);
   if (!ismatch) {
-    return sendResponse(res, 400, "Current Password is Wrong");
+    throw new ApiError(400, "Current Password is Wrong");
   }
 
   if(currentPass == newPass){
-    return sendResponse(res, 400, "Current Password and new password must be different");
+    throw new ApiError(400, "New password cannot be the same as old password");
   }
   
   if(newPass !== confirmPass){
-    return sendResponse(res, 400, "password and confirm password doesnt match");
+    throw new ApiError(400, "password and confirm password doesnt match");
   }
 
   const salt = await bcrypt.genSalt(10);
@@ -267,8 +268,7 @@ exports.changeuserpassword = CatchAsync(async (req, res) => {
 
 
 
-exports.profileEdit=CatchAsync(async(req,res,next)=>{
-
+exports.updateProfile = CatchAsync(async(req,res,next) => {
   if (req.fileValidationError) {
     return res.status(400).json({ messege: req.fileValidationError });
   }
@@ -276,7 +276,7 @@ exports.profileEdit=CatchAsync(async(req,res,next)=>{
   if(!user){
     return sendResponse(res, 204, "No User Found", user)
   }
-  const {fullName, email, mobileNumber, location }=req.body;
+  const {fullName, email, mobileNumber, location, about }=req.body;
 
   let imageFileName = "";
   if (req.files && req.files.image && req.files.image[0]) {
@@ -293,6 +293,7 @@ exports.profileEdit=CatchAsync(async(req,res,next)=>{
   user.email= email ? email : user?.email;
   user.mobileNumber= mobileNumber ? mobileNumber : user.mobileNumber
   user.location= location ? location : user.location;
+  user.about= about ? about : user.about;
   user.image = imageFileName ? imageFileName : user.image
   await user.save();
 
