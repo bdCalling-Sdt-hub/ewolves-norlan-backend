@@ -10,6 +10,10 @@ const gigSchema = new Schema(
       type: String,
       required: true,
     },
+    about: {
+      type: String,
+      required: true,
+    },
     location: {
       type: String,
       required: true,
@@ -87,17 +91,6 @@ const gigSchema = new Schema(
       ref: "User",
       required: true,
     },
-    comments: [
-      {
-        user: {
-          type: Schema.Types.ObjectId,
-          ref: "User",
-        },
-        comment: {
-          type: String,
-        },
-      },
-    ],
   },
   { timestamps: true }
 );
