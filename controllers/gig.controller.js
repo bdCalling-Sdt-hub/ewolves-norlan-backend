@@ -5,6 +5,7 @@ const sendResponse = require("../shared/sendResponse");
 const CatchAsync = require("../shared/CatchAsync");
 const pick = require("../shared/pick");
 const paginationCalculate = require("../helper/paginationHelper");
+const Video = require("../models/video.model");
 
 exports.createGigToDB = CatchAsync(async (req, res, next) => {
   console.log("Connected");
@@ -26,7 +27,6 @@ exports.createGigToDB = CatchAsync(async (req, res, next) => {
   };
 
   const value = {
-    media: `/media/${req.files.media[0].filename}`,
     thumbnail: `/media/${req.files.thumbnail[0].filename}`,
     basicPackage,
     standardPackage,
@@ -35,12 +35,27 @@ exports.createGigToDB = CatchAsync(async (req, res, next) => {
   };
 
   let result;
-  if (value.media && value.thumbnail) {
+  if (value.thumbnail) {
     result = await Gig.create(value);
   }
 
   if (!result) {
     throw new ApiError(400, "Failed to created gig");
+  }
+
+  if (result) {
+    const videoData = {
+      video: `/media/${req.files.media[0].filename}`,
+      location: result.location,
+      videoDescription: result.about,
+      price: result.basicPackage?.price,
+      gig: result._id,
+      artist: result.artist,
+    };
+
+    const doc = await Video.create(videoData);
+    result.video = doc._id;
+    await result.save();
   }
 
   return sendResponse(res, {
@@ -58,7 +73,9 @@ exports.getAllGigFromDB = CatchAsync(async (req, res, next) => {
   const result = await Gig.find()
     .sort({ createdAt: -1 })
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .populate("video")
+    .populate("artist");
 
   const total = await Gig.countDocuments();
 
@@ -121,6 +138,19 @@ exports.updateGigToDB = CatchAsync(async(req, res, next)=>{
     statusCode: httpStatus.OK,
     success: true,
     message: "Gig Updated successfully",
+    data: result,
+  });
+});
+
+exports.findGigByArtistId = CatchAsync(async (req, res, next) => {
+  const id = req.params.id;
+
+  const result = await Gig.find({ artist: id }).sort({ createdAt: -1 });
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Single Artist gig retrive successfully",
     data: result,
   });
 });

@@ -1,4 +1,4 @@
-const UserModel = require("../models/user.model");
+const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const emailWithNodemailer = require("../config/email.config");
@@ -18,7 +18,7 @@ exports.userRegister = CatchAsync(async (req, res, next) => {
     throw new ApiError(400, "All Field are required");
   }
 
-  const isExist = await UserModel.findOne({ email: email });
+  const isExist = await User.findOne({ email: email });
   if (isExist) {
     throw new ApiError(409, "Email already exist!");
   }
@@ -36,7 +36,7 @@ exports.userRegister = CatchAsync(async (req, res, next) => {
 
   const emailVerifyCode = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
 
-  const user = await UserModel.create({
+  const user = await User.create({
     fullName,
     email,
     password: hashPassword,
@@ -84,22 +84,21 @@ exports.userRegister = CatchAsync(async (req, res, next) => {
     success: true,
     message: "Register successfully! Please check your E-mail to verify."
   });
-
 });
 
 exports.verifyEmail = CatchAsync(async (req, res, next) => {
   const { emailVerifyCode, email } = req.body;
 
-  if (!emailVerifyCode && !email ) {
+  if (!emailVerifyCode && !email) {
     throw new ApiError(400, "All Field are required");
   }
 
-  const user = await UserModel.findOne({ email: email });
+  const user = await User.findOne({ email: email });
   if (!user) {
-    throw new ApiError(404, "User Not Found")
+    throw new ApiError(404, "User Not Found");
   }
 
-  if(user.emailVerifyCode !== emailVerifyCode){
+  if (user.emailVerifyCode !== emailVerifyCode) {
     throw new ApiError(410, "OTP Don't matched");
   }
 
@@ -110,18 +109,17 @@ exports.verifyEmail = CatchAsync(async (req, res, next) => {
     success: true,
     message: "Email Verified Successfully"
   });
-
 });
 
 exports.userLogin = CatchAsync(async (req, res) => {
 
   const { email, password } = req.body;
-  if (!password && !email ) {
+  if (!password && !email) {
     throw new ApiError(400, "All Field are required");
   }
 
-  const user = await UserModel.findOne({ email: email });
-  if(!user){
+  const user = await User.findOne({ email: email });
+  if (!user) {
     throw new ApiError(204, "User not Found");
   }
 
@@ -130,17 +128,19 @@ exports.userLogin = CatchAsync(async (req, res) => {
   }
 
   const ismatch = await bcrypt.compare(password, user.password);
-  if(!ismatch){
+  if (!ismatch) {
     throw new ApiError(401, "your credential doesn't match");
   }
 
-  const token = jwt.sign( { userID: user._id }, process.env.JWT_SECRET, { expiresIn: "3d" });
+  const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, {
+    expiresIn: "3d",
+  });
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Your Are logged in successfully",
     data: user,
-    token: token
+    token: token,
   });
 });
 
@@ -148,70 +148,69 @@ exports.userLogin = CatchAsync(async (req, res) => {
 
 exports.forgotPassword = CatchAsync(async (req, res, next) => {
 
-    const { email } = req.body;
+  
 
-    const user = await UserModel.findOne({ email });
-    if (!user) {
-      throw new ApiError(400, "User doesn't exists");
-    }
+  const user = await UserModel.findOne({ email });
+  if (!user) {
+    throw new ApiError(400, "User doesn't exists");
+  }
 
-    // Generate OTC (One-Time Code)
-    const emailVerifyCode =
-      Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
+  // Store the OTC and its expiration time in the database
+  user.emailVerifyCode = emailVerifyCode;
+  user.emailVerified = false;
+  await user.save();
 
-    // Store the OTC and its expiration time in the database
-    user.emailVerifyCode = emailVerifyCode;
-    user.emailVerified = false;
-    await user.save();
-
-    // Prepare email for password reset
-    const emailData = {
-      email,
-      subject: "Password Reset Email",
-      html: `
+  // Prepare email for password reset
+  const emailData = {
+    email,
+    subject: "Password Reset Email",
+    html: `
         <h1>Hello, ${user.fullName}</h1>
         <p>Your Email verified Code is <h3>${emailVerifyCode}</h3> to reset your password</p>
         <small>This Code is valid for 3 minutes</small>
       `,
-    };
+  };
 
-    // Send email
+  // Send email
+  try {
+    await emailWithNodemailer(emailData);
+  } catch (emailError) {
+    console.error("Failed to send verification email", emailError);
+  }
+
+  // Set a timeout to update the oneTimeCode to null after 1 minute
+  setTimeout(async () => {
     try {
-      await emailWithNodemailer(emailData);
-    } catch (emailError) {
-      console.error("Failed to send verification email", emailError);
+      user.emailVerifyCode = null;
+      await user.save();
+      console.log("emailVerifyCode reset to null after 3 minute");
+    } catch (error) {
+      console.error("Error updating EmailVerifyCode:", error);
     }
-
-    // Set a timeout to update the oneTimeCode to null after 1 minute
-    setTimeout(async () => {
-      try {
-        user.emailVerifyCode = null;
-        await user.save();
-        console.log("emailVerifyCode reset to null after 3 minute");
-      } catch (error) {
-        console.error("Error updating EmailVerifyCode:", error);
-      }
-    }, 180000); // 3 minute in milliseconds
+  }, 180000); // 3 minute in milliseconds
 
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Send email Verify Code Successfully"
+    message: "Send email Verify Code Successfully",
   });
-
 });
 
 exports.resetPassword = CatchAsync(async (req, res, next) => {
 
   const { email, password, confirmPassword } = req.body;
-  const user = await UserModel.findOne({ email: email });
+  const user = await User.findOne({ email: email });
 
   if (!user) {
     return sendResponse(res, 400, "User does not exist");
   }
 
-  if(password !== confirmPassword){
-    return sendResponse(res, 400, "Password and confirm password does not match");
+  if (password !== confirmPassword) {
+    return sendResponse(
+      res,
+      400,
+      "Password and confirm password does not match"
+    );
   }
 
   if (user.emailVerified === true) {
@@ -225,15 +224,14 @@ exports.resetPassword = CatchAsync(async (req, res, next) => {
       statusCode: httpStatus.OK,
       success: true,
       message: "Password Updated Successfully",
-      data: user
+      data: user,
     });
   }
-
 });
 
 exports.changePassword = CatchAsync(async (req, res) => {
   const { currentPass, newPass, confirmPass } = req.body;
-  const user = await UserModel.findById(req.user._id);
+  const user = await User.findById(req.user._id);
 
   if(!currentPass || !newPass || !confirmPass){
     throw new ApiError(400, "All Fields are required");
@@ -254,16 +252,15 @@ exports.changePassword = CatchAsync(async (req, res) => {
 
   const salt = await bcrypt.genSalt(10);
   const hashpassword = await bcrypt.hash(newPass, salt);
-  await UserModel.findByIdAndUpdate(req.user._id, {
-    $set: { password: hashpassword }
+  await User.findByIdAndUpdate(req.user._id, {
+    $set: { password: hashpassword },
   });
 
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Password Changed Successfully"
+    message: "Password Changed Successfully",
   });
-
 });
 
 
@@ -272,9 +269,9 @@ exports.updateProfile = CatchAsync(async(req,res,next) => {
   if (req.fileValidationError) {
     return res.status(400).json({ messege: req.fileValidationError });
   }
-  const user = await UserModel.findById(req.user._id);
-  if(!user){
-    return sendResponse(res, 204, "No User Found", user)
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return sendResponse(res, 204, "No User Found", user);
   }
   const {fullName, email, mobileNumber, location, about }=req.body;
 
@@ -284,7 +281,7 @@ exports.updateProfile = CatchAsync(async(req,res,next) => {
   }
 
   const fileName = user?.image?.split("/").pop();
-  const filePath = path.join(__dirname, '..', 'uploads', 'media', fileName);
+  const filePath = path.join(__dirname, "..", "uploads", "media", fileName);
   if (fs.existsSync(filePath)) {
     fs.unlinkSync(filePath);
   }
@@ -301,9 +298,8 @@ exports.updateProfile = CatchAsync(async(req,res,next) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "Profile Updated Successfully",
-    data: user
+    data: user,
   });
-
 });
 
 exports.makeFollower = CatchAsync(async(req, res, next)=>{

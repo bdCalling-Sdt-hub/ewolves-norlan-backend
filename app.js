@@ -11,6 +11,7 @@ const termsRoute = require("./routes/terms.routes");
 const gigRouter = require("./routes/gig.route");
 const videoRouter = require("./routes/video.routes");
 const globalErrorHandler = require("./middlewares/globalErrorHandler");
+const highlightRouter = require("./routes/highlight.route");
 
 //parser
 app.use(cors());
@@ -24,6 +25,7 @@ app.use("/api/", subscriptionRoute);
 app.use("/api/about/", aboutRoute);
 app.use("/api/privacy/", privacyRoute);
 app.use("/api/gig/", gigRouter);
+app.use("/api/highlight", highlightRouter);
 app.use("/api/terms-and-condition/", termsRoute);
 app.use("/api/video/", videoRouter);
 

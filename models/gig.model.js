@@ -2,10 +2,6 @@ const { Schema, model } = require("mongoose");
 
 const gigSchema = new Schema(
   {
-    media: {
-      type: String,
-      require: true,
-    },
     contentName: {
       type: String,
       required: true,
@@ -89,7 +85,10 @@ const gigSchema = new Schema(
     artist: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+    },
+    video: {
+      type: Schema.Types.ObjectId,
+      ref: "Video",
     },
   },
   { timestamps: true }
