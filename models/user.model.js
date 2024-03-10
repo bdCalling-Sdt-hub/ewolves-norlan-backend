@@ -22,6 +22,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    about: {
+      type: String
+    },
     mobileNumber: {
       type: String,
       required: false,
@@ -57,6 +60,11 @@ const userSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    status: {
+      type: String,
+      enum: ["ACTIVE", "DELETE"],
+      default: "ACTIVE"
+    }
   },
   { timestamps: true }
 );

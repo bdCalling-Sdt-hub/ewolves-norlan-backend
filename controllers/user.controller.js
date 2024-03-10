@@ -80,8 +80,7 @@ exports.userRegister = CatchAsync(async (req, res, next) => {
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Register successfully! Please check your E-mail to verify.",
-    data: user
+    message: "Register successfully! Please check your E-mail to verify."
   });
 
 });
@@ -331,4 +330,20 @@ exports.makeFollower = CatchAsync(async(req, res, next)=>{
     success: true,
     message: "Make Following Successfully"
   });
+})
+
+
+exports.deleteAccount= CatchAsync(async(req, res, next)=>{
+  const {id} = req.params;
+  const user = await UserModel.findById(id);
+  if(!user){
+    throw new ApiError(204, "No User Found");
+  }
+  user.status= "DELETE";
+  await user.save();
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Account Delete Successfully"
+  })
 })

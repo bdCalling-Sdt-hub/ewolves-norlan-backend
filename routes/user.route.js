@@ -33,5 +33,6 @@ router.post(
   userController.profileEdit
 );
 
-router.post("/make-follower/:id", configureFileUpload(), userController.makeFollower)
+router.post("/make-follower/:id", configureFileUpload(), userController.makeFollower);
+router.patch("/delete-account/:id", userController.deleteAccount);
 module.exports = router;
