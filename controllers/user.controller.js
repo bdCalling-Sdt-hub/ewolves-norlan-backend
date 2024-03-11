@@ -150,7 +150,7 @@ exports.forgotPassword = CatchAsync(async (req, res, next) => {
 
   
 
-  const user = await UserModel.findOne({ email });
+  const user = await User.findOne({ email });
   if (!user) {
     throw new ApiError(400, "User doesn't exists");
   }
@@ -305,13 +305,13 @@ exports.updateProfile = CatchAsync(async(req,res,next) => {
 exports.makeFollower = CatchAsync(async(req, res, next)=>{
   const {id} = req.params;
 
-  const followers = await UserModel.findById(id);
+  const followers = await User.findById(id);
   if(!followers){
     throw new ApiError(204, "No User Found");
   }
 
   const {userId} = req.body;
-  const following = await UserModel.findById(userId);
+  const following = await User.findById(userId);
   if(!following){
     throw new ApiError(204, "No User Found");
   }
@@ -332,7 +332,7 @@ exports.makeFollower = CatchAsync(async(req, res, next)=>{
 
 exports.deleteAccount= CatchAsync(async(req, res, next)=>{
   const {id} = req.params;
-  const user = await UserModel.findById(id);
+  const user = await User.findById(id);
   if(!user){
     throw new ApiError(204, "No User Found");
   }

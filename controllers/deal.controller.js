@@ -9,7 +9,6 @@ exports.makeDeal= catchAsync(async(req, res, next)=>{
     const { id } = req.params;
     const { userId } = req.body;
     const artist = await User.findById(id);
-    console.log(userId)
     if(!artist){
         throw new ApiError(404, "No User Found");
     }
@@ -32,3 +31,22 @@ exports.makeDeal= catchAsync(async(req, res, next)=>{
         data: result
     })
 });
+
+exports.getDealByUserId= catchAsync(async(req, res, next)=>{
+    const {id} = req.params;
+    const { type } = req.query;
+    const filter = type === "user" ? {user: id} : {artist: id};
+
+    const deals = await Deal.find(filter).populate(["user", "artist"] );
+    if(!deals){
+        throw new ApiError(404, "No Deals Found By this ID");
+    }
+
+    return sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: false,
+        message: "Deal retrive by user ID",
+        data: deals
+    })
+
+})
