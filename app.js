@@ -10,6 +10,7 @@ const privacyRoute = require("./routes/privacy.routes");
 const termsRoute = require("./routes/terms.routes");
 const gigRouter = require("./routes/gig.route");
 const videoRouter = require("./routes/video.routes");
+const dealRouter = require("./routes/deal.routes");
 const globalErrorHandler = require("./middlewares/globalErrorHandler");
 const highlightRouter = require("./routes/highlight.route");
 
@@ -28,6 +29,7 @@ app.use("/api/gig/", gigRouter);
 app.use("/api/highlight", highlightRouter);
 app.use("/api/terms-and-condition/", termsRoute);
 app.use("/api/video/", videoRouter);
+app.use("/api/deal/", dealRouter)
 
 //image get
 app.use(express.static("uploads"));
