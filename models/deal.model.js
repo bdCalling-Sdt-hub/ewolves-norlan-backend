@@ -27,8 +27,14 @@ const dealSchema = new Schema(
       ref: "User",
     },
     user: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+    status: {
+      type: String,
+      required: false,
+      enum: ["Complete", "Pending", "Report" ],
+      default: "Pending",
     },
   },
   { timestamps: true }

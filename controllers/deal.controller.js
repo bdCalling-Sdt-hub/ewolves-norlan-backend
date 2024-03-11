@@ -50,3 +50,27 @@ exports.getDealByUserId= catchAsync(async(req, res, next)=>{
     })
 
 })
+
+exports.changeDealStatusToDB = catchAsync(async(req, res, next)=>{
+    const { id } = req.params;
+    console.log(id);
+    const { type } = req.query;
+    console.log(type)
+
+    const deal = await Deal.findById(id);
+    if(!deal){
+        throw new ApiError(404, "No Deal Found This Id");
+    }
+
+    const result = await Deal.findOneAndUpdate(
+        {_id: id}, 
+        {$set: {status : type}},
+        {new: true}
+    )
+    return sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Deal Cancel Successful",
+        data: result
+    })
+});
