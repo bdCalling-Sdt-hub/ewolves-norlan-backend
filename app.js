@@ -18,16 +18,16 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use("/api/auth/", userRoute);
-app.use("/api/", sliderRoute);
-app.use("/api/", categoryRoute);
-app.use("/api/", subscriptionRoute);
-app.use("/api/about/", aboutRoute);
-app.use("/api/privacy/", privacyRoute);
-app.use("/api/gig/", gigRouter);
+app.use("/api/auth", userRoute);
+app.use("/api", sliderRoute);
+app.use("/api", categoryRoute);
+app.use("/api", subscriptionRoute);
+app.use("/api/about", aboutRoute);
+app.use("/api/privacy", privacyRoute);
+app.use("/api/gig", gigRouter);
 app.use("/api/highlight", highlightRouter);
-app.use("/api/terms-and-condition/", termsRoute);
-app.use("/api/video/", videoRouter);
+app.use("/api/terms-and-condition", termsRoute);
+app.use("/api/video", videoRouter);
 
 //image get
 app.use(express.static("uploads"));

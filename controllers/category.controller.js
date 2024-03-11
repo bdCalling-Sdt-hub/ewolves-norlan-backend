@@ -39,7 +39,7 @@ exports.getSingleCategory = catchAsync(async (req, res, next) => {
   return sendResponse(res, 200, "Category Fetch Successfully", category);
 });
 
-exports.deleteCategory = CatchAsync(async (req, res, next) => {
+exports.deleteCategory = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const category = await CategoryModel.findOne({ _id: id });
   if (!category) {
@@ -78,13 +78,11 @@ exports.updateCategory = catchAsync(async (req, res, next) => {
     (category.image = imageFileName ? imageFileName : category.image);
   const result = await category.save();
 
-  return res
-    .status(200)
-    .send({
-      status: 200,
-      message: "Category Updated Successfully",
-      data: result,
-    });
+  return res.status(200).send({
+    status: 200,
+    message: "Category Updated Successfully",
+    data: result,
+  });
 });
 
 exports.addSubCategory = catchAsync(async (req, res, next) => {
