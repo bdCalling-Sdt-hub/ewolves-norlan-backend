@@ -211,27 +211,31 @@ exports.findGigByArtistId = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.addRating = catchAsync(async(req, res, next)=>{
-  const  { id } =req.params;
+exports.addRating = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
   const { ratings } = req.body;
   const gig = await Gig.findById(id).populate("artist");
-  if(!gig){
+  if (!gig) {
     throw new ApiError(404, "Gig not Found");
   }
-  const count = parseInt(gig?.ratings.count)  + 1;
-  const rate = (parseInt(gig?.ratings.rate) + parseInt(ratings)) ;
-
+  const count = parseInt(gig?.ratings.count) + 1;
+  const rate = parseInt(gig?.ratings.rate) + parseInt(ratings);
 
   const result = await Gig.findOneAndUpdate(
-    {_id: id}, 
-    {$set: { "ratings.rate": (rate / count).toString(), "ratings.count": count  }},
-    {new: true}
-  )
-  
+    { _id: id },
+    {
+      $set: {
+        "ratings.rate": (rate / count).toString(),
+        "ratings.count": count,
+      },
+    },
+    { new: true }
+  );
+
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Added Rating Successfully",
     data: result,
   });
-})
+});
