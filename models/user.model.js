@@ -65,6 +65,16 @@ const userSchema = new mongoose.Schema(
       enum: ["ACTIVE", "DELETE"],
       default: "ACTIVE",
     },
+    ratings: {
+      rate: {
+        type: String,
+        default: "0" // Default value for rate
+      },
+      count: {
+        type: Number,
+        default: 0 // Default value for count
+      }
+    }
   },
   { timestamps: true }
 );

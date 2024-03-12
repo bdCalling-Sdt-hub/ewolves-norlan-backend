@@ -68,16 +68,64 @@ exports.createGigToDB = catchAsync(async (req, res, next) => {
 
 exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
   const paginationOptions = pick(req.query, ["limit", "page"]);
+  const { priceMin, priceMax } = pick(req.query, ["priceMin", "priceMax"]);
+  const filters = pick(req.query, [
+    "searchTerm",
+    "category",
+    "subCategory",
+    "location",
+  ]);
   const { limit, page, skip } = paginationCalculate(paginationOptions);
+  const { searchTerm, ...filterData } = filters;
 
-  const result = await Gig.find()
+  const andConditions = [];
+  if (searchTerm) {
+    andConditions.push({
+      $or: ["contentName", "location"].map((field) => ({
+        [field]: {
+          $regex: searchTerm,
+          $options: "i",
+        },
+      })),
+    });
+
+    andConditions.push({
+      searchTags: {
+        $elemMatch: {
+          $regex: searchTerm,
+          $options: "i",
+        },
+      },
+    });
+  }
+
+  // if (Object.keys(filterData).length) {
+  //   andConditions.push({
+  //     $and: Object.entries(filterData).map(([field, value]) => ({
+  //       [field]: value,
+  //     })),
+  //   });
+  // }
+
+  if (priceMin && priceMax) {
+    andConditions.push({
+      "basicPackage.price": {
+        $gte: priceMin,
+        $lte: priceMax,
+      },
+    });
+  }
+
+  const whereConditions =
+    andConditions.length > 0 ? { $and: andConditions } : {};
+
+  const result = await Gig.find(whereConditions)
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit)
-    .populate("video")
-    .populate("artist");
+    .populate(["artist", "video"]);
 
-  const total = await Gig.countDocuments();
+  const total = await Gig.countDocuments(whereConditions);
 
   return sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -162,3 +210,28 @@ exports.findGigByArtistId = catchAsync(async (req, res, next) => {
     data: result,
   });
 });
+
+exports.addRating = catchAsync(async(req, res, next)=>{
+  const  { id } =req.params;
+  const { ratings } = req.body;
+  const gig = await Gig.findById(id).populate("artist");
+  if(!gig){
+    throw new ApiError(404, "Gig not Found");
+  }
+  const count = parseInt(gig?.ratings.count)  + 1;
+  const rate = (parseInt(gig?.ratings.rate) + parseInt(ratings)) ;
+
+
+  const result = await Gig.findOneAndUpdate(
+    {_id: id}, 
+    {$set: { "ratings.rate": (rate / count).toString(), "ratings.count": count  }},
+    {new: true}
+  )
+  
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Added Rating Successfully",
+    data: result,
+  });
+})
