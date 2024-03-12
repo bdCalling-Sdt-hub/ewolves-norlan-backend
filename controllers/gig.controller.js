@@ -2,12 +2,12 @@ const httpStatus = require("http-status");
 const ApiError = require("../errors/ApiError");
 const Gig = require("../models/gig.model");
 const sendResponse = require("../shared/sendResponse");
-const CatchAsync = require("../shared/CatchAsync");
+const catchAsync = require("../shared/catchAsync");
 const pick = require("../shared/pick");
 const paginationCalculate = require("../helper/paginationHelper");
 const Video = require("../models/video.model");
 
-exports.createGigToDB = CatchAsync(async (req, res, next) => {
+exports.createGigToDB = catchAsync(async (req, res, next) => {
   console.log("Connected");
 
   const basicPackage = {
@@ -66,7 +66,7 @@ exports.createGigToDB = CatchAsync(async (req, res, next) => {
   });
 });
 
-exports.getAllGigFromDB = CatchAsync(async (req, res, next) => {
+exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
   const paginationOptions = pick(req.query, ["limit", "page"]);
   const { limit, page, skip } = paginationCalculate(paginationOptions);
 
@@ -92,7 +92,7 @@ exports.getAllGigFromDB = CatchAsync(async (req, res, next) => {
   });
 });
 
-exports.updateGigToDB = CatchAsync(async (req, res, next) => {
+exports.updateGigToDB = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const gig = await Gig.findById(id);
   if (!gig) {
@@ -150,7 +150,7 @@ exports.updateGigToDB = CatchAsync(async (req, res, next) => {
   });
 });
 
-exports.findGigByArtistId = CatchAsync(async (req, res, next) => {
+exports.findGigByArtistId = catchAsync(async (req, res, next) => {
   const id = req.params.id;
 
   const result = await Gig.find({ artist: id }).sort({ createdAt: -1 });

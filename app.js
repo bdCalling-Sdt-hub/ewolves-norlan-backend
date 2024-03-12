@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const userRoute = require("./routes/user.route");
-const sliderRoute = require("./routes/slider.route");
+// const bannerRoute = require("./routes/banner.route");
 const categoryRoute = require("./routes/category.routes");
 const subscriptionRoute = require("./routes/subscription.routes");
 const aboutRoute = require("./routes/about.routes");
@@ -19,17 +19,19 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use("/api/auth/", userRoute);
-app.use("/api/", sliderRoute);
-app.use("/api/", categoryRoute);
-app.use("/api/", subscriptionRoute);
-app.use("/api/about/", aboutRoute);
-app.use("/api/privacy/", privacyRoute);
-app.use("/api/gig/", gigRouter);
+app.use("/api/auth", userRoute);
+// app.use("/api/banner", bannerRoute);
+app.use("/api", categoryRoute);
+app.use("/api", subscriptionRoute);
+app.use("/api/about", aboutRoute);
+app.use("/api/privacy", privacyRoute);
+app.use("/api/gig", gigRouter);
 app.use("/api/highlight", highlightRouter);
 app.use("/api/terms-and-condition/", termsRoute);
 app.use("/api/video/", videoRouter);
 app.use("/api/deal/", dealRouter)
+app.use("/api/terms-and-condition", termsRoute);
+app.use("/api/video", videoRouter);
 
 //image get
 app.use(express.static("uploads"));

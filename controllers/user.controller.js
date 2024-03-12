@@ -5,12 +5,12 @@ const emailWithNodemailer = require("../config/email.config");
 const sendResponse = require("../shared/sendResponse");
 const ApiError = require("../errors/ApiError");
 const httpStatus = require("http-status");
-const CatchAsync = require("../shared/CatchAsync");
+const catchAsync = require("../shared/catchAsync");
 const userTimers = new Map();
-const fs = require('fs');
-const path =require("path");
+const fs = require("fs");
+const path = require("path");
 
-exports.userRegister = CatchAsync(async (req, res, next) => {
+exports.userRegister = catchAsync(async (req, res, next) => {
   const { fullName, email, password, confirmPass, termAndCondition, role } =
     req.body;
 
@@ -82,11 +82,11 @@ exports.userRegister = CatchAsync(async (req, res, next) => {
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Register successfully! Please check your E-mail to verify."
+    message: "Register successfully! Please check your E-mail to verify.",
   });
 });
 
-exports.verifyEmail = CatchAsync(async (req, res, next) => {
+exports.verifyEmail = catchAsync(async (req, res, next) => {
   const { emailVerifyCode, email } = req.body;
 
   if (!emailVerifyCode && !email) {
@@ -107,12 +107,11 @@ exports.verifyEmail = CatchAsync(async (req, res, next) => {
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Email Verified Successfully"
+    message: "Email Verified Successfully",
   });
 });
 
-exports.userLogin = CatchAsync(async (req, res) => {
-
+exports.userLogin = catchAsync(async (req, res) => {
   const { email, password } = req.body;
   if (!password && !email) {
     throw new ApiError(400, "All Field are required");
@@ -144,12 +143,7 @@ exports.userLogin = CatchAsync(async (req, res) => {
   });
 });
 
-
-
-exports.forgotPassword = CatchAsync(async (req, res, next) => {
-
-  
-
+exports.forgotPassword = catchAsync(async (req, res, next) => {
   const user = await User.findOne({ email });
   if (!user) {
     throw new ApiError(400, "User doesn't exists");
@@ -196,8 +190,7 @@ exports.forgotPassword = CatchAsync(async (req, res, next) => {
   });
 });
 
-exports.resetPassword = CatchAsync(async (req, res, next) => {
-
+exports.resetPassword = catchAsync(async (req, res, next) => {
   const { email, password, confirmPassword } = req.body;
   const user = await User.findOne({ email: email });
 
@@ -229,11 +222,11 @@ exports.resetPassword = CatchAsync(async (req, res, next) => {
   }
 });
 
-exports.changePassword = CatchAsync(async (req, res) => {
+exports.changePassword = catchAsync(async (req, res) => {
   const { currentPass, newPass, confirmPass } = req.body;
   const user = await User.findById(req.user._id);
 
-  if(!currentPass || !newPass || !confirmPass){
+  if (!currentPass || !newPass || !confirmPass) {
     throw new ApiError(400, "All Fields are required");
   }
 
@@ -242,11 +235,11 @@ exports.changePassword = CatchAsync(async (req, res) => {
     throw new ApiError(400, "Current Password is Wrong");
   }
 
-  if(currentPass == newPass){
+  if (currentPass == newPass) {
     throw new ApiError(400, "New password cannot be the same as old password");
   }
-  
-  if(newPass !== confirmPass){
+
+  if (newPass !== confirmPass) {
     throw new ApiError(400, "password and confirm password doesnt match");
   }
 
@@ -263,9 +256,7 @@ exports.changePassword = CatchAsync(async (req, res) => {
   });
 });
 
-
-
-exports.updateProfile = CatchAsync(async(req,res,next) => {
+exports.updateProfile = catchAsync(async (req, res, next) => {
   if (req.fileValidationError) {
     return res.status(400).json({ messege: req.fileValidationError });
   }
@@ -273,7 +264,7 @@ exports.updateProfile = CatchAsync(async(req,res,next) => {
   if (!user) {
     return sendResponse(res, 204, "No User Found", user);
   }
-  const {fullName, email, mobileNumber, location, about }=req.body;
+  const { fullName, email, mobileNumber, location, about } = req.body;
 
   let imageFileName = "";
   if (req.files && req.files.image && req.files.image[0]) {
@@ -286,12 +277,12 @@ exports.updateProfile = CatchAsync(async(req,res,next) => {
     fs.unlinkSync(filePath);
   }
 
-  user.fullName= fullName ? fullName : user.fullName
-  user.email= email ? email : user?.email;
-  user.mobileNumber= mobileNumber ? mobileNumber : user.mobileNumber
-  user.location= location ? location : user.location;
-  user.about= about ? about : user.about;
-  user.image = imageFileName ? imageFileName : user.image
+  user.fullName = fullName ? fullName : user.fullName;
+  user.email = email ? email : user?.email;
+  user.mobileNumber = mobileNumber ? mobileNumber : user.mobileNumber;
+  user.location = location ? location : user.location;
+  user.about = about ? about : user.about;
+  user.image = imageFileName ? imageFileName : user.image;
   await user.save();
 
   return sendResponse(res, {
@@ -302,17 +293,17 @@ exports.updateProfile = CatchAsync(async(req,res,next) => {
   });
 });
 
-exports.makeFollower = CatchAsync(async(req, res, next)=>{
-  const {id} = req.params;
+exports.makeFollower = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
 
   const followers = await User.findById(id);
-  if(!followers){
+  if (!followers) {
     throw new ApiError(204, "No User Found");
   }
 
-  const {userId} = req.body;
+  const { userId } = req.body;
   const following = await User.findById(userId);
-  if(!following){
+  if (!following) {
     throw new ApiError(204, "No User Found");
   }
 
@@ -325,22 +316,21 @@ exports.makeFollower = CatchAsync(async(req, res, next)=>{
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Make Following Successfully"
+    message: "Make Following Successfully",
   });
-})
+});
 
-
-exports.deleteAccount= CatchAsync(async(req, res, next)=>{
-  const {id} = req.params;
+exports.deleteAccount = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
   const user = await User.findById(id);
-  if(!user){
+  if (!user) {
     throw new ApiError(204, "No User Found");
   }
-  user.status= "DELETE";
+  user.status = "DELETE";
   await user.save();
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Account Delete Successfully"
-  })
-})
+    message: "Account Delete Successfully",
+  });
+});
