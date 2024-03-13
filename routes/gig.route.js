@@ -13,6 +13,6 @@ router.post("/create-gig", configureFileUpload(), createGigToDB);
 router.get("/artist/:id", findGigByArtistId);
 router.get("/", getAllGigFromDB);
 router.patch("/update-gig/:id", configureFileUpload(), updateGigToDB);
-router.post("/add-rating/:id", configureFileUpload(), addRating)
+router.post("/add-rating/:id", addRating)
 
 module.exports = router;

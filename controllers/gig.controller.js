@@ -214,19 +214,22 @@ exports.findGigByArtistId = catchAsync(async (req, res, next) => {
 exports.addRating = catchAsync(async(req, res, next)=>{
   const  { id } =req.params;
   const { ratings } = req.body;
+  console.log(ratings);
   const gig = await Gig.findById(id).populate("artist");
+  
   if(!gig){
     throw new ApiError(404, "Gig not Found");
   }
   const count = parseInt(gig?.ratings.count)  + 1;
-  const rate = (parseInt(gig?.ratings.rate) + parseInt(ratings)) ;
+  const newRating = (parseInt(ratings) * count + parseInt(gig?.ratings.rate) * parseInt(gig?.ratings.count)) / (count + parseInt(gig?.ratings.count));
 
 
   const result = await Gig.findOneAndUpdate(
     {_id: id}, 
-    {$set: { "ratings.rate": (rate / count).toString(), "ratings.count": count  }},
+    {$set: { "ratings.rate": newRating.toString(), "ratings.count": count  }},
     {new: true}
   )
+  console.log(result.artist)
   
   return sendResponse(res, {
     statusCode: httpStatus.OK,
