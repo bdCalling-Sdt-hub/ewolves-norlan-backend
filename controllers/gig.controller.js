@@ -6,6 +6,7 @@ const catchAsync = require("../shared/catchAsync");
 const pick = require("../shared/pick");
 const paginationCalculate = require("../helper/paginationHelper");
 const Video = require("../models/video.model");
+const User = require("../models/user.model");
 
 exports.createGigToDB = catchAsync(async (req, res, next) => {
   console.log("Connected");
@@ -211,10 +212,9 @@ exports.findGigByArtistId = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.addRating = catchAsync(async(req, res, next)=>{
-  const  { id } =req.params;
+exports.addRating = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
   const { ratings } = req.body;
-  console.log(ratings);
   const gig = await Gig.findById(id).populate("artist");
   
   if(!gig){
@@ -228,13 +228,26 @@ exports.addRating = catchAsync(async(req, res, next)=>{
     {_id: id}, 
     {$set: { "ratings.rate": newRating.toString(), "ratings.count": count  }},
     {new: true}
-  )
-  console.log(result.artist)
+  );
   
+  const artist = await User.findById(result.artist);
+  if(!artist){
+    throw new ApiError(404, "User not Found");
+  }
+
+  const artistCount = parseInt(artist?.ratings.count)  + 1;
+  const artistRating = (parseInt(ratings) * count + parseInt(artist?.ratings.rate) * parseInt(artist?.ratings.count)) / (count + parseInt(artist?.ratings.count));
+
+  const newResult = await User.findOneAndUpdate(
+    {_id: result?.artist}, 
+    {$set: { "ratings.rate": artistRating.toString(), "ratings.count": artistCount  }},
+    {new: true}
+  );
+
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Added Rating Successfully",
-    data: result,
+    data: newResult,
   });
-})
+});

@@ -5,7 +5,11 @@ const chatSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    user:{
+    sender:{
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    },
+    receiver:{
         type: mongoose.Schema.Types.ObjectId,
         required: true
     }
