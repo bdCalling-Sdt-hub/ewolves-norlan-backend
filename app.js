@@ -11,6 +11,7 @@ const termsRoute = require("./routes/terms.routes");
 const gigRouter = require("./routes/gig.route");
 const videoRouter = require("./routes/video.routes");
 const dealRouter = require("./routes/deal.routes");
+const chatRouter = require("./routes/chat.routes");
 const globalErrorHandler = require("./middlewares/globalErrorHandler");
 const highlightRouter = require("./routes/highlight.route");
 
@@ -32,6 +33,7 @@ app.use("/api/video/", videoRouter);
 app.use("/api/deal/", dealRouter);
 app.use("/api/terms-and-condition", termsRoute);
 app.use("/api/video", videoRouter);
+app.use("/api/chat/", chatRouter)
 
 //image get
 app.use(express.static("uploads"));
