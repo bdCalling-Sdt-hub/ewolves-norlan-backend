@@ -29,7 +29,7 @@ app.use("/api/gig", gigRouter);
 app.use("/api/highlight", highlightRouter);
 app.use("/api/terms-and-condition/", termsRoute);
 app.use("/api/video/", videoRouter);
-app.use("/api/deal/", dealRouter)
+app.use("/api/deal/", dealRouter);
 app.use("/api/terms-and-condition", termsRoute);
 app.use("/api/video", videoRouter);
 
