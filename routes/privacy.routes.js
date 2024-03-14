@@ -1,18 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const privacyController = require("../controllers/privacy.controller");
+const {addPrivacy, getPrivacy, updatePrivacy} = require("../controllers/privacy.controller");
 const configureFileUpload = require("../middlewares/fileUpload");
+const { checkAdmin } = require("../middlewares/checkAdmin");
+const { checkUser } = require("../middlewares/checkUser");
 
-router.post(
-  "/create-privacy",
-  configureFileUpload(),
-  privacyController.addPrivacy
-);
-router.get("/get-privacy", privacyController.getPrivacy);
-router.patch(
-  "/update-privacy/:id",
-  configureFileUpload(),
-  privacyController.updatePrivacy
-);
+router.post( "/create-privacy", checkAdmin, configureFileUpload(), addPrivacy);
+router.get("/get-privacy", checkUser, getPrivacy);
+router.patch("/update-privacy/:id", checkAdmin, configureFileUpload(), updatePrivacy);
 
 module.exports = router;

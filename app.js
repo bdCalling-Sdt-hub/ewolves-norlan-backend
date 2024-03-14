@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/api/auth", userRoute);
 // app.use("/api/banner", bannerRoute);
-app.use("/api", categoryRoute);
+app.use("/api/category/", categoryRoute);
 app.use("/api", subscriptionRoute);
 app.use("/api/about", aboutRoute);
 app.use("/api/privacy", privacyRoute);

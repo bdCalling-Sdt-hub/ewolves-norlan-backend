@@ -1,19 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const subscriptionController = require("../controllers/subscription.controller.js");
+const { addSubscription, getSubscription, updateSubscription } = require("../controllers/subscription.controller.js");
 const configureFileUpload = require("../middlewares/fileUpload.js");
+const { checkAdmin } = require("../middlewares/checkAdmin.js");
+const { checkUser } = require("../middlewares/checkUser.js");
 
 // category
-router.post(
-  "/add-subscription",
-  configureFileUpload(),
-  subscriptionController.addSubscription
-);
-router.get("/subscription", subscriptionController.getSubscription);
-router.patch(
-  "/update-subscription/:id",
-  configureFileUpload(),
-  subscriptionController.updateSubscription
-);
+router.post( "/add-subscription", checkAdmin, configureFileUpload(), addSubscription );
+router.get("/subscription", checkUser,getSubscription);
+router.patch( "/update-subscription/:id", checkAdmin, configureFileUpload(), updateSubscription);
 
 module.exports = router;

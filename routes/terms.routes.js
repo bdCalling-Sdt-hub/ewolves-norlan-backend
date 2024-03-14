@@ -1,16 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const termsController = require("../controllers/terms.controller");
+const { addTerms, getTerms, updateTerms } = require("../controllers/terms.controller");
 const configureFileUpload = require("../middlewares/fileUpload");
-router.post(
-  "/create-terms-and-condition",
-  configureFileUpload(),
-  termsController.addTerms
-);
-router.get("/get-terms-and-condition", termsController.getTerms);
-router.patch(
-  "/update-terms-and-condition/:id",
-  configureFileUpload(),
-  termsController.updateTerms
-);
+const { checkAdmin } = require("../middlewares/checkAdmin");
+const { checkUser } = require("../middlewares/checkUser");
+
+router.post( "/create-terms-and-condition", checkAdmin, configureFileUpload(), addTerms);
+router.get("/get-terms-and-condition", checkUser, getTerms);
+router.patch( "/update-terms-and-condition/:id", checkAdmin, configureFileUpload(), updateTerms );
 module.exports = router;

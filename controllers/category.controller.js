@@ -33,7 +33,12 @@ exports.getCategory = catchAsync(async (req, res, next) => {
   if (!category) {
     throw new ApiError(404, "No Category Found")
   }
-  return sendResponse(res, 200, "Category fetch Successfully", category);
+  return sendResponse(res,{
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Category Data retrive successfully",
+    data: category
+  });
 });
 
 // get single category
@@ -49,19 +54,18 @@ exports.getSingleCategory = catchAsync(async (req, res, next) => {
     message: "Get Single Category Retrive",
     data: category
   });
-  return sendResponse(res, 200, "Category Fetch Successfully", category);
 });
 
 exports.deleteCategory = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const category = await CategoryModel.findOne({ _id: id });
+  const category = await CategoryModel.findOneAndDelete({ _id: id });
   if (!category) {
     throw new ApiError(404, "No Category Found")
   }
   return sendResponse(res,{
     statusCode: httpStatus.OK,
     success: true,
-    message: "Category Retrive",
+    message: "Category Delete Successfully",
     data: category
   });
 });

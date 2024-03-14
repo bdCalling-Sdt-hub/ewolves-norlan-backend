@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 
-exports.checkUser = async (req, res, next) => {
+exports.checkAdmin = async (req, res, next) => {
   const { authorization } = req.headers;
   let token;
   if (authorization && authorization.startsWith("Bearer")) {

@@ -7,10 +7,11 @@ const {
   getAllVideo,
   getWishListByUserId,
 } = require("../controllers/video.controller.js");
+const { checkUser } = require("../middlewares/checkUser.js");
 
-router.get("/", getAllVideo);
-router.post("/create-comment/:id", configureFileUpload(), createComment);
-router.post("/create-wish/:id", createWishList);
-router.get("/wishlist/:id", getWishListByUserId);
+router.get("/", checkUser, getAllVideo);
+router.post("/create-comment/:id", checkUser, configureFileUpload(), createComment);
+router.post("/create-wish/:id", checkUser, createWishList);
+router.get("/wishlist/:id", checkUser, getWishListByUserId);
 
 module.exports = router;

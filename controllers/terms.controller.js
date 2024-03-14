@@ -1,3 +1,4 @@
+const httpStatus = require("http-status");
 const TermsModel = require("../models/terms.model");
 const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");

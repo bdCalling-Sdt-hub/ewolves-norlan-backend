@@ -2,10 +2,10 @@ const httpStatus = require("http-status");
 const ApiError = require("../errors/ApiError");
 const Chat = require("../models/chat.model");
 const User = require("../models/user.model");
-const CatchAsync = require("../shared/catchAsync");
+const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");
 
-exports.getChatByUserID= CatchAsync(async(req, res, next)=>{
+exports.getChatByUserID= catchAsync(async(req, res, next)=>{
     const { senderId, receiverId } = req.params;
 
     const sender = await User.findById(senderId);
@@ -30,4 +30,8 @@ exports.getChatByUserID= CatchAsync(async(req, res, next)=>{
         success: true,
         data: chat
     })
+})
+
+exports.saveToDB = catchAsync(async(req, res, next)=>{
+    
 })

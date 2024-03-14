@@ -13,6 +13,6 @@ router.post("/reset-password", configureFileUpload(), userController.resetPasswo
 
 router.post("/change-password", checkUser, configureFileUpload(), userController.changePassword);
 router.post("/update-profile", checkUser, configureFileUpload(), userController.updateProfile);
-router.post("/make-follower/:id", configureFileUpload(), userController.makeFollower);
-router.patch("/delete-account/:id", userController.deleteAccount);
+router.post("/make-follower/:id", checkUser, configureFileUpload(), userController.makeFollower);
+router.patch("/delete-account/:id", checkUser, userController.deleteAccount);
 module.exports = router;
