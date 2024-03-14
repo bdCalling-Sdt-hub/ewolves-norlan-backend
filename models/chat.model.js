@@ -10,18 +10,10 @@ const chatSchema = new mongoose.Schema({
         required: true,
         ref: "User"
     },
-    image:{
-        type: String,
-        required: false
-    },
     receiver:{
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: "User"
-    },
-    image: {
-        type: String,
-        required: false
     }
 },{ timestamps: true });
 
