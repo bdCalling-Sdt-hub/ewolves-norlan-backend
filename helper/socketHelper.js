@@ -1,3 +1,5 @@
+const { startSession } = require("mongoose");
+
 const socketHandler = (io) => {
   io.on("connection", (socket) => {
     console.log(`Socket connected with ${socket.id}`);
