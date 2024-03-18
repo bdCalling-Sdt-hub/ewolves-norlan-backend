@@ -9,8 +9,6 @@ const Video = require("../models/video.model");
 const User = require("../models/user.model");
 
 exports.createGigToDB = catchAsync(async (req, res, next) => {
-  console.log("Connected");
-
   const basicPackage = {
     serviceDescription: req.body.basicDes,
     price: req.body.basicPrice,
@@ -35,35 +33,40 @@ exports.createGigToDB = catchAsync(async (req, res, next) => {
     ...req.body,
   };
 
-  let result;
+  let createGig;
   if (value.thumbnail) {
-    result = await Gig.create(value);
+    createGig = await Gig.create(value);
   }
 
-  if (!result) {
+  if (!createGig) {
     throw new ApiError(400, "Failed to created gig");
   }
 
-  if (result) {
+  if (createGig) {
     const videoData = {
       video: `/media/${req.files.media[0].filename}`,
-      location: result.location,
-      videoDescription: result.about,
-      price: result.basicPackage?.price,
-      gig: result._id,
-      artist: result.artist,
+      location: createGig.location,
+      videoDescription: createGig.about,
+      price: createGig.basicPackage?.price,
+      gig: createGig._id,
+      artist: createGig.artist,
     };
 
-    const doc = await Video.create(videoData);
-    result.video = doc._id;
-    await result.save();
+    const createVideo = await Video.create(videoData);
+    createGig.video = createVideo._id;
+    await createGig.save();
+
+    if (!createVideo) {
+      await Gig.findByIdAndDelete(createGig._id);
+      throw new ApiError(400, "Failed to created gig");
+    }
   }
 
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Gig created Successfully",
-    data: result,
+    data: createGig,
   });
 });
 
@@ -100,13 +103,20 @@ exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
     });
   }
 
-  // if (Object.keys(filterData).length) {
-  //   andConditions.push({
-  //     $and: Object.entries(filterData).map(([field, value]) => ({
-  //       [field]: value,
-  //     })),
-  //   });
-  // }
+  console.log(filterData);
+
+  if (
+    Object.keys(filterData).length &&
+    filterData.category !== undefined &&
+    filterData.subCategory !== undefined &&
+    filterData.location !== undefined
+  ) {
+    andConditions.push({
+      $and: Object.entries(filterData).map(([field, value]) => ({
+        [field]: value,
+      })),
+    });
+  }
 
   if (priceMin && priceMax) {
     andConditions.push({
@@ -119,6 +129,8 @@ exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
 
   const whereConditions =
     andConditions.length > 0 ? { $and: andConditions } : {};
+
+  console.log(whereConditions);
 
   const result = await Gig.find(whereConditions)
     .sort({ createdAt: -1 })
