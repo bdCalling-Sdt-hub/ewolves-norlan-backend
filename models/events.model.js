@@ -10,5 +10,5 @@ const eventModel = new Schema({
         require: true
     }
 });
-const Event = model("gig", eventModel);
+const Event = model("event", eventModel);
 module.exports = Event;

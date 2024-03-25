@@ -32,3 +32,17 @@ exports.createEvent = CatchAsync(async(req, res, next)=>{
     });
 
 });
+
+exports.getEvent = CatchAsync( async(req, res, next)=>{
+    const events = await Event.find({});
+    if(!events){
+        throw new ApiError(404, "No Events Found");
+    }
+
+    return sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Events Data Retrive",
+        data: events
+    })
+})
