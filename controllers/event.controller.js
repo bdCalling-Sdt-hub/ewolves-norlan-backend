@@ -16,7 +16,7 @@ exports.createEvent = CatchAsync(async(req, res, next)=>{
 
     const isExist = await Event.findOne({name: name});
     if(isExist){
-        const filePath = path.join(__dirname, "..", "uploads", "media", imageFileName.split("/")[2]);
+        const filePath = path.join(__dirname, "..", "uploads", "media", imageFileName.pop());
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
         }
@@ -45,4 +45,36 @@ exports.getEvent = CatchAsync( async(req, res, next)=>{
         message: "Events Data Retrive",
         data: events
     })
+});
+
+exports.updateEvent = CatchAsync( async (req, res, next)=>{
+    const { id } = req.params;
+    const { name }  = req.body;
+    const event = await Event.findById(id);
+    if(!event){
+        throw new ApiError(404, "No Event found by this ID");
+    }
+
+    const fileName = event?.image?.split("/").pop();
+    const filePath = path.join(__dirname, "..", "uploads", "media", fileName);
+    if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+    }
+
+    let imageFileName = "";
+    if (req.files && req.files.image && req.files.image[0]) {
+        imageFileName = `/media/${req.files.image[0].filename}`;
+    }
+
+    const result = await Event.findByIdAndUpdate(id, {
+        $set: {name: name, image: imageFileName}
+    }, { new: true });
+
+    return sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Event Updated Successfully",
+        data: result
+    })
+
 })
