@@ -334,3 +334,21 @@ exports.deleteAccount = catchAsync(async (req, res, next) => {
     message: "Account Delete Successfully",
   });
 });
+
+exports.makeInterest = catchAsync( async(req, res, next)=>{
+  const { id } = req.params;
+  const { interest } = req.body;
+  const user = await User.findById(id);
+  if(!user){
+    throw new ApiError(404, "No User Found by This ID");
+  }
+
+  user.interest.push(...interest);
+  await user.save();
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Make interest Successfully",
+  });
+})

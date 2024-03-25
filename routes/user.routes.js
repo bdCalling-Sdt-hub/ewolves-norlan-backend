@@ -15,4 +15,5 @@ router.post("/change-password", checkUser, configureFileUpload(), userController
 router.post("/update-profile", checkUser, configureFileUpload(), userController.updateProfile);
 router.post("/make-follower/:id", checkUser, configureFileUpload(), userController.makeFollower);
 router.patch("/delete-account/:id", checkUser, userController.deleteAccount);
+router.patch("/make-interest/:id",  configureFileUpload(), userController.makeInterest)
 module.exports = router;
