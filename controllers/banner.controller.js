@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");
+const ApiError = require("../errors/ApiError");
 
 // add slider image
 exports.addBanner = catchAsync(async (req, res, next) => {
@@ -18,17 +19,20 @@ exports.addBanner = catchAsync(async (req, res, next) => {
     message: "Banner Added Successfully",
     data: result
   });
-  return sendResponse(res, 204, "Banner Added Successfully", result);
 });
 
 // get all slider
 exports.getBanner = catchAsync(async (req, res, next) => {
   const slider = await Banner.find({});
   if (!slider) {
-    throw new ApiEroor
-    return sendResponse(res, 204, "No Data Found", slider);
+    throw new ApiError("No Data Found")
   }
-  return sendResponse(res, 204, "Banner Data Fetch Successfully", slider);
+  return sendResponse(res,{
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Banner Data Fetch Successfully",
+    data: slider
+  });
 });
 
 // update single slider
@@ -36,7 +40,7 @@ exports.updateBanner = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const result = await Banner.findOne({ _id: id });
   if (!result) {
-    return sendResponse(res, 204, "No Data Found", result);
+    throw new ApiError("No Data Found");
   }
 
   const fileName = result?.slider?.split("/").pop();
@@ -52,7 +56,12 @@ exports.updateBanner = catchAsync(async (req, res, next) => {
 
   result.slider = imageFileName;
   await result.save();
-  return sendResponse(res, 200, "Banner Updated Successfully");
+  return sendResponse(res,{
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Banner updated Successfully",
+    data: result
+  });
 });
 
 // delete a single slider
@@ -60,7 +69,7 @@ exports.deleteBanner = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const result = await Banner.findOne({ _id: id });
   if (!result) {
-    return sendResponse(res, 204, "No Data Found", result);
+    throw new ApiError("No Data Found");
   }
 
   const fileName = result?.slider?.split("/").pop();
@@ -68,6 +77,10 @@ exports.deleteBanner = catchAsync(async (req, res, next) => {
   if (fs.existsSync(filePath)) {
     fs.unlinkSync(filePath);
     await Banner.findByIdAndDelete({ _id: id });
-    return sendResponse(res, 200, "Banner Delete Successfully", result);
+    return sendResponse(res,{
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Banner Deleted Successfully"
+    });
   }
 });
