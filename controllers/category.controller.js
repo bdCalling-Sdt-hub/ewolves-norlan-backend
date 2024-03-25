@@ -211,3 +211,21 @@ exports.updateSubCategory = catchAsync(async (req, res, next) => {
     data: result
   });
 });
+
+exports.getAllSubCategory= catchAsync( async(req, res, next)=>{
+  const subCategory = await CategoryModel.aggregate([
+    { $project: { _id: 0, sub_category: 1 } },
+    { $unwind: '$sub_category' },
+    { $replaceRoot: { newRoot: '$sub_category' } }
+  ]);
+
+  if (!subCategory) {
+    throw new ApiError(404, "No Sub Category Found")
+  }
+  return sendResponse(res,{
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Sub Category Data retrive successfully",
+    data: subCategory
+  });
+})

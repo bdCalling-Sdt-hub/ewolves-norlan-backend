@@ -77,4 +77,4 @@ exports.updateEvent = CatchAsync( async (req, res, next)=>{
         data: result
     })
 
-})
+});
