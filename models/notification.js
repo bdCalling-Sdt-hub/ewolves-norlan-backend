@@ -4,14 +4,18 @@ const notificationSchema = new Schema(
   {
     message: { type: String, required: false },
     image: { type: Object, required: false },
-    type: { type: String, enum: ["payment", "unknown"], default: "unknown" },
+    type: {
+      type: String,
+      enum: ["payment", "term-and-conditions", "unknown"],
+      default: "unknown",
+    },
     view: { type: Boolean, default: false },
     role: {
       type: String,
-      enum: ["user", "artist", "admin"],
+      enum: ["USER", "ARTIST", "ADMIN"],
       default: ["user"],
     },
-    receiver: { type: Schema.Types.ObjectId, ref: "User" },
+    user: { type: Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
 );

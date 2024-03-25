@@ -2,6 +2,10 @@ const httpStatus = require("http-status");
 const TermsModel = require("../models/terms.model");
 const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");
+const {
+  addNotification,
+  getAllNotifications,
+} = require("./notification.controller");
 
 exports.addTerms = catchAsync(async (req, res, next) => {
   const { name, description } = req.body;
@@ -12,6 +16,21 @@ exports.addTerms = catchAsync(async (req, res, next) => {
       description: description,
     });
   }
+
+  //create notification;
+  const notificationData = {
+    message: "Create term and condition",
+    image: "https://siffahim.github.io/artist-tailwind/images/02.jpg",
+    type: "term-and-conditions",
+    role: "ADMIN",
+    view: false,
+  };
+
+  await addNotification(notificationData);
+  const allNotification = await getAllNotifications();
+
+  io.emit("admin-notification", allNotification);
+
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
