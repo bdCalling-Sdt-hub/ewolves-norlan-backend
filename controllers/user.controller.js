@@ -144,10 +144,17 @@ exports.userLogin = catchAsync(async (req, res) => {
 });
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
+
+  const {email} = req.body;
   const user = await User.findOne({ email });
+
   if (!user) {
     throw new ApiError(400, "User doesn't exists");
   }
+
+  // Generate OTC (One-Time Code)
+  const emailVerifyCode = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
+
 
   // Store the OTC and its expiration time in the database
   user.emailVerifyCode = emailVerifyCode;
@@ -190,20 +197,43 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.otpVerify = catchAsync(async (req, res, next) => {
+
+  const {email, otp} = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new ApiError(400, "User doesn't exists");
+  }
+
+
+  // Store the OTC and its expiration time in the database
+  if(user.emailVerifyCode == otp){
+    user.emailVerified = true;
+    user.emailVerifyCode = null;
+    await user.save();
+  }
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "OTP Verified Successfully",
+  });
+});
+
+
+
+
 exports.resetPassword = catchAsync(async (req, res, next) => {
   const { email, password, confirmPassword } = req.body;
   const user = await User.findOne({ email: email });
 
   if (!user) {
-    return sendResponse(res, 400, "User does not exist");
+    throw new ApiError(400, "User doesn't exists");
   }
 
   if (password !== confirmPassword) {
-    return sendResponse(
-      res,
-      400,
-      "Password and confirm password does not match"
-    );
+    throw new ApiError(400, "Password and confirm password does not match");
   }
 
   if (user.emailVerified === true) {

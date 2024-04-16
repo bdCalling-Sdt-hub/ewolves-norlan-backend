@@ -40,7 +40,7 @@ exports.addTerms = catchAsync(async (req, res, next) => {
 });
 
 exports.getTerms = catchAsync(async (req, res, next) => {
-  const terms = await TermsModel.find({});
+  const terms = await TermsModel.findOne().sort({createdAt: -1});
   if (!terms) {
     return sendResponse(res, 204, "No Data Found", terms);
   }

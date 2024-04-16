@@ -5,6 +5,12 @@ const eventModel = new Schema({
         type: String,
         require: true
     },
+    colors: [
+        {
+            type: String,
+            required: true,
+        }
+    ],
     image: {
         type: String,
         require: true

@@ -18,7 +18,7 @@ const { checkAdmin } = require("../middlewares/checkAdmin");
 
 // category
 router.post("/create-category", configureFileUpload(), addCategory);
-router.get("/",  getCategory);
+router.get("/get-category", checkUser, getCategory);
 router.get("/category-details/:id", checkUser, getSingleCategory);
 router.delete("/delete-category/:id", checkAdmin, deleteCategory);
 router.patch( "/update-category/:id", checkAdmin, configureFileUpload(), updateCategory);

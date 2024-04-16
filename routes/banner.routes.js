@@ -5,9 +5,9 @@ const configureFileUpload = require("../middlewares/fileUpload.js");
 const { checkUser } = require("../middlewares/checkUser.js");
 const { checkAdmin } = require("../middlewares/checkAdmin.js");
 
-router.post("/banner", configureFileUpload(), addBanner);
-router.get("/banner", checkUser, getBanner);
-router.patch( "/banner/:id", checkAdmin, configureFileUpload(), updateBanner);
+router.post("/create-banner", checkAdmin, configureFileUpload(), addBanner);
+router.get("/get-banner", checkUser, getBanner);
+router.patch( "/update-banner/:id", checkAdmin, configureFileUpload(), updateBanner);
 router.delete("/delete-banner/:id", checkAdmin, deleteBanner);
 
 module.exports = router;

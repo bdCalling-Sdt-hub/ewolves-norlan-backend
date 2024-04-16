@@ -5,14 +5,13 @@ const categorySchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    primary_color:{
-        type: String,
-        required: true
-    },
-    secondary_color:{
-        type: String,
-        required: true
-    },
+    colors:[
+        {
+            type: String,
+            required: true
+        }
+    ],
+    
     image:{
 
         type: String,

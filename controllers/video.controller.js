@@ -9,7 +9,8 @@ const catchAsync = require("../shared/catchAsync");
 exports.getAllVideo = catchAsync(async (req, res) => {
   const result = await Video.find()
     .sort({ createdAt: -1 })
-    .populate(["artist"]);
+    .populate(["artist"])
+    .populate(["comments.user"]);
 
   // Sending response for video metadata
   sendResponse(res, {

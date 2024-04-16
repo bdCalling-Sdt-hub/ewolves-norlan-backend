@@ -8,23 +8,27 @@ const ApiError = require("../errors/ApiError");
 
 // add category
 exports.addCategory = catchAsync(async (req, res, next) => {
-  const { name, primary_color, secondary_color } = req.body;
+  const { name, colors } = req.body;
+
   let imageFileName = "";
   if (req.files && req.files.image && req.files.image[0]) {
     imageFileName = `/media/${req.files.image[0].filename}`;
   }
+
   const result = await CategoryModel.create({
     name: name,
-    primary_color: primary_color,
-    secondary_color: secondary_color,
+    colors: colors,
     image: imageFileName,
   });
+
   return sendResponse(res,{
     statusCode: httpStatus.OK,
     success: true,
     message: "Created a new Category",
     data: result
   });
+
+  
 });
 
 // fetch category
@@ -65,8 +69,7 @@ exports.deleteCategory = catchAsync(async (req, res, next) => {
   return sendResponse(res,{
     statusCode: httpStatus.OK,
     success: true,
-    message: "Category Delete Successfully",
-    data: category
+    message: "Category Delete Successfully"
   });
 });
 
@@ -151,7 +154,7 @@ exports.getSubCategory = catchAsync(async (req, res, next) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "Sub Category Details Retrive Successfully",
-    data: subCategorycategory
+    data: subCategory
   });
 });
 

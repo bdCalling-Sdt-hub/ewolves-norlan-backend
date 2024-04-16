@@ -7,7 +7,7 @@ const fs = require("fs");
 const path = require("path");
 
 exports.createEvent = CatchAsync(async(req, res, next)=>{
-    const { name } = req.body;
+    const { name, colors } = req.body;
 
     let imageFileName = "";
     if (req.files && req.files.image && req.files.image[0]) {
@@ -15,15 +15,21 @@ exports.createEvent = CatchAsync(async(req, res, next)=>{
     }
 
     const isExist = await Event.findOne({name: name});
+
     if(isExist){
-        const filePath = path.join(__dirname, "..", "uploads", "media", imageFileName.pop());
+
+        const fileName = imageFileName.split("/").pop();
+        const filePath = path.join(__dirname, "..", "uploads", "media", fileName);
+
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
         }
+
         throw new ApiError(204, "Event name already taken");
     }
 
-    const result = await Event.create({ name: name, image: imageFileName });
+    const result = await Event.create({ name: name, colors: colors, image: imageFileName });
+    
     return sendResponse(res,{
         statusCode: httpStatus.OK,
         success: true,
@@ -55,19 +61,22 @@ exports.updateEvent = CatchAsync( async (req, res, next)=>{
         throw new ApiError(404, "No Event found by this ID");
     }
 
+    let imageFileName = "";
+    if (req.files && req.files.image && req.files.image[0]) {
+        imageFileName = `/media/${req.files.image[0].filename}`;
+    }
+
     const fileName = event?.image?.split("/").pop();
     const filePath = path.join(__dirname, "..", "uploads", "media", fileName);
     if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
     }
 
-    let imageFileName = "";
-    if (req.files && req.files.image && req.files.image[0]) {
-        imageFileName = `/media/${req.files.image[0].filename}`;
-    }
-
     const result = await Event.findByIdAndUpdate(id, {
-        $set: {name: name, image: imageFileName}
+        $set: {
+            name: name ? name : event.name, 
+            image: imageFileName ? imageFileName : event?.image
+        }
     }, { new: true });
 
     return sendResponse(res, {

@@ -8,6 +8,7 @@ router.post("/register", configureFileUpload(), userController.userRegister);
 router.post("/verify-email", configureFileUpload(), userController.verifyEmail);
 router.post("/login", configureFileUpload(), userController.userLogin);
 router.post("/forgot-password", configureFileUpload(), userController.forgotPassword);
+router.post("/otp-verify", configureFileUpload(), userController.otpVerify);
 
 router.post("/reset-password", configureFileUpload(), userController.resetPassword);
 

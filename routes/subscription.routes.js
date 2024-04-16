@@ -7,7 +7,7 @@ const { checkUser } = require("../middlewares/checkUser.js");
 
 // category
 router.post( "/create-subscription", checkAdmin, configureFileUpload(), addSubscription );
-router.get("/subscription", checkUser, getSubscription);
+router.get("/subscription", checkUser,  getSubscription);
 router.patch( "/update-subscription/:id", checkAdmin, configureFileUpload(), updateSubscription);
 
 module.exports = router;

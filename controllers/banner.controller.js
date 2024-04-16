@@ -4,6 +4,7 @@ const path = require("path");
 const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");
 const ApiError = require("../errors/ApiError");
+const httpStatus = require("http-status");
 
 // add slider image
 exports.addBanner = catchAsync(async (req, res, next) => {
@@ -40,10 +41,10 @@ exports.updateBanner = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const result = await Banner.findOne({ _id: id });
   if (!result) {
-    throw new ApiError("No Data Found");
+    throw new ApiError(404, "No Data Found");
   }
 
-  const fileName = result?.slider?.split("/").pop();
+  const fileName = result?.banner?.split("/").pop();
   const filePath = path.join(__dirname, "..", "uploads", "media", fileName);
   if (fs.existsSync(filePath)) {
     fs.unlinkSync(filePath);
@@ -64,16 +65,16 @@ exports.updateBanner = catchAsync(async (req, res, next) => {
   });
 });
 
-// delete a single slider
+// delete a single banner
 exports.deleteBanner = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const result = await Banner.findOne({ _id: id });
   if (!result) {
-    throw new ApiError("No Data Found");
+    throw new ApiError(400, "No Data Found");
   }
 
-  const fileName = result?.slider?.split("/").pop();
-  const filePath = path.join(__dirname, "..", "uploads", "image", fileName);
+  const fileName = result?.banner?.split("/").pop();
+  const filePath = path.join(__dirname, "..", "uploads", "media", fileName);
   if (fs.existsSync(filePath)) {
     fs.unlinkSync(filePath);
     await Banner.findByIdAndDelete({ _id: id });

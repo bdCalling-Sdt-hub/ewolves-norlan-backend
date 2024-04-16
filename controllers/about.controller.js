@@ -22,7 +22,7 @@ exports.addAboutUs = catchAsync(async (req, res, next) => {
 });
 
 exports.getAboutUs = catchAsync(async (req, res, next) => {
-  const about = await AboutModel.find();
+  const about = await AboutModel.findOne().sort({createdAt: -1});
   if (!about) {
     throw new ApiError(404, "No About Found")
   }
