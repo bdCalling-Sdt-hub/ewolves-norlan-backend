@@ -131,9 +131,13 @@ exports.userLogin = catchAsync(async (req, res) => {
     throw new ApiError(401, "your credential doesn't match");
   }
 
-  const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "3d",
-  });
+  const token = jwt.sign(
+    { userID: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "3d",
+    }
+  );
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -144,8 +148,7 @@ exports.userLogin = catchAsync(async (req, res) => {
 });
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
-
-  const {email} = req.body;
+  const { email } = req.body;
   const user = await User.findOne({ email });
 
   if (!user) {
@@ -154,7 +157,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   // Generate OTC (One-Time Code)
   const emailVerifyCode = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
-
 
   // Store the OTC and its expiration time in the database
   user.emailVerifyCode = emailVerifyCode;
@@ -198,17 +200,15 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 });
 
 exports.otpVerify = catchAsync(async (req, res, next) => {
-
-  const {email, otp} = req.body;
+  const { email, otp } = req.body;
   const user = await User.findOne({ email });
 
   if (!user) {
     throw new ApiError(400, "User doesn't exists");
   }
 
-
   // Store the OTC and its expiration time in the database
-  if(user.emailVerifyCode == otp){
+  if (user.emailVerifyCode == otp) {
     user.emailVerified = true;
     user.emailVerifyCode = null;
     await user.save();
@@ -220,9 +220,6 @@ exports.otpVerify = catchAsync(async (req, res, next) => {
     message: "OTP Verified Successfully",
   });
 });
-
-
-
 
 exports.resetPassword = catchAsync(async (req, res, next) => {
   const { email, password, confirmPassword } = req.body;
@@ -365,11 +362,11 @@ exports.deleteAccount = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.makeInterest = catchAsync( async(req, res, next)=>{
+exports.makeInterest = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const { interest } = req.body;
   const user = await User.findById(id);
-  if(!user){
+  if (!user) {
     throw new ApiError(404, "No User Found by This ID");
   }
 
@@ -381,4 +378,4 @@ exports.makeInterest = catchAsync( async(req, res, next)=>{
     success: true,
     message: "Make interest Successfully",
   });
-})
+});

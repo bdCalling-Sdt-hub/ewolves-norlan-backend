@@ -1,12 +1,29 @@
 const express = require("express");
 const router = express.Router();
-const {addAboutUs, getAboutUs, updateAboutUs} = require("../controllers/about.controller");
+const {
+  addAboutUs,
+  getAboutUs,
+  updateAboutUs,
+} = require("../controllers/about.controller");
 const configureFileUpload = require("../middlewares/fileUpload");
-const { checkUser } = require("../middlewares/checkUser");
-const { checkAdmin } = require("../middlewares/checkAdmin");
+const { USER_ROLE } = require("../enums/user");
+const auth = require("../middlewares/auth");
 
-
-router.post("/create-about", checkAdmin, configureFileUpload(), addAboutUs);
-router.get("/get-about",  checkUser, getAboutUs);
-router.patch( "/update-about/:id", configureFileUpload(), updateAboutUs );
+router.post(
+  "/create-about",
+  auth(USER_ROLE.ADMIN),
+  configureFileUpload(),
+  addAboutUs
+);
+router.get(
+  "/get-about",
+  auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
+  getAboutUs
+);
+router.patch(
+  "/update-about/:id",
+  auth(USER_ROLE.ADMIN),
+  configureFileUpload(),
+  updateAboutUs
+);
 module.exports = router;

@@ -1,12 +1,31 @@
 const express = require("express");
 const router = express.Router();
 const configureFileUpload = require("../middlewares/fileUpload.js");
-const { createEvent, getEvent, updateEvent } = require("../controllers/event.controller.js")
-const { checkAdmin } = require("../middlewares/checkAdmin");
-const { checkUser } = require("../middlewares/checkUser");
+const {
+  createEvent,
+  getEvent,
+  updateEvent,
+} = require("../controllers/event.controller.js");
 
-router.post("/create-event", checkAdmin, configureFileUpload(), createEvent);
-router.get("/get-event", checkUser, getEvent);
-router.patch("/update-event/:id", configureFileUpload(), updateEvent)
+const auth = require("../middlewares/auth.js");
+const { USER_ROLE } = require("../enums/user.js");
+
+router.post(
+  "/create-event",
+  auth(USER_ROLE.ADMIN),
+  configureFileUpload(),
+  createEvent
+);
+router.get(
+  "/get-event",
+  auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
+  getEvent
+);
+router.patch(
+  "/update-event/:id",
+  auth(USER_ROLE.ADMIN),
+  configureFileUpload(),
+  updateEvent
+);
 
 module.exports = router;

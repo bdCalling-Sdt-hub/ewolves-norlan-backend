@@ -4,16 +4,39 @@ const {
   getAllGigFromDB,
   updateGigToDB,
   findGigByArtistId,
-  addRating
+  addRating,
 } = require("../controllers/gig.controller");
 const configureFileUpload = require("../middlewares/fileUpload");
-const { checkUser } = require("../middlewares/checkUser");
+const auth = require("../middlewares/auth");
+const { USER_ROLE } = require("../enums/user");
 const router = express.Router();
 
-router.post("/create-gig", checkUser, configureFileUpload(), createGigToDB);
-router.get("/artist/:id", checkUser, findGigByArtistId);
-router.get("/", checkUser, getAllGigFromDB);
-router.patch("/update-gig/:id", checkUser, configureFileUpload(), updateGigToDB);
-router.post("/add-rating/:id", checkUser, addRating)
+router.post(
+  "/create-gig",
+  auth(USER_ROLE.ARTIST),
+  configureFileUpload(),
+  createGigToDB
+);
+router.get(
+  "/artist/:id",
+  auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
+  findGigByArtistId
+);
+router.get(
+  "/",
+  auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
+  getAllGigFromDB
+);
+router.patch(
+  "/update-gig/:id",
+  auth(USER_ROLE.ARTIST),
+  configureFileUpload(),
+  updateGigToDB
+);
+router.post(
+  "/add-rating/:id",
+  auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
+  addRating
+);
 
 module.exports = router;
