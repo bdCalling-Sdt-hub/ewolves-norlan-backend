@@ -16,10 +16,11 @@ const auth =
 
         //verify token
         const verifyUser = jwt.verify(token, process.env.JWT_SECRET);
-        const { userID, role } = verifyUser;
-
         //add user to headers
         req.user = verifyUser;
+        const { role } = verifyUser;
+
+        
 
         //guard user
         if (roles.length && !roles.includes(role)) {

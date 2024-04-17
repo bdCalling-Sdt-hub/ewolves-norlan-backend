@@ -132,17 +132,21 @@ exports.userLogin = catchAsync(async (req, res) => {
   }
 
   const token = jwt.sign(
-    { userID: user._id, role: user.role },
+    { _id: user._id, role: user.role },
     process.env.JWT_SECRET,
     {
       expiresIn: "3d",
     }
   );
+  console.log(user?.role)
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Your Are logged in successfully",
-    data: user,
+    user: {
+      role: user.role,
+      id: user._id
+    },
     token: token,
   });
 });
@@ -214,10 +218,20 @@ exports.otpVerify = catchAsync(async (req, res, next) => {
     await user.save();
   }
 
+
+  const token = jwt.sign(
+    { _id: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "3d",
+    }
+  );
+
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "OTP Verified Successfully",
+    token: token
   });
 });
 
@@ -272,6 +286,7 @@ exports.changePassword = catchAsync(async (req, res) => {
 
   const salt = await bcrypt.genSalt(10);
   const hashpassword = await bcrypt.hash(newPass, salt);
+  
   await User.findByIdAndUpdate(req.user._id, {
     $set: { password: hashpassword },
   });
@@ -379,3 +394,19 @@ exports.makeInterest = catchAsync(async (req, res, next) => {
     message: "Make interest Successfully",
   });
 });
+
+
+exports.getProfileFromDB = catchAsync( async (req, res, next) =>{
+  const user = await User.findById(req.user._id);
+  if(!user){
+    throw new ApiError(404, "Your are not a valid User");
+  }
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Retrive Data",
+    user: user
+  })
+  console.log(user);
+})

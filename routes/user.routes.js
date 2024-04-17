@@ -49,4 +49,12 @@ router.patch(
   configureFileUpload(),
   userController.makeInterest
 );
+
+router.get(
+  "/get-profile",
+  auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
+  userController.getProfileFromDB
+);
+
+
 module.exports = router;
