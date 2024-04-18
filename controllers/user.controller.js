@@ -138,7 +138,6 @@ exports.userLogin = catchAsync(async (req, res) => {
       expiresIn: "3d",
     }
   );
-  console.log(user?.role)
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
