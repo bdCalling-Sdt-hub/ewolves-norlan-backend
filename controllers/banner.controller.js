@@ -13,6 +13,8 @@ exports.addBanner = catchAsync(async (req, res, next) => {
     imageFileName = `/media/${req.files.image[0].filename}`;
   }
 
+  console.log("iamge", imageFileName);
+
   const result = await Banner.create({ banner: imageFileName });
   return sendResponse(res,{
     statusCode: httpStatus.OK,

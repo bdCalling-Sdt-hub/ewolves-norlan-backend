@@ -3,7 +3,7 @@ const router = express.Router();
 const {
   addSubscription,
   getSubscription,
-  updateSubscription,
+  updateSubscription
 } = require("../controllers/subscription.controller.js");
 const configureFileUpload = require("../middlewares/fileUpload.js");
 const auth = require("../middlewares/auth.js");

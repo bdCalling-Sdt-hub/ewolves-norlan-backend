@@ -61,5 +61,11 @@ router.get(
   userController.getTopArtistFromDB
 );
 
+router.get(
+  "/get-all-artist",
+  auth(USER_ROLE.ADMIN),
+  userController.getAllArtistFromDB
+);
+
 
 module.exports = router;

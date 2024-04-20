@@ -82,26 +82,25 @@ exports.updateCategory = catchAsync(async (req, res, next) => {
     throw new ApiError(404, "No Category Found")
   }
 
-  const { name, primary_color, secondary_color } = req.body;
+  const { name, primary_color, secondary_color, image } = req.body;
+  console.log(req.body);
   let imageFileName = "";
   if (req.files && req.files.image && req.files.image[0]) {
     imageFileName = `/media/${req.files.image[0].filename}`;
   }
 
-  const fileName = category?.image?.split("/").pop();
-  const filePath = path.join(__dirname, "..", "uploads", "media", fileName);
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
+  if(imageFileName){
+    const fileName = category?.image?.split("/").pop();
+    const filePath = path.join(__dirname, "..", "uploads", "media", fileName);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
   }
 
-  (category.name = name ? name : category.name),
-    (category.primary_color = primary_color
-      ? primary_color
-      : category.primary_color),
-    (category.secondary_color = secondary_color
-      ? secondary_color
-      : category.secondary_color),
-    (category.image = imageFileName ? imageFileName : category.image);
+  category.name = name ? name : category.name,
+  category.primary_color = primary_color ? primary_color : category.primary_color,
+  category.secondary_color = secondary_color ? secondary_color : category.secondary_color,
+  category.image = imageFileName ? imageFileName : image;
   const result = await category.save();
   return sendResponse(res,{
     statusCode: httpStatus.OK,
@@ -110,126 +109,3 @@ exports.updateCategory = catchAsync(async (req, res, next) => {
     data: result
   });
 });
-
-
-
-exports.addSubCategory = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
-  const category = await CategoryModel.findById(id);
-  if (!category) {
-    throw new ApiError(404, "No Sub Category Found")
-  }
-
-  const { name, color } = req.body;
-
-  let imageFileName = "";
-  if (req.files && req.files.image && req.files.image[0]) {
-    imageFileName = `/media/${req.files.image[0].filename}`;
-  }
-
-  const value = {
-    name: name,
-    color: color,
-    image: imageFileName,
-  };
-
-  category.sub_category.push(value);
-  const newCategory = await category.save();
-  return sendResponse(res,{
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Sub Category Added Successfully",
-    data: newCategory
-  });
-});
-
-exports.getSubCategory = catchAsync(async (req, res, next) => {
-  const { catId, subId } = req.params;
-  const category = await CategoryModel.findById(catId);
-  const subCategory = category.sub_category.id(subId);
-  if (!subCategory) {
-    throw new ApiError(404, "No Sub Category Found")
-  }
-
-  return sendResponse(res,{
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Sub Category Details Retrive Successfully",
-    data: subCategory
-  });
-});
-
-exports.deleteSubCategory = catchAsync(async (req, res, next) => {
-  const { catId, subId } = req.params;
-  const category = await CategoryModel.findById(catId);
-  const subCategory = category.sub_category.id(subId);
-  if (!subCategory) {
-    throw new ApiError(404, "No Category Found")
-  }
-
-  const fileName = subCategory?.image?.split("/").pop();
-  const filePath = path.join(__dirname, "..", "uploads", "media", fileName);
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-  }
-
-  subCategory.deleteOne();
-  const data = await category.save();
-  return sendResponse(res,{
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Delete Sub Category Item Successfully",
-    data: data
-  });
-});
-
-exports.updateSubCategory = catchAsync(async (req, res, next) => {
-  const { catId, subId } = req.params;
-  const category = await CategoryModel.findById(catId);
-  const subCategory = category.sub_category.id(subId);
-  if (!subCategory) {
-    throw new ApiError(404, "No Category Found")
-  }
-
-  const { name, color } = req.body;
-
-  let imageFileName = "";
-  if (req.files && req.files.image && req.files.image[0]) {
-    imageFileName = `/media/${req.files.image[0].filename}`;
-  }
-
-  const fileName = category?.image?.split("/").pop();
-  const filePath = path.join(__dirname, "..", "uploads", "media", fileName);
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-  }
-
-  (subCategory.name = name ? name : subCategory.name),
-    (subCategory.color = color ? color : subCategory.color),
-    (subCategory.image = imageFileName ? imageFileName : subCategory.image);
-  const result = await category.save();
-  return sendResponse(res,{
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Category Updated Successully",
-    data: result
-  });
-});
-
-exports.getAllSubCategory= catchAsync( async(req, res, next)=>{
-  const subCategory = await CategoryModel.aggregate([
-    { $project: { _id: 0, sub_category: 1 } },
-    { $unwind: '$sub_category' },
-    { $replaceRoot: { newRoot: '$sub_category' } }
-  ]);
-
-  if (!subCategory) {
-    throw new ApiError(404, "No Sub Category Found")
-  }
-  return sendResponse(res,{
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Sub Category Data retrive successfully",
-    data: subCategory
-  });
-})

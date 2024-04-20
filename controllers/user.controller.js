@@ -9,6 +9,8 @@ const catchAsync = require("../shared/catchAsync");
 const userTimers = new Map();
 const fs = require("fs");
 const path = require("path");
+const pick = require("../shared/pick");
+const paginationCalculate = require("../helper/paginationHelper");
 
 exports.userRegister = catchAsync(async (req, res, next) => {
   const { fullName, email, password, confirmPass, termAndCondition, role } =
@@ -424,4 +426,27 @@ exports.getTopArtistFromDB = catchAsync( async (req, res, next)=>{
     message: "Retrieve Data",
     data: artists
   })
+})
+
+exports.getAllArtistFromDB = catchAsync( async (req, res, next)=>{
+
+  const paginationOptions = pick(req.query, ["limit", "page"]);
+  const { limit, page, skip } = paginationCalculate(paginationOptions);
+
+  const artists = await User.find({role: "ARTIST"})
+  .skip(skip)
+  .limit(limit)
+
+  const total = await User.countDocuments({role: "ARTIST"});
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All gig retrieved successfully",
+    pagination: {
+      page,
+      limit,
+      total,
+    },
+    data: artists,
+  });
 })
