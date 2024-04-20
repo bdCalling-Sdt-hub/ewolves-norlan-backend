@@ -8,7 +8,7 @@ const ApiError = require("../errors/ApiError");
 
 // add category
 exports.addCategory = catchAsync(async (req, res, next) => {
-  const { name, colors } = req.body;
+  const { name, primary_color, secondary_color } = req.body;
 
   let imageFileName = "";
   if (req.files && req.files.image && req.files.image[0]) {
@@ -17,7 +17,8 @@ exports.addCategory = catchAsync(async (req, res, next) => {
 
   const result = await CategoryModel.create({
     name: name,
-    colors: colors,
+    primary_color: primary_color,
+    secondary_color: secondary_color,
     image: imageFileName,
   });
 
@@ -28,7 +29,7 @@ exports.addCategory = catchAsync(async (req, res, next) => {
     data: result
   });
 
-  
+
 });
 
 // fetch category
@@ -149,7 +150,7 @@ exports.getSubCategory = catchAsync(async (req, res, next) => {
   if (!subCategory) {
     throw new ApiError(404, "No Sub Category Found")
   }
-  
+
   return sendResponse(res,{
     statusCode: httpStatus.OK,
     success: true,

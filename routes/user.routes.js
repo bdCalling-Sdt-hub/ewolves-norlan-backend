@@ -55,6 +55,11 @@ router.get(
   auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
   userController.getProfileFromDB
 );
+router.get(
+  "/get-top-artist",
+  auth(USER_ROLE.ARTIST, USER_ROLE.USER),
+  userController.getTopArtistFromDB
+);
 
 
 module.exports = router;

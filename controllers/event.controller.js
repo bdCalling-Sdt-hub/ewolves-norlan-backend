@@ -29,7 +29,7 @@ exports.createEvent = CatchAsync(async(req, res, next)=>{
     }
 
     const result = await Event.create({ name: name, colors: colors, image: imageFileName });
-    
+
     return sendResponse(res,{
         statusCode: httpStatus.OK,
         success: true,
@@ -55,7 +55,7 @@ exports.getEvent = CatchAsync( async(req, res, next)=>{
 
 exports.updateEvent = CatchAsync( async (req, res, next)=>{
     const { id } = req.params;
-    const { name }  = req.body;
+    const { name, colors, image }  = req.body;
     const event = await Event.findById(id);
     if(!event){
         throw new ApiError(404, "No Event found by this ID");
@@ -66,24 +66,23 @@ exports.updateEvent = CatchAsync( async (req, res, next)=>{
         imageFileName = `/media/${req.files.image[0].filename}`;
     }
 
-    const fileName = event?.image?.split("/").pop();
-    const filePath = path.join(__dirname, "..", "uploads", "media", fileName);
-    if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+    if(imageFileName !== ""){
+        const fileName = event?.image?.split("/").pop();
+        const filePath = path.join(__dirname, "..", "uploads", "media", fileName);
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+        }
     }
 
-    const result = await Event.findByIdAndUpdate(id, {
-        $set: {
-            name: name ? name : event.name, 
-            image: imageFileName ? imageFileName : event?.image
-        }
-    }, { new: true });
+    event.name= name ? name : event.name,
+    event.image= imageFileName ? imageFileName : image,
+    event.colors= colors ? colors : event.colors,
+    await event.save();
 
     return sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "Event Updated Successfully",
-        data: result
+        message: "Event Updated Successfully"
     })
 
 });

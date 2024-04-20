@@ -71,6 +71,7 @@ exports.createGigToDB = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
+  const { interest } = await User.findById(req.user._id);
   const paginationOptions = pick(req.query, ["limit", "page"]);
   const { priceMin, priceMax } = pick(req.query, ["priceMin", "priceMax"]);
   const filters = pick(req.query, [
@@ -128,12 +129,11 @@ exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
   }
 
   const whereConditions =
-    andConditions.length > 0 ? { $and: andConditions } : {};
+    andConditions.length > 0 ? { $and: andConditions, searchTags: { $in : interest }, "ratings.rate" : { $gt : 0 } } : { searchTags: { $in : interest }, "ratings.rate" : { $gt : 0 } };
 
-  console.log(whereConditions);
-
+  
   const result = await Gig.find(whereConditions)
-    .sort({ createdAt: -1 })
+    .sort({ "ratings.rate" : -1})
     .skip(skip)
     .limit(limit)
     .populate(["artist", "video"]);

@@ -264,6 +264,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
 exports.changePassword = catchAsync(async (req, res) => {
   const { currentPass, newPass, confirmPass } = req.body;
+  console.log(req.body)
   const user = await User.findById(req.user._id);
 
   if (!currentPass || !newPass || !confirmPass) {
@@ -285,7 +286,7 @@ exports.changePassword = catchAsync(async (req, res) => {
 
   const salt = await bcrypt.genSalt(10);
   const hashpassword = await bcrypt.hash(newPass, salt);
-  
+
   await User.findByIdAndUpdate(req.user._id, {
     $set: { password: hashpassword },
   });
@@ -306,6 +307,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
     return sendResponse(res, 204, "No User Found", user);
   }
   const { fullName, email, mobileNumber, location, about } = req.body;
+  console.log(req.body)
 
   let imageFileName = "";
   if (req.files && req.files.image && req.files.image[0]) {
@@ -329,8 +331,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Profile Updated Successfully",
-    data: user,
+    message: "Profile Updated Successfully"
   });
 });
 
@@ -404,8 +405,23 @@ exports.getProfileFromDB = catchAsync( async (req, res, next) =>{
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Retrive Data",
+    message: "Retrieve Data",
     user: user
   })
-  console.log(user);
+})
+
+exports.getTopArtistFromDB = catchAsync( async (req, res, next)=>{
+  const { interest } = await User.findById(req.user._id);
+  const artists = await User.find({
+    role: "ARTIST",
+    interest: { $in : interest },
+    "ratings.rate" : { $gt : 0 }
+  }).sort({ "ratings.rate" : -1})
+
+  return sendResponse(res,{
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Retrieve Data",
+    data: artists
+  })
 })
