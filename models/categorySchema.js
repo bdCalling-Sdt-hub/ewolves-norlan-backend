@@ -17,23 +17,7 @@ const categorySchema = new mongoose.Schema({
 
         type: String,
         required: true
-    },
-    sub_category:[
-        {
-            name:{
-                type: String,
-                required: false,
-            },
-            color:{
-                type: String,
-                required: false
-            },
-            image: {
-                type: String,
-                required: false
-            }
-        }
-    ]
+    }
 },{ timestamps: true });
 
 const CategorySchema = mongoose.model("category", categorySchema);

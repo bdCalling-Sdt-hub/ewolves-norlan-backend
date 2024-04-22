@@ -1,6 +1,11 @@
+const httpStatus = require("http-status");
 const TermsModel = require("../models/terms.model");
 const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");
+const {
+  addNotification,
+  getAllNotifications,
+} = require("./notification.controller");
 
 exports.addTerms = catchAsync(async (req, res, next) => {
   const { name, description } = req.body;
@@ -11,6 +16,21 @@ exports.addTerms = catchAsync(async (req, res, next) => {
       description: description,
     });
   }
+
+  //create notification;
+  const notificationData = {
+    message: "Create term and condition",
+    image: "https://siffahim.github.io/artist-tailwind/images/02.jpg",
+    type: "term-and-conditions",
+    role: "ADMIN",
+    view: false,
+  };
+
+  await addNotification(notificationData);
+  const allNotification = await getAllNotifications();
+
+  io.emit("admin-notification", allNotification);
+
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -20,7 +40,7 @@ exports.addTerms = catchAsync(async (req, res, next) => {
 });
 
 exports.getTerms = catchAsync(async (req, res, next) => {
-  const terms = await TermsModel.find({});
+  const terms = await TermsModel.findOne().sort({createdAt: -1});
   if (!terms) {
     return sendResponse(res, 204, "No Data Found", terms);
   }

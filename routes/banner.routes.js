@@ -1,31 +1,32 @@
 const express = require("express");
 const router = express.Router();
 const {
-  addSubscription,
-  getSubscription,
-  updateSubscription
-} = require("../controllers/subscription.controller.js");
+  addBanner,
+  deleteBanner,
+  getBanner,
+  updateBanner,
+} = require("../controllers/banner.controller.js");
 const configureFileUpload = require("../middlewares/fileUpload.js");
-const auth = require("../middlewares/auth.js");
 const { USER_ROLE } = require("../enums/user.js");
+const auth = require("../middlewares/auth.js");
 
-// category
 router.post(
-  "/create-subscription",
+  "/create-banner",
   auth(USER_ROLE.ADMIN),
   configureFileUpload(),
-  addSubscription
+  addBanner
 );
 router.get(
-  "/subscription",
+  "/get-banner",
   auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
-  getSubscription
+  getBanner
 );
 router.patch(
-  "/update-subscription/:id",
+  "/update-banner/:id",
   auth(USER_ROLE.ADMIN),
   configureFileUpload(),
-  updateSubscription
+  updateBanner
 );
+router.delete("/delete-banner/:id", auth(USER_ROLE.ADMIN), deleteBanner);
 
 module.exports = router;

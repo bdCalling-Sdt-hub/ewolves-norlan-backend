@@ -1,6 +1,8 @@
-const SubscriptionModel = require("../models/subscriptionSchema");
+const httpStatus = require("http-status");
+const Subscription = require("../models/subscriptionSchema");
 const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");
+const ApiError = require("../errors/ApiError");
 
 // add slider image
 exports.addSubscription = catchAsync(async (req, res, next) => {
@@ -12,32 +14,42 @@ exports.addSubscription = catchAsync(async (req, res, next) => {
     package_features,
   } = req.body;
 
-  const result = await SubscriptionModel.create({
+  const result = await Subscription.create({
     package_name: package_name,
     package_duration: package_duration,
     package_price: parseInt(package_price),
     gig_count: parseInt(gig_count),
     package_features,
   });
-  return sendResponse(res, 200, "Subscription Added Successfully", result);
+  return sendResponse(res,{
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Created subcription Plan Successfully",
+    data: result
+  });
 });
 
 // get all slider
 exports.getSubscription = catchAsync(async (req, res, next) => {
-  const subscription = await SubscriptionModel.find({});
+  const subscription = await Subscription.find({});
   if (!subscription) {
-    return sendResponse(res, 204, "No Data Found", subscription);
+    throw new ApiError(404, "No Subscription Found");
   }
-  return sendResponse(res, 200, "Slider Added Successfully", subscription);
+  return sendResponse(res,{
+    statusCode: httpStatus.OK,
+    success: true,
+    message: " subcription retrive Successfully",
+    data: subscription
+  });
 });
 
 // update single slider
 exports.updateSubscription = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const { package_name, package_duration, package_price, gig_count } = req.body;
-  const result = await SubscriptionModel.findById(id);
+  const result = await Subscription.findById(id);
   if (!result) {
-    return sendResponse(res, 204, "No Data Found", result);
+    throw new ApiError(404, "No Subscription Found");
   }
 
   result.package_name = package_name ? package_name : result.package_name;
@@ -48,5 +60,10 @@ exports.updateSubscription = catchAsync(async (req, res, next) => {
   result.gig_count = gig_count ? gig_count : result.gig_count;
 
   await result.save();
-  return sendResponse(res, 200, "Subscription Updated Successfully", result);
+  return sendResponse(res,{
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Subscription Updated Successfully",
+    data: result
+  });
 });

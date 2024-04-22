@@ -9,6 +9,8 @@ const catchAsync = require("../shared/catchAsync");
 const userTimers = new Map();
 const fs = require("fs");
 const path = require("path");
+const pick = require("../shared/pick");
+const paginationCalculate = require("../helper/paginationHelper");
 
 exports.userRegister = catchAsync(async (req, res, next) => {
   const { fullName, email, password, confirmPass, termAndCondition, role } =
@@ -131,23 +133,35 @@ exports.userLogin = catchAsync(async (req, res) => {
     throw new ApiError(401, "your credential doesn't match");
   }
 
-  const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "3d",
-  });
+  const token = jwt.sign(
+    { _id: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "3d",
+    }
+  );
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Your Are logged in successfully",
-    data: user,
+    user: {
+      role: user.role,
+      id: user._id
+    },
     token: token,
   });
 });
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
   const user = await User.findOne({ email });
+
   if (!user) {
     throw new ApiError(400, "User doesn't exists");
   }
+
+  // Generate OTC (One-Time Code)
+  const emailVerifyCode = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
 
   // Store the OTC and its expiration time in the database
   user.emailVerifyCode = emailVerifyCode;
@@ -190,20 +204,48 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.otpVerify = catchAsync(async (req, res, next) => {
+  const { email, otp } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new ApiError(400, "User doesn't exists");
+  }
+
+  // Store the OTC and its expiration time in the database
+  if (user.emailVerifyCode == otp) {
+    user.emailVerified = true;
+    user.emailVerifyCode = null;
+    await user.save();
+  }
+
+
+  const token = jwt.sign(
+    { _id: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "3d",
+    }
+  );
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "OTP Verified Successfully",
+    token: token
+  });
+});
+
 exports.resetPassword = catchAsync(async (req, res, next) => {
   const { email, password, confirmPassword } = req.body;
   const user = await User.findOne({ email: email });
 
   if (!user) {
-    return sendResponse(res, 400, "User does not exist");
+    throw new ApiError(400, "User doesn't exists");
   }
 
   if (password !== confirmPassword) {
-    return sendResponse(
-      res,
-      400,
-      "Password and confirm password does not match"
-    );
+    throw new ApiError(400, "Password and confirm password does not match");
   }
 
   if (user.emailVerified === true) {
@@ -224,6 +266,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
 exports.changePassword = catchAsync(async (req, res) => {
   const { currentPass, newPass, confirmPass } = req.body;
+  console.log(req.body)
   const user = await User.findById(req.user._id);
 
   if (!currentPass || !newPass || !confirmPass) {
@@ -245,6 +288,7 @@ exports.changePassword = catchAsync(async (req, res) => {
 
   const salt = await bcrypt.genSalt(10);
   const hashpassword = await bcrypt.hash(newPass, salt);
+
   await User.findByIdAndUpdate(req.user._id, {
     $set: { password: hashpassword },
   });
@@ -265,6 +309,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
     return sendResponse(res, 204, "No User Found", user);
   }
   const { fullName, email, mobileNumber, location, about } = req.body;
+  console.log(req.body)
 
   let imageFileName = "";
   if (req.files && req.files.image && req.files.image[0]) {
@@ -288,8 +333,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Profile Updated Successfully",
-    data: user,
+    message: "Profile Updated Successfully"
   });
 });
 
@@ -334,3 +378,95 @@ exports.deleteAccount = catchAsync(async (req, res, next) => {
     message: "Account Delete Successfully",
   });
 });
+
+exports.makeInterest = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const { interest } = req.body;
+  const user = await User.findById(id);
+  if (!user) {
+    throw new ApiError(404, "No User Found by This ID");
+  }
+
+  user.interest.push(...interest);
+  await user.save();
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Make interest Successfully",
+  });
+});
+
+
+exports.getProfileFromDB = catchAsync( async (req, res, next) =>{
+  const user = await User.findById(req.user._id);
+  if(!user){
+    throw new ApiError(404, "Your are not a valid User");
+  }
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Retrieve Data",
+    user: user
+  })
+})
+
+exports.getTopArtistFromDB = catchAsync( async (req, res, next)=>{
+  const { interest } = await User.findById(req.user._id);
+  const artists = await User.find({
+    role: "ARTIST",
+    interest: { $in : interest },
+    "ratings.rate" : { $gt : 0 }
+  }).sort({ "ratings.rate" : -1})
+
+  return sendResponse(res,{
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Retrieve Data",
+    data: artists
+  })
+})
+
+exports.getAllArtistFromDB = catchAsync( async (req, res, next)=>{
+
+  const paginationOptions = pick(req.query, ["limit", "page"]);
+  const { limit, page, skip } = paginationCalculate(paginationOptions);
+
+  const searchQuery = req.query.keyword;
+
+  const query = {
+    $or: [
+      {
+        name: {
+          $regex: searchQuery,
+          $options: "i",
+        },
+      },
+      {
+        email: {
+          $regex: searchQuery,
+          $options: "i",
+        },
+      }
+    ]
+   
+  }
+
+  const artists = await User.find({role: "ARTIST", query})
+  .skip(skip)
+  .limit(limit)
+
+  const total = await User.countDocuments({role: "ARTIST"});
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All gig retrieved successfully",
+    pagination: {
+      page,
+      limit,
+      total,
+    },
+    data: artists,
+  });
+})

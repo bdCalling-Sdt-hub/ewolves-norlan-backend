@@ -38,7 +38,6 @@ const userSchema = new mongoose.Schema(
     instagramLink: { type: String, trim: true, required: false },
     accountStatus: { type: Boolean, default: false, required: false },
     profession: { type: String, trim: true, required: false },
-    aboutUs: { type: String, trim: true, required: false },
     termAndCondition: { type: Boolean, default: false, required: false },
     role: {
       type: String,
@@ -47,7 +46,7 @@ const userSchema = new mongoose.Schema(
       default: "USER",
     },
     emailVerified: { type: Boolean, default: false, required: false },
-    emailVerifyCode: { type: String, required: false, required: false },
+    emailVerifyCode: { type: String, required: false },
     following: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -65,6 +64,18 @@ const userSchema = new mongoose.Schema(
       enum: ["ACTIVE", "DELETE"],
       default: "ACTIVE",
     },
+    ratings: {
+      rate: {
+        type: String,
+        default: "0" // Default value for rate
+      },
+      count: {
+        type: Number,
+        default: 0 // Default value for count
+      }
+    },
+
+    interest:[]
   },
   { timestamps: true }
 );
