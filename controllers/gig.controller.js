@@ -73,11 +73,11 @@ exports.createGigToDB = catchAsync(async (req, res, next) => {
 exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
   const { interest } = await User.findById(req.user._id);
   const paginationOptions = pick(req.query, ["limit", "page"]);
+  console.log(req.query)
   const { priceMin, priceMax } = pick(req.query, ["priceMin", "priceMax"]);
   const filters = pick(req.query, [
     "searchTerm",
     "category",
-    "subCategory",
     "location",
   ]);
   const { limit, page, skip } = paginationCalculate(paginationOptions);
@@ -109,7 +109,6 @@ exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
   if (
     Object.keys(filterData).length &&
     filterData.category !== undefined &&
-    filterData.subCategory !== undefined &&
     filterData.location !== undefined
   ) {
     andConditions.push({
@@ -164,7 +163,6 @@ exports.updateGigToDB = catchAsync(async (req, res, next) => {
     location,
     skillLevel,
     searchTags,
-    subCategory,
     category,
     about,
   } = req.body;
@@ -189,7 +187,6 @@ exports.updateGigToDB = catchAsync(async (req, res, next) => {
   gig.skillLevel = skillLevel ? skillLevel : gig.skillLevel;
   gig.searchTags = searchTags ? searchTags : gig.searchTags;
   gig.category = category ? category : gig.category;
-  gig.subCategory = subCategory ? subCategory : gig.subCategory;
   gig.thumbnail = thumbnail ? thumbnail : gig.thumbnail;
 
   const result = await gig.save();

@@ -90,12 +90,14 @@ exports.userRegister = catchAsync(async (req, res, next) => {
 
 exports.verifyEmail = catchAsync(async (req, res, next) => {
   const { emailVerifyCode, email } = req.body;
+  console.log(emailVerifyCode, email)
 
   if (!emailVerifyCode && !email) {
     throw new ApiError(400, "All Field are required");
   }
 
   const user = await User.findOne({ email: email });
+  console.log(user)
   if (!user) {
     throw new ApiError(404, "User Not Found");
   }
