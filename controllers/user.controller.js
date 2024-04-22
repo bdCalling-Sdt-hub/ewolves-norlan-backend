@@ -433,7 +433,27 @@ exports.getAllArtistFromDB = catchAsync( async (req, res, next)=>{
   const paginationOptions = pick(req.query, ["limit", "page"]);
   const { limit, page, skip } = paginationCalculate(paginationOptions);
 
-  const artists = await User.find({role: "ARTIST"})
+  const searchQuery = req.query.keyword;
+
+  const query = {
+    $or: [
+      {
+        name: {
+          $regex: searchQuery,
+          $options: "i",
+        },
+      },
+      {
+        email: {
+          $regex: searchQuery,
+          $options: "i",
+        },
+      }
+    ]
+   
+  }
+
+  const artists = await User.find({role: "ARTIST", query})
   .skip(skip)
   .limit(limit)
 
