@@ -104,8 +104,6 @@ exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
     });
   }
 
-  console.log(filterData);
-
   if (
     Object.keys(filterData).length &&
     filterData.category !== undefined &&

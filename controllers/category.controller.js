@@ -8,7 +8,7 @@ const ApiError = require("../errors/ApiError");
 
 // add category
 exports.addCategory = catchAsync(async (req, res, next) => {
-  const { name, primary_color, secondary_color } = req.body;
+  const { name, colors } = req.body;
 
   let imageFileName = "";
   if (req.files && req.files.image && req.files.image[0]) {
@@ -17,8 +17,7 @@ exports.addCategory = catchAsync(async (req, res, next) => {
 
   const result = await CategoryModel.create({
     name: name,
-    primary_color: primary_color,
-    secondary_color: secondary_color,
+    colors: colors,
     image: imageFileName,
   });
 
@@ -82,7 +81,7 @@ exports.updateCategory = catchAsync(async (req, res, next) => {
     throw new ApiError(404, "No Category Found")
   }
 
-  const { name, primary_color, secondary_color, image } = req.body;
+  const { name, colors, image } = req.body;
   console.log(req.body);
   let imageFileName = "";
   if (req.files && req.files.image && req.files.image[0]) {
@@ -98,8 +97,7 @@ exports.updateCategory = catchAsync(async (req, res, next) => {
   }
 
   category.name = name ? name : category.name,
-  category.primary_color = primary_color ? primary_color : category.primary_color,
-  category.secondary_color = secondary_color ? secondary_color : category.secondary_color,
+  category.colors = colors ? colors : category.colors,
   category.image = imageFileName ? imageFileName : image;
   const result = await category.save();
   return sendResponse(res,{
