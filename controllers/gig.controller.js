@@ -73,7 +73,6 @@ exports.createGigToDB = catchAsync(async (req, res, next) => {
 exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
   const { interest } = await User.findById(req.user._id);
   const paginationOptions = pick(req.query, ["limit", "page"]);
-  console.log(req.query)
   const { priceMin, priceMax } = pick(req.query, ["priceMin", "priceMax"]);
   const filters = pick(req.query, [
     "searchTerm",

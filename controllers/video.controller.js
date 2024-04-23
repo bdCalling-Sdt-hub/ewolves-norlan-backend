@@ -65,9 +65,8 @@ exports.createComment = catchAsync(async (req, res, next) => {
 
 exports.createWishList = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const { userId } = req.body;
-
-  const user = await User.findById(userId);
+  
+  const user = await User.findById(req.user._id);
   if (!user) {
     throw new ApiError(204, "User not found");
   }
