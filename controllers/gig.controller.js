@@ -249,3 +249,24 @@ exports.addRating = catchAsync(async (req, res, next) => {
     data: newResult,
   });
 });
+
+exports.gigByEventName = catchAsync(async (req, res, next) => {
+  const { event } = req.query;
+  let gig;
+  if(event){
+    gig = await Gig.find({event : event});
+  }else{
+    gig = await Gig.find({}).sort({createdAt: -1});
+  }
+  
+  if(!gig){
+    throw new ApiError(404, "Gig not Found");
+  }
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Retrieve Gig Data Successfully",
+    data: gig,
+  });
+});

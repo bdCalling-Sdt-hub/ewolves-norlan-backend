@@ -5,6 +5,7 @@ const {
   updateGigToDB,
   findGigByArtistId,
   addRating,
+  gigByEventName
 } = require("../controllers/gig.controller");
 const configureFileUpload = require("../middlewares/fileUpload");
 const auth = require("../middlewares/auth");
@@ -38,6 +39,12 @@ router.post(
   "/add-rating/:id",
   auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
   addRating
+);
+
+router.get(
+  "/get-event-gig",
+  auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
+  gigByEventName
 );
 
 module.exports = router;
