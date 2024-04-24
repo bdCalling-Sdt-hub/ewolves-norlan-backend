@@ -17,7 +17,7 @@ router.post(
   createHighlightToDB
 );
 router.get(
-  "/artist/:id",
+  "/artist",
   auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
   getHighlightFromDB
 );

@@ -19,7 +19,7 @@ router.post(
   createGigToDB
 );
 router.get(
-  "/artist/:id",
+  "/artist-gig",
   auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
   findGigByArtistId
 );
