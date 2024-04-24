@@ -77,11 +77,11 @@ exports.createWishList = catchAsync(async (req, res, next) => {
   }
 
   const index = video.wishList.findIndex(
-    (wish) => wish.user.toString() === userId
+    (wish) => wish.user.toString() === req.user._id
   );
 
   if (index === -1) {
-    video.wishList.push({ user: userId });
+    video.wishList.push({ user: req.user._id });
     await video.save();
 
     return sendResponse(res, {
@@ -104,8 +104,7 @@ exports.createWishList = catchAsync(async (req, res, next) => {
 });
 
 exports.getWishListByUserId = catchAsync(async (req, res) => {
-  const id = req.params.id;
-
+  const id = req.user._id
   const result = await Video.find({ "wishList.user": id })
     .sort({
       createdAt: -1,

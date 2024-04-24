@@ -268,7 +268,6 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
 exports.changePassword = catchAsync(async (req, res) => {
   const { currentPass, newPass, confirmPass } = req.body;
-  console.log(req.body)
   const user = await User.findById(req.user._id);
 
   if (!currentPass || !newPass || !confirmPass) {
@@ -310,7 +309,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
   if (!user) {
     return sendResponse(res, 204, "No User Found", user);
   }
-  const { fullName, email, mobileNumber, location, about } = req.body;
+  const { fullName, email, mobileNumber, location, about, profession } = req.body;
   console.log(req.body)
 
   let imageFileName = "";
@@ -329,6 +328,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
   user.mobileNumber = mobileNumber ? mobileNumber : user.mobileNumber;
   user.location = location ? location : user.location;
   user.about = about ? about : user.about;
+  user.profession = profession ? profession : user.profession;
   user.image = imageFileName ? imageFileName : user.image;
   await user.save();
 
@@ -347,8 +347,7 @@ exports.makeFollower = catchAsync(async (req, res, next) => {
     throw new ApiError(204, "No User Found");
   }
 
-  const { userId } = req.body;
-  const following = await User.findById(userId);
+  const following = await User.findById(req.user._id);
   if (!following) {
     throw new ApiError(204, "No User Found");
   }
@@ -401,7 +400,7 @@ exports.makeInterest = catchAsync(async (req, res, next) => {
 
 
 exports.getProfileFromDB = catchAsync( async (req, res, next) =>{
-  const user = await User.findById(req.user._id);
+  const user = await User.findById(req.user._id).populate("followers").populate("following");
   if(!user){
     throw new ApiError(404, "Your are not a valid User");
   }

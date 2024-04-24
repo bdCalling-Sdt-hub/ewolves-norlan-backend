@@ -10,7 +10,7 @@ require("dotenv").config();
 
 //db connect here
 dbConnection(process.env.DB_URL);
-const server = app.listen(port, "192.168.10.104", () => {
+const server = app.listen(port, "192.168.10.116", () => {
   console.log("Application running on port", port);
 });
 

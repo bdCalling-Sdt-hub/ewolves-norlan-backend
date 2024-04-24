@@ -28,7 +28,7 @@ router.post(
   createWishList
 );
 router.get(
-  "/wishlist/:id",
+  "/wishlist-by-user",
   auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
   getWishListByUserId
 );
