@@ -381,10 +381,7 @@ exports.deleteAccount = catchAsync(async (req, res, next) => {
 });
 
 exports.makeInterest = catchAsync(async (req, res, next) => {
-  console.log("first")
-  console.log("make interest", req.user)
   const { interest } = req.body;
-  console.log(interest)
   const user = await User.findById(req.user._id);
   if (!user) {
     throw new ApiError(404, "No User Found by This ID");
