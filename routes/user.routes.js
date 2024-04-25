@@ -45,8 +45,9 @@ router.patch(
   userController.deleteAccount
 );
 router.patch(
-  "/make-interest/:id",
+  "/make-interest",
   configureFileUpload(),
+  auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
   userController.makeInterest
 );
 
@@ -54,6 +55,12 @@ router.get(
   "/get-profile",
   auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
   userController.getProfileFromDB
+);
+
+router.get(
+  "/get-profile-id/:id",
+  auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
+  userController.getProfileByIDFromDB
 );
 router.get(
   "/get-top-artist",

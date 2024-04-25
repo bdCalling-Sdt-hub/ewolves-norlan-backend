@@ -32,7 +32,7 @@ exports.getChatByUserID= catchAsync(async(req, res, next)=>{
     })
 })
 
-exports.getChatUserById = catchAsync(async(req, res, next)=>{
+exports.getUserById = catchAsync(async(req, res, next)=>{
     const { id } = req.params;
     const user = await User.findById(id);
     if(!user){

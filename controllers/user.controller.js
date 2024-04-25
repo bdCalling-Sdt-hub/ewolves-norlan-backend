@@ -381,9 +381,11 @@ exports.deleteAccount = catchAsync(async (req, res, next) => {
 });
 
 exports.makeInterest = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
+  console.log("first")
+  console.log("make interest", req.user)
   const { interest } = req.body;
-  const user = await User.findById(id);
+  console.log(interest)
+  const user = await User.findById(req.user._id);
   if (!user) {
     throw new ApiError(404, "No User Found by This ID");
   }
@@ -401,6 +403,21 @@ exports.makeInterest = catchAsync(async (req, res, next) => {
 
 exports.getProfileFromDB = catchAsync( async (req, res, next) =>{
   const user = await User.findById(req.user._id).populate("followers").populate("following");
+  if(!user){
+    throw new ApiError(404, "Your are not a valid User");
+  }
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Retrieve Data",
+    user: user
+  })
+})
+
+exports.getProfileByIDFromDB = catchAsync( async (req, res, next) =>{
+  const { id } = req.params;
+  const user = await User.findById(id).populate("followers").populate("following");
   if(!user){
     throw new ApiError(404, "Your are not a valid User");
   }
