@@ -19,6 +19,14 @@ const subscriptionSchema = new mongoose.Schema({
     },
     package_features:{
         type:Array
+    },
+    package_type: {
+        type: String,
+        required: true
+    },
+    package_description: {
+        type: String,
+        required: true
     }
 },{ timestamps: true });
 
