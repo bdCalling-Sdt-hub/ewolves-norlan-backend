@@ -3,7 +3,8 @@ const router = express.Router();
 const {
   addSubscription,
   getSubscription,
-  updateSubscription
+  updateSubscription,
+  getSingleSubscription
 } = require("../controllers/subscription.controller.js");
 const configureFileUpload = require("../middlewares/fileUpload.js");
 const auth = require("../middlewares/auth.js");
@@ -20,6 +21,11 @@ router.get(
   "/subscription",
   auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
   getSubscription
+);
+router.get(
+  "/subscription-details/:id",
+  auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
+  getSingleSubscription
 );
 router.patch(
   "/update-subscription/:id",

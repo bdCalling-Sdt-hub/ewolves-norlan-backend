@@ -43,6 +43,20 @@ exports.getSubscription = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getSingleSubscription = catchAsync(async (req, res, next) => {
+  const id = req.params.id;
+  const subscription = await Subscription.findById(id);
+  if (!subscription) {
+    throw new ApiError(404, "No Subscription Found");
+  }
+  return sendResponse(res,{
+    statusCode: httpStatus.OK,
+    success: true,
+    message: " subcription retrive Successfully",
+    data: subscription
+  });
+});
+
 // update single slider
 exports.updateSubscription = catchAsync(async (req, res, next) => {
   const { id } = req.params;
