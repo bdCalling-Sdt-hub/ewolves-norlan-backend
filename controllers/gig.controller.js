@@ -192,7 +192,7 @@ exports.updateGigToDB = catchAsync(async (req, res, next) => {
 });
 
 exports.findGigByArtistId = catchAsync(async (req, res, next) => {
-  const id = req.body.id;
+  const id = req.params.id;
 
   const result = await Gig.find({ artist: id }).sort({ createdAt: -1 });
 
