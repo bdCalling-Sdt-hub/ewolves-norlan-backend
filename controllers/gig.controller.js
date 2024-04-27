@@ -74,11 +74,7 @@ exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
   const { interest } = await User.findById(req.user._id);
   const paginationOptions = pick(req.query, ["limit", "page"]);
   const { priceMin, priceMax } = pick(req.query, ["priceMin", "priceMax"]);
-  const filters = pick(req.query, [
-    "searchTerm",
-    "category",
-    "location",
-  ]);
+  const filters = pick(req.query, ["searchTerm", "category", "location"]);
   const { limit, page, skip } = paginationCalculate(paginationOptions);
   const { searchTerm, ...filterData } = filters;
 
@@ -125,11 +121,16 @@ exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
   }
 
   const whereConditions =
-    andConditions.length > 0 ? { $and: andConditions, searchTags: { $in : interest }, "ratings.rate" : { $gt : 0 } } : { searchTags: { $in : interest }, "ratings.rate" : { $gt : 0 } };
+    andConditions.length > 0
+      ? {
+          $and: andConditions,
+          searchTags: { $in: interest },
+          "ratings.rate": { $gt: 0 },
+        }
+      : { searchTags: { $in: interest }, "ratings.rate": { $gt: 0 } };
 
-  
   const result = await Gig.find(whereConditions)
-    .sort({ "ratings.rate" : -1})
+    .sort({ "ratings.rate": -1 })
     .skip(skip)
     .limit(limit)
     .populate(["artist", "video"]);
@@ -155,14 +156,8 @@ exports.updateGigToDB = catchAsync(async (req, res, next) => {
   if (!gig) {
     throw new ApiError(204, "No Gig Found");
   }
-  const {
-    contentName,
-    location,
-    skillLevel,
-    searchTags,
-    category,
-    about,
-  } = req.body;
+  const { contentName, location, skillLevel, searchTags, category, about } =
+    req.body;
 
   let thumbnail = "";
 
@@ -197,14 +192,14 @@ exports.updateGigToDB = catchAsync(async (req, res, next) => {
 });
 
 exports.findGigByArtistId = catchAsync(async (req, res, next) => {
-  const id = req.user._id
+  const id = req.body.id;
 
   const result = await Gig.find({ artist: id }).sort({ createdAt: -1 });
 
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Single Artist gig retrive successfully",
+    message: "Single Artist gig retrieved successfully",
     data: result,
   });
 });
@@ -213,32 +208,42 @@ exports.addRating = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const { ratings } = req.body;
   const gig = await Gig.findById(id).populate("artist");
-  
-  if(!gig){
+
+  if (!gig) {
     throw new ApiError(404, "Gig not Found");
   }
-  const count = parseInt(gig?.ratings.count)  + 1;
-  const newRating = (parseInt(ratings) * count + parseInt(gig?.ratings.rate) * parseInt(gig?.ratings.count)) / (count + parseInt(gig?.ratings.count));
-
+  const count = parseInt(gig?.ratings.count) + 1;
+  const newRating =
+    (parseInt(ratings) * count +
+      parseInt(gig?.ratings.rate) * parseInt(gig?.ratings.count)) /
+    (count + parseInt(gig?.ratings.count));
 
   const result = await Gig.findOneAndUpdate(
-    {_id: id}, 
-    {$set: { "ratings.rate": newRating.toString(), "ratings.count": count  }},
-    {new: true}
+    { _id: id },
+    { $set: { "ratings.rate": newRating.toString(), "ratings.count": count } },
+    { new: true }
   );
-  
+
   const artist = await User.findById(result.artist);
-  if(!artist){
+  if (!artist) {
     throw new ApiError(404, "User not Found");
   }
 
-  const artistCount = parseInt(artist?.ratings.count)  + 1;
-  const artistRating = (parseInt(ratings) * count + parseInt(artist?.ratings.rate) * parseInt(artist?.ratings.count)) / (count + parseInt(artist?.ratings.count));
+  const artistCount = parseInt(artist?.ratings.count) + 1;
+  const artistRating =
+    (parseInt(ratings) * count +
+      parseInt(artist?.ratings.rate) * parseInt(artist?.ratings.count)) /
+    (count + parseInt(artist?.ratings.count));
 
   const newResult = await User.findOneAndUpdate(
-    {_id: result?.artist}, 
-    {$set: { "ratings.rate": artistRating.toString(), "ratings.count": artistCount  }},
-    {new: true}
+    { _id: result?.artist },
+    {
+      $set: {
+        "ratings.rate": artistRating.toString(),
+        "ratings.count": artistCount,
+      },
+    },
+    { new: true }
   );
 
   return sendResponse(res, {
@@ -252,13 +257,13 @@ exports.addRating = catchAsync(async (req, res, next) => {
 exports.gigByEventName = catchAsync(async (req, res, next) => {
   const { event } = req.query;
   let gig;
-  if(event){
-    gig = await Gig.find({event : event});
-  }else{
-    gig = await Gig.find({}).sort({createdAt: -1});
+  if (event) {
+    gig = await Gig.find({ event: event });
+  } else {
+    gig = await Gig.find({}).sort({ createdAt: -1 });
   }
-  
-  if(!gig){
+
+  if (!gig) {
     throw new ApiError(404, "Gig not Found");
   }
 
