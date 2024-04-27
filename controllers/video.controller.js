@@ -7,10 +7,9 @@ const httpStatus = require("http-status");
 const catchAsync = require("../shared/catchAsync");
 
 exports.getAllVideo = catchAsync(async (req, res) => {
-  const result = await Video.find()
+  const result = await Video.find({}, { comments: 0 })
     .sort({ createdAt: -1 })
-    .populate(["artist"])
-    .populate(["comments.user"]);
+    .populate({ path: "artist", select: "fullName image location" });
 
   // Sending response for video metadata
   sendResponse(res, {
@@ -63,9 +62,26 @@ exports.createComment = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getVideoComments = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const video = await Video.findById(id)
+    .populate({ path: "comments.user", select: "fullName image" })
+    .select("comments");
+  if (!video) {
+    throw new ApiError(httpStatus.OK, "Video doesn't exist!");
+  }
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Comment retrieved successfully",
+    data: video,
+  });
+});
+
 exports.createWishList = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  
+
   const user = await User.findById(req.user._id);
   if (!user) {
     throw new ApiError(204, "User not found");
@@ -104,7 +120,7 @@ exports.createWishList = catchAsync(async (req, res, next) => {
 });
 
 exports.getWishListByUserId = catchAsync(async (req, res) => {
-  const id = req.user._id
+  const id = req.user._id;
   const result = await Video.find({ "wishList.user": id })
     .sort({
       createdAt: -1,
