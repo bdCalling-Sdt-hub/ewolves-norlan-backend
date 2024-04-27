@@ -17,10 +17,11 @@ router.post(
   createHighlightToDB
 );
 router.get(
-  "/artist",
+  "/artist/:id",
   auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
   getHighlightFromDB
 );
+
 router.patch(
   "/:id",
   auth(USER_ROLE.ARTIST),

@@ -22,7 +22,7 @@ exports.createHighlightToDB = catchAsync(async (req, res, next) => {
 });
 
 exports.getHighlightFromDB = catchAsync(async (req, res, next) => {
-  const id = req.user._id
+  const id = req.body.id;
   const result = await Highlight.find({ artist: id }).sort({
     createdAt: -1,
   });
