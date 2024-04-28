@@ -35,6 +35,35 @@ exports.getAllVideo = catchAsync(async (req, res) => {
   });
 });
 
+
+exports.getSingleVideo = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const result = await Video.findById(id, { comments: 0 })
+    .sort({ createdAt: -1 })
+    .populate({ path: "artist", select: "fullName image location" });
+
+  // Sending response for video metadata
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Single video retrieved successfully",
+    data: result,
+  });
+
+  // Streaming video data using fs.createReadStream
+  if (result && result.video.path) {
+    const videoStream = fs.createReadStream(video.path);
+    videoStream.on("open", () => {
+      videoStream.pipe(res);
+    });
+    videoStream.on("error", (err) => {
+      console.error("Error reading video file:", err);
+      res.status(500).end("Internal Server Error");
+    });
+  }
+ 
+});
+
 exports.createComment = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const { userId, comment } = req.body;

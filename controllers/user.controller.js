@@ -309,7 +309,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
   if (!user) {
     return sendResponse(res, 204, "No User Found", user);
   }
-  const { fullName, email, mobileNumber, location, about, profession } = req.body;
+  const { fullName, email, mobileNumber, location, about, profession,color } = req.body;
   console.log(req.body)
 
   let imageFileName = "";
@@ -327,6 +327,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
   user.email = email ? email : user?.email;
   user.mobileNumber = mobileNumber ? mobileNumber : user.mobileNumber;
   user.location = location ? location : user.location;
+  user.color = color ? color : user.color;
   user.about = about ? about : user.about;
   user.profession = profession ? profession : user.profession;
   user.image = imageFileName ? imageFileName : user.image;
@@ -352,7 +353,7 @@ exports.makeFollower = catchAsync(async (req, res, next) => {
     throw new ApiError(204, "No User Found");
   }
 
-  followers.followers.push(userId);
+  followers.followers.push(id);
   await followers.save();
 
   following.following.push(id);

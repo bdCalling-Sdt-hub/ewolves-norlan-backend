@@ -7,6 +7,7 @@ const {
   getAllVideo,
   getWishListByUserId,
   getVideoComments,
+  getSingleVideo,
 } = require("../controllers/video.controller.js");
 
 const auth = require("../middlewares/auth.js");
@@ -35,6 +36,12 @@ router.get(
   "/wishlist-by-user",
   auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
   getWishListByUserId
+);
+
+router.get(
+  "/:id",
+  auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
+  getSingleVideo
 );
 
 router.get(

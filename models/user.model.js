@@ -74,7 +74,11 @@ const userSchema = new mongoose.Schema(
         default: 0 // Default value for count
       }
     },
-
+    color: {
+      type:
+       String,
+       default:"#fff"
+      },
     interest:[]
   },
   { timestamps: true }

@@ -6,7 +6,7 @@ const eventModel = new Schema({
         require: true
     },
     colors: {
-        type: String,
+        type: [String],
         required: true
     },
     image: {
