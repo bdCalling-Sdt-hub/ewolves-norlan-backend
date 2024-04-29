@@ -23,9 +23,7 @@ exports.getCommunity = catchAsync(async (req, res) => {
       ? { communityCreator: user._id }
       : { communityMembers: { $in: [user._id] } };
 
-  const result = await Community.find(whereCondition);
-
-  console.log(result);
+  const result = await Community.find(whereCondition).populate({path: "communityMembers", select: "fullName _id image color"});
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

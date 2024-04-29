@@ -11,10 +11,12 @@ const communityModel = new Schema(
       type: String,
       required: true,
     },
-    communityMembers: {
-      type: [String],
-      required: true,
-    },
+    communityMembers: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true }
 );
