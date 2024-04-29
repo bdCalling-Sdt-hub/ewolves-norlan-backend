@@ -35,7 +35,6 @@ exports.getAllVideo = catchAsync(async (req, res) => {
   });
 });
 
-
 exports.getSingleVideo = catchAsync(async (req, res) => {
   const id = req.params.id;
   const result = await Video.findById(id, { comments: 0 })
@@ -61,7 +60,6 @@ exports.getSingleVideo = catchAsync(async (req, res) => {
       res.status(500).end("Internal Server Error");
     });
   }
- 
 });
 
 exports.createComment = catchAsync(async (req, res, next) => {

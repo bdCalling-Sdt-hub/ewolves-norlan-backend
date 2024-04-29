@@ -15,6 +15,7 @@ const chatRouter = require("./routes/chat.routes");
 const highlightRouter = require("./routes/highlight.routes");
 const eventRouter = require("./routes/event.routes");
 const fagRouter = require("./routes/faq.routes");
+const communityRoutes = require("./routes/community.routes");
 const globalErrorHandler = require("./middlewares/globalErrorHandler");
 
 //parser
@@ -38,6 +39,7 @@ app.use("/api/video", videoRouter);
 app.use("/api/chat/", chatRouter);
 app.use("/api/event/", eventRouter);
 app.use("/api/faq/", fagRouter);
+app.use("/api/community", communityRoutes);
 
 //image get
 app.use(express.static("uploads"));
