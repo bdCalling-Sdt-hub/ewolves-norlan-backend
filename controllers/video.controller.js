@@ -7,16 +7,31 @@ const httpStatus = require("http-status");
 const catchAsync = require("../shared/catchAsync");
 
 exports.getAllVideo = catchAsync(async (req, res) => {
-  const result = await Video.find({}, { comments: 0 })
-    .sort({ createdAt: -1 })
-    .populate({ path: "artist", select: "fullName image location" });
+  const result = await Video.find({})
+  .sort({ createdAt: -1 })
+  .populate({ path: "artist", select: "fullName image location" })
+  .lean(); 
 
+
+const modifiedResult = result.map(video => {
+  return {
+      ...video,
+      comments: video.comments.length
+  };
+});
+
+
+
+
+
+
+  
   // Sending response for video metadata
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "All video retrieved successfully",
-    data: result,
+    data: modifiedResult,
   });
 
   // Streaming video data using fs.createReadStream

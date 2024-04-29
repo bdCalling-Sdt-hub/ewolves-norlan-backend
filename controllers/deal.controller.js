@@ -7,20 +7,19 @@ const httpStatus = require("http-status");
 
 exports.makeDeal= catchAsync(async(req, res, next)=>{
     const { id } = req.params;
-    const { userId } = req.body;
     const artist = await User.findById(id);
     if(!artist){
         throw new ApiError(404, "No User Found");
     }
 
-    const user = await User.findById(userId);
+    const user = await User.findById(req.user_id);
     if(!user){
         throw new ApiError(404, "No User Found");
     }
 
     const result = await Deal.create({
         artist:id,
-        user: userId,  
+        user: req.user_id,  
         ...req.body
     });
 
@@ -53,9 +52,7 @@ exports.getDealByUserId= catchAsync(async(req, res, next)=>{
 
 exports.changeDealStatusToDB = catchAsync(async(req, res, next)=>{
     const { id } = req.params;
-    console.log(id);
     const { type } = req.query;
-    console.log(type)
 
     const deal = await Deal.findById(id);
     if(!deal){
@@ -70,7 +67,7 @@ exports.changeDealStatusToDB = catchAsync(async(req, res, next)=>{
     return sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "Deal Cancel Successful",
+        message: `Deal ${type} Successful`,
         data: result
     })
 });

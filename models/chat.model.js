@@ -5,6 +5,28 @@ const chatSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    messageType:{
+        type: String,
+        required: true,
+        enum: ["Text", "Deal", "Image"],
+        default: "Text",
+    },
+    deal: {
+       type:{
+            title:{
+                type: String
+            },
+            description: {
+                type: String
+            },
+            status: {
+                type: String,
+                enum: ["Pending", "Complete", "Cancel"],
+                default: "Pending"
+            }
+
+       }
+    },
     sender:{
         type: mongoose.Schema.Types.ObjectId,
         required: true,

@@ -16,11 +16,15 @@ const highlightRouter = require("./routes/highlight.routes");
 const eventRouter = require("./routes/event.routes");
 const fagRouter = require("./routes/faq.routes");
 const globalErrorHandler = require("./middlewares/globalErrorHandler");
+const morgan = require("morgan");
 
 //parser
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+//morgan
+app.use(morgan("tiny"))
 
 app.use("/api/auth", userRoute);
 app.use("/api/banner", bannerRoute);
