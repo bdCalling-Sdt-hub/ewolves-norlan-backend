@@ -13,18 +13,12 @@ exports.getAllVideo = catchAsync(async (req, res) => {
   .lean(); 
 
 
-const modifiedResult = result.map(video => {
-  return {
-      ...video,
-      comments: video.comments.length
-  };
-});
-
-
-
-
-
-
+  const modifiedResult = result.map(video => {
+    return {
+        ...video,
+        comments: video.comments.length
+    };
+  });
   
   // Sending response for video metadata
   sendResponse(res, {
@@ -161,6 +155,8 @@ exports.createWishList = catchAsync(async (req, res, next) => {
       data: video,
     });
   }
+
+  
 });
 
 exports.getWishListByUserId = catchAsync(async (req, res) => {

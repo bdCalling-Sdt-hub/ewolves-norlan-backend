@@ -123,11 +123,11 @@ exports.userLogin = catchAsync(async (req, res) => {
 
   const user = await User.findOne({ email: email });
   if (!user) {
-    throw new ApiError(204, "User not Found");
+    throw new ApiError(400, "User not Found");
   }
 
-  if (user.emailVerified === false) {
-    throw new ApiError(401, "your email is not verified");
+  if (!user.emailVerified) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "your email is not verified");
   }
 
   const ismatch = await bcrypt.compare(password, user.password);
@@ -142,13 +142,14 @@ exports.userLogin = catchAsync(async (req, res) => {
       expiresIn: "3d",
     }
   );
-  return sendResponse(res, {
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Your Are logged in successfully",
     user: {
       role: user.role,
-      id: user._id
+      id: user._id,
+      interest: user.interest
     },
     token: token,
   });
