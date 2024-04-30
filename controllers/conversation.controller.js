@@ -5,16 +5,32 @@ const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");
 
 exports.createConversationToDB  = catchAsync( async(req, res, next)=>{
+
+    const existingConversation = await Conversation.findOne({
+        members: {
+            $all: [req.body.senderId, req.body.receiverId]
+        }
+    });
+
     const conversation = new Conversation({
         members: [ req.body.senderId, req.body.receiverId ]
     });
-    const result = await conversation.save();
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        status: true,
-        message: "Conversation Created Successfully",
-        data: result
-    })
+
+    if(!existingConversation){
+        const result = await conversation.save();
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
+            status: true,
+            message: "Conversation Created Successfully",
+            data: result
+        });
+    }else{
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
+            status: true,
+            message: "Conversation Created Successfully"
+        });
+    }
 });
 
 exports.getConversationsFromDB = catchAsync( async (req, res, next)=>{

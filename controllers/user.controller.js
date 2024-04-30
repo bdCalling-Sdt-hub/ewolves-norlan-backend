@@ -235,6 +235,11 @@ exports.otpVerify = catchAsync(async (req, res, next) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "OTP Verified Successfully",
+    user: {
+      role: user.role,
+      id: user._id,
+      interest: user.interest
+    },
     token: token
   });
 });

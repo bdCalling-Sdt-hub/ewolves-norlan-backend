@@ -6,6 +6,11 @@ const MessageSchema = new Schema(
             type: String,
             required: true
         },
+        messageType:{
+            type: String,
+            enum: ["Text", "Deal", "Image"],
+            default: "Text",
+        },
         sender: {
             type: Schema.Types.ObjectId,
             ref: "User",
