@@ -79,7 +79,9 @@ const userSchema = new mongoose.Schema(
        String,
        default:"0XFFFFFFFF"
       },
-    interest:[]
+    interest: {
+      type: Array
+    }
   },
   { timestamps: true }
 );

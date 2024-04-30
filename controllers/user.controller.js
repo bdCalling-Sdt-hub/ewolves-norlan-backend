@@ -389,18 +389,21 @@ exports.deleteAccount = catchAsync(async (req, res, next) => {
 
 exports.makeInterest = catchAsync(async (req, res, next) => {
   const { interest } = req.body;
-  const user = await User.findById(req.user._id);
+
+  // Add interest to the user's interest array
+  const user = await User.findOneAndUpdate({_id:req.user._id}, {interest: [...interest]},{new:true})
+  
   if (!user) {
-    throw new ApiError(404, "No User Found by This ID");
+    throw new ApiError(404, "User doesn't exist!");
   }
 
-  user.interest.push(...interest);
-  await user.save();
+  console.log(user)
 
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Make interest Successfully",
+    data: user
   });
 });
 
