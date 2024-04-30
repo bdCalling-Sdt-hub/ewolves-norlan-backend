@@ -18,7 +18,7 @@ exports.createMessageToDB = catchAsync( async(req, res, next)=>{
 // get message by conversation ID
 exports.getMessageFromDB = catchAsync( async(req, res, next) =>{
     const messages = await Message.find({
-        conversationId: req.params.conversationId,
+        conversationId: req.params.conversationId
     });
 
     if(!messages){
