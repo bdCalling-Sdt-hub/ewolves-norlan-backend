@@ -1,7 +1,6 @@
-const {
-  getAllNotifications,
-} = require("../controllers/notification.controller");
-const Chat = require("../models/chat.model");
+
+
+
 const socketHandler = (io) => {
   io.on("connection", (socket) => {
     console.log(`Socket connected with ${socket.id}`);
@@ -16,11 +15,11 @@ const socketHandler = (io) => {
             senderId: senderId,
           });
         }
-        await Chat.create({
+        /* await Chat.create({
           sender: sender,
           receiver: receiver,
           message: message,
-        });
+        }); */
       }
     );
   });
