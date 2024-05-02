@@ -16,19 +16,18 @@ exports.createConversationToDB  = catchAsync( async(req, res, next)=>{
         members: [ req.body.senderId, req.body.receiverId ]
     });
 
-    if(!existingConversation){
-        const result = await conversation.save();
+    if(existingConversation){
         sendResponse(res, {
             statusCode: httpStatus.OK,
             status: true,
-            message: "Conversation Created Successfully",
-            data: result
+            message: "Already Exist",
+            data: existingConversation
         });
     }else{
         sendResponse(res, {
             statusCode: httpStatus.OK,
             status: true,
-            message: "Conversation Created Successfully",
+            message: "Conversation Created Successfully!!!",
             data: conversation
         });
     }
