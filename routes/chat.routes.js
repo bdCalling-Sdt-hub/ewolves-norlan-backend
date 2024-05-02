@@ -7,8 +7,8 @@ const { createConversationToDB, getConversationsFromDB, getSingleConversationFro
 const { createMessageToDB, getMessageFromDB } = require('../controllers/message.controller.js');
 
 // conversation api
-router.post("/create-conversation", fileUpload(), createConversationToDB);
-router.get("/get-conversations/:userId", getConversationsFromDB);
+router.post("/create-conversation", auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER), fileUpload(), createConversationToDB);
+router.get("/get-conversations", auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER), getConversationsFromDB);
 router.get("/get-conversation/:firstUserId/:secondUserId", getSingleConversationFromDB);
 
 // message api

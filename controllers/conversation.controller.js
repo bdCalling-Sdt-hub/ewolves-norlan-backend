@@ -28,14 +28,16 @@ exports.createConversationToDB  = catchAsync( async(req, res, next)=>{
         sendResponse(res, {
             statusCode: httpStatus.OK,
             status: true,
-            message: "Conversation Created Successfully"
+            message: "Conversation Created Successfully",
+            data: conversation
         });
     }
 });
 
 exports.getConversationsFromDB = catchAsync( async (req, res, next)=>{
+    const id = req.user._id
     const conversations = await Conversation.find({
-        members: { $in: [req.params.userId] }
+        members: { $in: [id] }
     }).populate({ path: "members", select: "fullName _id image color"});
 
     if(!conversations){
