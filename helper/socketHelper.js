@@ -2,9 +2,8 @@ const Message = require("../models/message.model");
 
 const socketHandler = (io) => {
     let users = [];
-
+    
     const addUser = (userId, socketId) => {
-        console.log(userId)
         !users.some((user) => user.userId === userId) && users.push({ userId, socketId });
     };
 
@@ -31,7 +30,11 @@ const socketHandler = (io) => {
         //send and get message
         socket.on("sendMessage", async({ conversationId, senderId, receiverId, text }) => {
             const user = getUser(receiverId);
-            io.to(user.socketId).emit("getMessage", { conversationId, senderId, receiverId, text });
+
+            const specificSocketId = user?.socketId;
+            if(specificSocketId){
+                io.to(specificSocketId).emit("getMessage", { conversationId, senderId, receiverId, text });
+            } 
 
             // save to DB
             const message = {
