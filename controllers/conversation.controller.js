@@ -7,36 +7,39 @@ const sendResponse = require("../shared/sendResponse");
 exports.createConversationToDB  = catchAsync( async(req, res, next)=>{
 
     const existingConversation = await Conversation.findOne({
-        members: {
-            $all: [req.body.senderId, req.body.receiverId]
-        }
-    });
-
-    const conversation = new Conversation({
-        members: [ req.body.senderId, req.body.receiverId ]
+        $or: [
+            { members: { $all: [req.body.senderId, req.body.receiverId] } },
+            { members: { $all: [req.body.receiverId, req.body.senderId] } }
+        ]
     });
 
     if(existingConversation){
-        sendResponse(res, {
+        return sendResponse(res, {
             statusCode: httpStatus.OK,
             status: true,
             message: "Already Exist",
             data: existingConversation
         });
-    }else{
-        sendResponse(res, {
-            statusCode: httpStatus.OK,
-            status: true,
-            message: "Conversation Created Successfully!!!",
-            data: conversation
-        });
     }
+
+    const conversation = new Conversation({
+        members: [ req.body.senderId, req.body.receiverId ]
+    });
+
+    const result = await conversation.save();
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        status: true,
+        message: "Conversation Created Successfully!!!",
+        data: result
+    })
 });
 
 exports.getConversationsFromDB = catchAsync( async (req, res, next)=>{
-    const id = req.user._id
+    const id = req.user._id;
     const conversations = await Conversation.find({
-        members: { $in: [id] }
+        members: { $in: [id] },
     }).populate({ path: "members", select: "fullName _id image color"});
 
     if(!conversations){

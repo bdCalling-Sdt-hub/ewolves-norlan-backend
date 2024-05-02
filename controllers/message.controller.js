@@ -19,7 +19,7 @@ exports.createMessageToDB = catchAsync( async(req, res, next)=>{
 exports.getMessageFromDB = catchAsync( async(req, res, next) =>{
     const messages = await Message.find({
         conversationId: req.params.conversationId
-    });
+    }).sort({createdAt: -1});
 
     if(!messages){
         throw new ApiError(404, "There is no Message !");
