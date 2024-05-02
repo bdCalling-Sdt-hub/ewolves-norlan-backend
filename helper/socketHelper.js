@@ -31,20 +31,19 @@ const socketHandler = (io) => {
         socket.on("sendMessage", async({ conversationId, senderId, receiverId, text }) => {
             const user = getUser(receiverId);
 
-            const specificSocketId = user?.socketId;
-            if(specificSocketId){
-                io.to(specificSocketId).emit("getMessage", { conversationId, senderId, receiverId, text });
-            } 
-
             // save to DB
             const message = {
                 conversationId: conversationId,
                 sender: senderId,
                 text: text
             }
-            await Message.create(message);
+            const response =  await Message.create(message);
 
+            const specificSocketId = user?.socketId;
 
+            if(specificSocketId){
+                io.to(specificSocketId).emit("getMessage", response);
+            } 
         });
 
         //when disconnect
