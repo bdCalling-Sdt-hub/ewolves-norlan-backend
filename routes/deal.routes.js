@@ -15,6 +15,7 @@ router.post(
   fileUpload(),
   makeDeal
 );
+
 router.get(
   "/get-deal/:id",
   auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
