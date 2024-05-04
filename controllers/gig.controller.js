@@ -79,7 +79,7 @@ exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
   const { searchTerm, ...filterData } = filters;
 
   const andConditions = [];
-  if (searchTerm) {
+  if (searchTerm) { 
     andConditions.push({
       $or: ["contentName", "location"].map((field) => ({
         [field]: {
@@ -124,13 +124,12 @@ exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
     andConditions.length > 0
       ? {
           $and: andConditions,
-          searchTags: { $in: interest },
-          "ratings.rate": { $gt: 0 },
+          searchTags: { $in: interest }
         }
-      : { searchTags: { $in: interest }, "ratings.rate": { $gt: 0 } };
+      : { searchTags: { $in: interest } };
 
   const result = await Gig.find(whereConditions)
-    .sort({ "ratings.rate": -1 })
+    .sort()
     .skip(skip)
     .limit(limit)
     .populate(["artist", "video"]);

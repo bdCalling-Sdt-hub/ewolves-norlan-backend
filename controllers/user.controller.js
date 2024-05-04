@@ -123,11 +123,11 @@ exports.userLogin = catchAsync(async (req, res) => {
 
   const user = await User.findOne({ email: email });
   if (!user) {
-    throw new ApiError(204, "User not Found");
+    throw new ApiError(400, "User not Found");
   }
 
-  if (user.emailVerified === false) {
-    throw new ApiError(401, "your email is not verified");
+  if (!user.emailVerified) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "your email is not verified");
   }
 
   const ismatch = await bcrypt.compare(password, user.password);
@@ -142,13 +142,14 @@ exports.userLogin = catchAsync(async (req, res) => {
       expiresIn: "3d",
     }
   );
-  return sendResponse(res, {
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Your Are logged in successfully",
     user: {
       role: user.role,
-      id: user._id
+      id: user._id,
+      interest: user.interest
     },
     token: token,
   });
@@ -234,6 +235,11 @@ exports.otpVerify = catchAsync(async (req, res, next) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "OTP Verified Successfully",
+    user: {
+      role: user.role,
+      id: user._id,
+      interest: user.interest
+    },
     token: token
   });
 });
@@ -383,18 +389,19 @@ exports.deleteAccount = catchAsync(async (req, res, next) => {
 
 exports.makeInterest = catchAsync(async (req, res, next) => {
   const { interest } = req.body;
-  const user = await User.findById(req.user._id);
-  if (!user) {
-    throw new ApiError(404, "No User Found by This ID");
-  }
 
-  user.interest.push(...interest);
-  await user.save();
+  // Add interest to the user's interest array
+  const user = await User.findOneAndUpdate({_id:req.user._id}, {interest: [...interest]},{new:true})
+  
+  if (!user) {
+    throw new ApiError(404, "User doesn't exist!");
+  }
 
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Make interest Successfully",
+    data: user
   });
 });
 

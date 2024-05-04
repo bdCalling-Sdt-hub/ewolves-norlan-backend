@@ -5,18 +5,27 @@ const sendResponse = require("../shared/sendResponse");
 const ApiError = require("../errors/ApiError");
 const httpStatus = require("http-status");
 const catchAsync = require("../shared/catchAsync");
+const Notification = require("../models/notification.model");
 
 exports.getAllVideo = catchAsync(async (req, res) => {
-  const result = await Video.find({}, { comments: 0 })
+  const result = await Video.find({})
     .sort({ createdAt: -1 })
-    .populate({ path: "artist", select: "fullName image location" });
+    .populate({ path: "artist", select: "fullName image location" })
+    .lean();
+
+  const modifiedResult = result.map((video) => {
+    return {
+      ...video,
+      comments: video.comments.length,
+    };
+  });
 
   // Sending response for video metadata
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "All video retrieved successfully",
-    data: result,
+    data: modifiedResult,
   });
 
   // Streaming video data using fs.createReadStream
@@ -71,21 +80,41 @@ exports.createComment = catchAsync(async (req, res, next) => {
     throw new ApiError(204, "No User Found");
   }
 
-  const result = await Video.findOneAndUpdate(
+  //video find
+  const video = await Video.findById(id);
+  if (!video) {
+    throw new ApiError(400, "Video not found");
+  }
+
+  const updateVideo = await Video.findOneAndUpdate(
     { _id: id },
     { $push: { comments: { user: userId, comment } } },
     { new: true }
   );
-
-  if (!result) {
+  if (!updateVideo) {
     throw new ApiError(400, "Failed to post comment");
   }
+
+  const videoOwner = await User.findById(video.artist);
+
+  const notificationMessage = `${user.fullName} is comment on your video ${comment}`;
+  //save to notification model
+  const notification = await Notification.create({
+    userInfo: { name: user.fullName, image: user.image },
+    message: notificationMessage,
+    role: videoOwner.role,
+    user: videoOwner._id,
+    type: "comment",
+  });
+
+  //socket notification
+  io.emit(`notification::${videoOwner._id}`, notification);
 
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Comment post successfully",
-    data: result,
+    data: updateVideo,
   });
 });
 

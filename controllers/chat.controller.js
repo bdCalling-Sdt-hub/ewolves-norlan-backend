@@ -33,19 +33,19 @@ exports.getChatByUserID= catchAsync(async(req, res, next)=>{
 })
 
 exports.getUserById = catchAsync(async(req, res, next)=>{
-    const { id } = req.params;
-    const user = await User.findById(id);
+    const user = await User.findById(req.user._id);
     if(!user){
         throw new ApiError(404, "No User Found");
     }
 
     const userList = [];
-    const result = (await Chat.find({sender: id}).populate("receiver")).map((item)=> {
-        const isUserExist = userList.find(user => user._id === item.receiver._id );
+    const result = await Chat.find({sender: req.user._id}).populate({path: "receiver",select: "fullName _id image color"});
+    result.map((item) => {
+        const isUserExist = userList.find(user => user._id === item.receiver._id);
         if (!isUserExist) {
             userList.push(item.receiver);
         }
-    })
+    });
 
     if(!result){
         throw new ApiError(404, "No User Found");

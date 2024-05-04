@@ -7,6 +7,8 @@ const globalErrorHandler = (error, req, res, next) => {
   let message = "Something went wrong";
   let errorMessages = [];
 
+  console.log("fd", error)
+
   if (error?.name === "ValidationError") {
     const simplifiedError = handleValidationError(error);
     statusCode = simplifiedError.statusCode;
@@ -23,6 +25,7 @@ const globalErrorHandler = (error, req, res, next) => {
           ]
         : []);
   } else if (error instanceof ApiError) {
+    console.log("api error",error)
     statusCode = error?.statusCode;
     (message = error?.message),
       (errorMessages = error?.message
@@ -34,6 +37,8 @@ const globalErrorHandler = (error, req, res, next) => {
           ]
         : []);
   }
+
+
 
   res.status(statusCode).json({
     success: false,

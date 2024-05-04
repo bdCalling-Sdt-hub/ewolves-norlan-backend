@@ -2,18 +2,27 @@ const { Schema, model } = require("mongoose");
 
 const notificationSchema = new Schema(
   {
-    message: { type: String, required: false },
-    image: { type: Object, required: false },
+    userInfo: {
+      name: {
+        type: String,
+        required: true,
+      },
+      image: {
+        type: String,
+        required: true,
+      },
+    },
     type: {
       type: String,
-      enum: ["payment", "term-and-conditions", "unknown"],
-      default: "unknown",
+      enum: ["comment", "wishlist"],
+      required: true,
     },
-    view: { type: Boolean, default: false },
+    message: { type: String, required: true },
+    read: { type: Boolean, default: false },
     role: {
       type: String,
       enum: ["USER", "ARTIST", "ADMIN"],
-      default: ["user"],
+      default: "USER",
     },
     user: { type: Schema.Types.ObjectId, ref: "User" },
   },
