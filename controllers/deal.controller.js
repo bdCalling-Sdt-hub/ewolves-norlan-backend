@@ -5,6 +5,7 @@ const sendResponse = require("../shared/sendResponse");
 const catchAsync = require("../shared/catchAsync");
 const httpStatus = require("http-status");
 const Message = require("../models/message.model");
+const Conversation = require("../models/conversation.model");
 
 exports.makeDeal= catchAsync(async(req, res, next)=>{
     const { id } = req.params;
@@ -46,17 +47,36 @@ exports.makeDeal= catchAsync(async(req, res, next)=>{
 });
 
 exports.getDealByUserId= catchAsync(async(req, res, next)=>{
-    const {_id : id, Role} = req.user;
-    console.log(id)
-    const deals =  await Deal.findOne({
-        "conversationId.members": { $in: [id] }
-      })
+    const {_id, role} = req.user;
+    const type = role === "USER" ? {user: _id } : {artist: _id}
 
-    return sendResponse(res, {
+    let need;
+    if(role === "USER"){
+        need = {user: 0}
+    }else{
+        need = {artist: 0}
+    }
+
+    
+    
+    const deals =  await Deal.find(type, need).populate([{path:"artist" , select: "fullName _id image color"},{path:"user" , select: "fullName _id image color"}]);
+sendResponse(res, {
         statusCode: httpStatus.OK,
         success: false,
         message: "Deal retrive by user ID",
         data: deals
+    })
+
+})
+
+exports.getDealDetailsByID= catchAsync(async(req, res, next)=>{
+    const {id} = req.params;
+    const deal =  await Deal.findById(id).populate("user").select("fullName _id image color")
+    return sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: false,
+        message: "Retrieved Deal Details",
+        data: deal
     })
 
 })

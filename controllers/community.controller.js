@@ -4,6 +4,8 @@ const Community = require("../models/community.model");
 const sendResponse = require("../shared/sendResponse");
 const ApiError = require("../errors/ApiError");
 const mongoose = require("mongoose");
+const pick = require("../shared/pick");
+const paginationCalculate = require("../helper/paginationHelper");
 
 exports.createCommunity = catchAsync(async (req, res) => {
   const user = req.user;
@@ -20,20 +22,47 @@ exports.createCommunity = catchAsync(async (req, res) => {
 
 exports.getCommunity = catchAsync(async (req, res) => {
   const user = req.user;
-  const whereCondition =
-    user.role === "USER"
-      ? { communityCreator: user._id }
-      : { communityMembers: { $in: [user._id] } };
+  const { searchTerm } = pick(req.query, ["searchTerm"]);
+  const paginationOptions = pick(req.query, ["limit", "page"]);
+  const { limit, skip, page } = paginationCalculate(paginationOptions);
 
-  const result = await Community.find(whereCondition).populate({
-    path: "communityMembers",
-    select: "fullName _id image color",
-  });
+  let andConditions = [];
+  if (searchTerm) {
+    andConditions.push({
+      communityName: {
+        $regex: searchTerm,
+        $options: "i",
+      },
+    });
+  }
+
+  if (user.role === "USER") {
+    andConditions.push({ communityCreator: user._id });
+  } else {
+    andConditions.push({ communityMembers: { $in: [user._id] } });
+  }
+
+  const whereCondition =
+    andConditions.length > 0 ? { $and: andConditions } : {};
+
+  const result = await Community.find(whereCondition)
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 })
+    .populate({
+      path: "communityMembers",
+      select: "fullName _id image color",
+    });
+
+  const total = await Community.countDocuments(whereCondition);
+
+  const totalPage = Math.ceil( total / limit);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Community retrieved successfully",
+    pagination: { page, limit,totalPage, total },
     data: result,
   });
 });

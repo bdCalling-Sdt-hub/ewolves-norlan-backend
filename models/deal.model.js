@@ -22,9 +22,13 @@ const dealSchema = new Schema(
       type: String,
       required: true,
     },
-    conversationId: {
+    user: {
       type: Schema.Types.ObjectId,
-      ref: "conversation",
+      ref: "User",
+    },
+    artist: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
     status: {
       type: String

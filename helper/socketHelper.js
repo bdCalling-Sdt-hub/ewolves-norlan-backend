@@ -1,3 +1,4 @@
+const Conversation = require("../models/conversation.model");
 const Deal = require("../models/deal.model");
 const Message = require("../models/message.model");
 
@@ -26,7 +27,19 @@ const socketHandler = (io) => {
 
             const response =  await Message.create(message);
             if(response.deal !== null){
-                await Deal.create({...response.deal, conversationId: conversationId})
+                
+            const result = await Conversation.findOne({_id: conversationId}).populate("members");;
+            let user;
+            let artist;
+            for(let u of result.members){
+                if(u.role === "USER"){
+                    user = u._id
+                }else{
+                    artist = u._id
+                }
+            }
+
+                await Deal.create({...response.deal, user, artist})
             }
             io.to(conversationId).emit("getMessage", response);
            
