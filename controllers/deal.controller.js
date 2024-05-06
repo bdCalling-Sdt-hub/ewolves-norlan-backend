@@ -50,14 +50,9 @@ exports.getDealByUserId= catchAsync(async(req, res, next)=>{
     const {_id, role} = req.user;
     const type = role === "USER" ? {user: _id } : {artist: _id}
 
-    let need;
-    if(role === "USER"){
-        need = {user: 0}
-    }else{
-        need = {artist: 0}
-    }
+    
 
-    const deals =  await Deal.find(type, need).populate(["artist","user"]);
+    const deals =  await Deal.find(type).populate(["artist","user"]);
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: false,
