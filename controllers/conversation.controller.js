@@ -54,11 +54,13 @@ exports.getConversationsFromDB = catchAsync(async (req, res, next) => {
     throw new ApiError(404, "There is no User!");
   }
 
+  const totalPage = Math.ceil(total / page);
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     status: true,
     message: "Conversation Retrieve Successfully",
-    pagination: { page, skip, total },
+    pagination: { page, skip, totalPage, total },
     data: conversations,
   });
 });
