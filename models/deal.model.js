@@ -15,7 +15,7 @@ const dealSchema = new Schema(
       required: true,
     },
     event_date: {
-      type: Date,
+      type: String,
       required: true,
     },
     location: {

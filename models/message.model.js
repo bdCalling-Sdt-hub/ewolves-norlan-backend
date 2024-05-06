@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose');
+const Deal = require('./deal.model');
 
 const MessageSchema = new Schema(
     {
@@ -9,34 +10,10 @@ const MessageSchema = new Schema(
         messageType:{
             type: String,
             enum: ["Text", "Deal", "Image"],
-            default: "Text",
         },
         deal:{
-            title:{
-                type: String,
-                default:""
-            },
-            description:{
-                type: String,
-                default:""
-            },
-            status:{
-                type: String,
-                enum:["pending","confirm","cancel"],
-                default:"pending"
-            },
-            price:{
-                type: Number,
-                default:0
-            },
-            quentity:{
-                type: Number,
-                default:0
-            },
-            deliveryDate:{
-                type: String,
-                default: Date.now()
-            },
+            type: {},
+            default: null
         },
         sender: {
             type: Schema.Types.ObjectId,
@@ -45,7 +22,7 @@ const MessageSchema = new Schema(
         },
         text: {
             type: String,
-            required: true
+            required: false,
         }
     },
     {timestamps: true}

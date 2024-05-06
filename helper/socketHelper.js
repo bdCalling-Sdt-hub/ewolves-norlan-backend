@@ -1,56 +1,42 @@
 const Message = require("../models/message.model");
 
 const socketHandler = (io) => {
-    let users = [];
-    
-    const addUser = (userId, socketId) => {
-        !users.some((user) => user.userId === userId) && users.push({ userId, socketId });
-    };
-
-    const removeUser = (socketId) => {
-        users = users.filter((user) => user.socketId !== socketId);
-    };
-
-    const getUser = (userId) => {
-        return users.find((user) => user.userId === userId);
-    };
-
-
 
     io.on("connection", (socket) => {
         console.log(`Socket connected with ${socket.id}`);
-        
-        //take userId and socketId from user
-        socket.on("addUser", ({userId}) => {
-            addUser(userId, socket.id);
-            io.emit("getUsers", users);
-        });
-
+        socket.on("joinChat", (conversationId)=>{
+            socket.join(conversationId)
+        })
+       
 
         //send and get message
-        socket.on("sendMessage", async({ conversationId, senderId, receiverId, text }) => {
-            const user = getUser(receiverId);
+        socket.on("sendMessage", async({ conversationId, senderId, text, deal }) => {
+
+            const type =  Object.keys(deal).length ? "Deal" : "Text";
 
             // save to DB
             const message = {
                 conversationId: conversationId,
                 sender: senderId,
-                text: text
+                text: text,
+                deal: type === "Deal" ? {...deal, status: "Pending"} : null ,
+                messageType: type
             }
+
             const response =  await Message.create(message);
-
-            const specificSocketId = user?.socketId;
-
-            if(specificSocketId){
-                io.to(specificSocketId).emit("getMessage", response);
-            } 
+            
+            io.to(conversationId).emit("getMessage", response);
+           
         });
+
+        socket.on("changeStatus", async({messageId, status, conversationId})=>{
+            const message  = await Message.findOneAndUpdate({_id: messageId}, {"deal.status": status}, {new: true});
+            io.to(conversationId).emit("getMessage", message);
+        })
 
         //when disconnect
         socket.on("disconnect", () => {
-            console.log("a user disconnected!");
-            removeUser(socket.id);
-            io.emit("getUsers", users);
+            console.log("a user disconnected!");     
         });
 
     });

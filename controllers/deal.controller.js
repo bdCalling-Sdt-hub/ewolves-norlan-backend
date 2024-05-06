@@ -2,8 +2,9 @@ const Deal = require("../models/deal.model");
 const User = require("../models/user.model");
 const ApiError = require("../errors/ApiError");
 const sendResponse = require("../shared/sendResponse");
-const catchAsync = require("../shared/CatchAsync");
+const catchAsync = require("../shared/catchAsync");
 const httpStatus = require("http-status");
+const Message = require("../models/message.model");
 
 exports.makeDeal= catchAsync(async(req, res, next)=>{
     const { id } = req.params;
@@ -12,7 +13,7 @@ exports.makeDeal= catchAsync(async(req, res, next)=>{
         throw new ApiError(404, "No User Found");
     }
 
-    const user = await User.findById(req.user_id);
+    const user = await User.findById(req.user._id);
     if(!user){
         throw new ApiError(404, "No User Found");
     }
@@ -23,11 +24,24 @@ exports.makeDeal= catchAsync(async(req, res, next)=>{
         ...req.body
     });
 
-    return sendResponse(res, {
+    const message = {
+        messageType: "Deal",
+        deal: result,
+        sender: req.user._id,
+        conversationId: req.body.conversationId
+    }
+
+
+    
+
+
+    const newMessage = await Message.create(message);
+
+    sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
         message: "Deal Make successfully",
-        data: result
+        data: newMessage
     })
 });
 

@@ -4,7 +4,7 @@ const auth = require("../middlewares/auth.js");
 const { USER_ROLE } = require("../enums/user.js");
 const fileUpload = require('../middlewares/fileUpload.js');
 const { createConversationToDB, getConversationsFromDB, getSingleConversationFromDB } = require('../controllers/conversation.controller.js');
-const { createMessageToDB, getMessageFromDB } = require('../controllers/message.controller.js');
+const { createMessageToDB, getMessageFromDB, deleteMessage } = require('../controllers/message.controller.js');
 
 // conversation api
 router.post("/create-conversation", auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER), fileUpload(), createConversationToDB);
@@ -12,8 +12,9 @@ router.get("/get-conversations", auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_RO
 router.get("/get-conversation/:firstUserId/:secondUserId", getSingleConversationFromDB);
 
 // message api
-router.post("/create-message", fileUpload(), createMessageToDB);
-router.get("/get-message/:conversationId",  getMessageFromDB);
+router.post("/create-message", auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER), fileUpload(), createMessageToDB);
+router.get("/get-message/:conversationId",auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),  getMessageFromDB);
+router.delete("/delete-message/:id", auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER), deleteMessage )
 
 
 module.exports = router;
