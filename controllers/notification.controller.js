@@ -11,7 +11,6 @@ exports.addNotification = async (payload) => {
 
 exports.getNotification = catchAsync(async (req, res) => {
   const id = req.user;
-  console.log(id);
 
   const notificationCheck = await Notification.findOne({ user: id });
   if (!notificationCheck) {
