@@ -22,19 +22,12 @@ const dealSchema = new Schema(
         type: String,
         required: true,
     },
-    artist: {
+    conversationId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
-    },
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "conversation",
     },
     status: {
-      type: String,
-      required: false,
-      enum: ["Complete", "Pending", "Report" ],
-      default: "Pending",
+      type: String
     },
   },
   { timestamps: true }
