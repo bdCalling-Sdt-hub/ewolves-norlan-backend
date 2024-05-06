@@ -10,8 +10,8 @@ const {
 const router = express.Router();
 
 router.post("/create-community", auth(USER_ROLE.USER), createCommunity);
-router.patch("/:id", auth(USER_ROLE.USER), removeCommunityMember);
-router.patch("/", auth(USER_ROLE.USER), updateCommunity);
+router.patch("/:id", auth(USER_ROLE.USER), updateCommunity);
+router.patch("/remove-member/:id", auth(USER_ROLE.USER), removeCommunityMember);
 router.get("/", auth(USER_ROLE.USER, USER_ROLE.ARTIST), getCommunity);
 
 module.exports = router;
