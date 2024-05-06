@@ -57,10 +57,8 @@ exports.getDealByUserId= catchAsync(async(req, res, next)=>{
         need = {artist: 0}
     }
 
-    
-    
-    const deals =  await Deal.find(type, need).populate([{path:"artist" , select: "fullName _id image color"},{path:"user" , select: "fullName _id image color"}]);
-sendResponse(res, {
+    const deals =  await Deal.find(type, need).populate(["artist","user"]);
+    sendResponse(res, {
         statusCode: httpStatus.OK,
         success: false,
         message: "Deal retrive by user ID",
