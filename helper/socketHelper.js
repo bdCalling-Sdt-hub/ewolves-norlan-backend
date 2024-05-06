@@ -19,7 +19,7 @@ const socketHandler = (io) => {
                 conversationId: conversationId,
                 sender: senderId,
                 text: text,
-                deal: {...deal, status: "Pending"},
+                deal: type === "Deal" ? {...deal, status: "Pending"} : null ,
                 messageType: type
             }
 
@@ -36,8 +36,7 @@ const socketHandler = (io) => {
 
         //when disconnect
         socket.on("disconnect", () => {
-            console.log("a user disconnected!");
-            io.emit("getUsers", users);
+            console.log("a user disconnected!");     
         });
 
     });

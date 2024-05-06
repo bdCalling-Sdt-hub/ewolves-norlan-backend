@@ -257,7 +257,7 @@ exports.gigByEventName = catchAsync(async (req, res, next) => {
   const { event } = req.query;
   let gig;
   if (event) {
-    gig = await Gig.find({ event: event });
+    gig = await Gig.find({ event: event }).populate("video");
   } else {
     gig = await Gig.find({}).sort({ createdAt: -1 });
   }
