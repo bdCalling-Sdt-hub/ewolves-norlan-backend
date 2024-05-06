@@ -40,15 +40,15 @@ exports.getCommunity = catchAsync(async (req, res) => {
 
 exports.updateCommunity = catchAsync(async (req, res) => {
   const user = req.user;
+  const id = req.params.id;
   const { communityMembers } = req.body;
-
   const data = [...communityMembers];
 
-  console.log(data);
+  const community = await Community.findById(id);
 
-  const community = await Community.findOne({
-    communityCreator: user._id,
-  });
+  if (!community) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Community doesn't exist!");
+  }
 
   if (user._id !== community.communityCreator.valueOf()) {
     throw new ApiError(
@@ -58,7 +58,7 @@ exports.updateCommunity = catchAsync(async (req, res) => {
   }
 
   const updatedCommunity = await Community.findByIdAndUpdate(
-    community._id,
+    id,
     { $push: { communityMembers: data } },
     { new: true }
   );

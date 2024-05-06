@@ -19,8 +19,8 @@ const dealSchema = new Schema(
       required: true,
     },
     location: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     conversationId: {
       type: Schema.Types.ObjectId,
