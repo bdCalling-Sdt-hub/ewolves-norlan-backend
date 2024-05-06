@@ -48,26 +48,15 @@ exports.makeDeal= catchAsync(async(req, res, next)=>{
 exports.getDealByUserId= catchAsync(async(req, res, next)=>{
     const {_id : id, Role} = req.user;
     console.log(id)
-    /* const { type } = req.query;
-    const filter = type === "user" ? {user: id} : {artist: id};
-
-    const user = await User.findById(id)
-    console.log(user)
- */
-    // const deals = await Deal.find(filter).populate(["user", "artist"] );
-    const deals = await Deal.find({}).populate("conversationId")
-
-    const totalDeal = await Deal.find({"conversationId.members": id }).populate("conversation")
-    
-    if(!deals){
-        throw new ApiError(404, "No Deals Found By this ID");
-    }
+    const deals =  await Deal.findOne({
+        "conversationId.members": { $in: [id] }
+      })
 
     return sendResponse(res, {
         statusCode: httpStatus.OK,
         success: false,
         message: "Deal retrive by user ID",
-        data: totalDeal
+        data: deals
     })
 
 })
