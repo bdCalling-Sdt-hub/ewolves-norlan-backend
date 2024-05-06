@@ -19,8 +19,8 @@ const dealSchema = new Schema(
       required: true,
     },
     location: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     artist: {
       type: Schema.Types.ObjectId,
@@ -33,7 +33,7 @@ const dealSchema = new Schema(
     status: {
       type: String,
       required: false,
-      enum: ["Complete", "Pending", "Report" ],
+      enum: ["Complete", "Pending", "Report"],
       default: "Pending",
     },
   },
