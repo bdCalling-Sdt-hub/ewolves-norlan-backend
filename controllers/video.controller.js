@@ -102,7 +102,6 @@ exports.createComment = catchAsync(async (req, res, next) => {
   const notification = await Notification.create({
     user: user._id,
     message: notificationMessage,
-    role: videoOwner.role,
     recipient: videoOwner._id,
     type: "comment",
   });

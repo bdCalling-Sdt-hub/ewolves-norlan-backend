@@ -3,14 +3,11 @@ const dbConnection = require("./config/db");
 const app = require("./app");
 const socketIo = require("socket.io");
 const socketHandler = require("./helper/socketHelper");
-const {
-  getAllNotifications,
-} = require("./controllers/notification.controller");
 require("dotenv").config();
 
 //db connect here
 dbConnection(process.env.DB_URL);
-const server = app.listen(port, "192.168.10.102", () => {
+const server = app.listen(port, "192.168.10.16", () => {
   console.log("Application running on port", port);
 });
 

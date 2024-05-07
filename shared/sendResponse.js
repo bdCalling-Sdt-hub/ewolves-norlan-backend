@@ -4,9 +4,10 @@ const sendResponse = (res, data) => {
     status: data?.success,
     message: data?.message,
     pagination: data?.pagination,
+    unreadNotifications: data?.unreadNotifications,
     data: data?.data,
     user: data?.user,
-    token: data?.token
+    token: data?.token,
   };
 
   return res.status(data.statusCode).json(responseData);

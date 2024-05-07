@@ -10,11 +10,6 @@ const notificationSchema = new Schema(
     },
     message: { type: String, required: true },
     read: { type: Boolean, default: false },
-    role: {
-      type: String,
-      enum: ["USER", "ARTIST", "ADMIN"],
-      default: "USER",
-    },
     recipient: { type: Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
