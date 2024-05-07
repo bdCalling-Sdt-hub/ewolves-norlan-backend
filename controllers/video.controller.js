@@ -100,13 +100,16 @@ exports.createComment = catchAsync(async (req, res, next) => {
   const notificationMessage = `${user.fullName} is comment on your video ${comment}`;
   //save to notification model
   const notification = await Notification.create({
-    user: {name: user.fullName, image: user.image, color: image.color},
+    user: {
+      id: user._id,
+      name: user.fullName,
+      image: user.image,
+      color: user.color,
+    },
     message: notificationMessage,
     recipient: videoOwner._id,
     type: "comment",
   });
-
-  console.log(notification)
 
   //socket notification
   io.emit(`notification::${videoOwner._id}`, notification);
@@ -156,6 +159,25 @@ exports.createWishList = catchAsync(async (req, res, next) => {
   if (index === -1) {
     video.wishList.push({ user: req.user._id });
     await video.save();
+
+    const videoOwner = await User.findById(video.artist);
+
+    const notificationMessage = `${user.fullName} is react on your video`;
+    //save to notification model
+    const notification = await Notification.create({
+      user: {
+        id: user._id,
+        name: user.fullName,
+        image: user.image,
+        color: user.color,
+      },
+      message: notificationMessage,
+      recipient: videoOwner._id,
+      type: "wishlist",
+    });
+
+    //socket notification
+    io.emit(`notification::${videoOwner._id}`, notification);
 
     return sendResponse(res, {
       statusCode: httpStatus.OK,

@@ -12,14 +12,13 @@ exports.getNotification = catchAsync(async (req, res) => {
   const id = req.user._id;
   const result = await Notification.find({
     recipient: id,
-    role: req.user.role,
   }).sort({
     createdAt: -1,
   });
 
   const total = await Notification.countDocuments({
     recipient: id,
-    role: req.user.role,
+
     read: false,
   });
 
@@ -34,14 +33,10 @@ exports.getNotification = catchAsync(async (req, res) => {
 
 exports.readNotifications = catchAsync(async (req, res) => {
   const id = req.user._id;
-  await Notification.updateMany(
-    { recipient: id, role: req.user.role, read: false },
-    { read: true }
-  );
+  await Notification.updateMany({ recipient: id, read: false }, { read: true });
 
   const total = await Notification.countDocuments({
     recipient: id,
-    role: req.user.role,
     read: false,
   });
 
