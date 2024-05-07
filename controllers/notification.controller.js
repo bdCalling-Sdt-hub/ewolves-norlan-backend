@@ -2,7 +2,6 @@ const httpStatus = require("http-status");
 const Notification = require("../models/notification.model");
 const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");
-const ApiError = require("../errors/ApiError");
 
 exports.addNotification = async (payload) => {
   const result = await Notification.create(payload);
@@ -10,15 +9,41 @@ exports.addNotification = async (payload) => {
 };
 
 exports.getNotification = catchAsync(async (req, res) => {
-  const id = req.user;
-  const result = await Notification.find({ recipient: id }).sort({
+  const id = req.user._id;
+  const result = await Notification.find({
+    recipient: id,
+  }).sort({
     createdAt: -1,
+  });
+
+  const total = await Notification.countDocuments({
+    recipient: id,
+
+    read: false,
   });
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Notification retrieved successfully",
+    unreadNotifications: total,
     data: result,
+  });
+});
+
+exports.readNotifications = catchAsync(async (req, res) => {
+  const id = req.user._id;
+  await Notification.updateMany({ recipient: id, read: false }, { read: true });
+
+  const total = await Notification.countDocuments({
+    recipient: id,
+    read: false,
+  });
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Notification read successfully",
+    unreadNotifications: total,
   });
 });

@@ -3,9 +3,6 @@ const dbConnection = require("./config/db");
 const app = require("./app");
 const socketIo = require("socket.io");
 const socketHandler = require("./helper/socketHelper");
-const {
-  getAllNotifications,
-} = require("./controllers/notification.controller");
 require("dotenv").config();
 
 //db connect here
