@@ -100,10 +100,10 @@ exports.createComment = catchAsync(async (req, res, next) => {
   const notificationMessage = `${user.fullName} is comment on your video ${comment}`;
   //save to notification model
   const notification = await Notification.create({
-    userInfo: { name: user.fullName, image: user.image },
+    user: user._id,
     message: notificationMessage,
     role: videoOwner.role,
-    user: videoOwner._id,
+    recipient: videoOwner._id,
     type: "comment",
   });
 
