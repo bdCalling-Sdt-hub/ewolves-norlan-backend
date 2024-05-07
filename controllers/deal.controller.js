@@ -7,43 +7,39 @@ const httpStatus = require("http-status");
 const Message = require("../models/message.model");
 const Conversation = require("../models/conversation.model");
 
-exports.makeDeal= catchAsync(async(req, res, next)=>{
-    const { id } = req.params;
-    const artist = await User.findById(id);
-    if(!artist){
-        throw new ApiError(404, "No User Found");
-    }
+exports.makeDeal = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const artist = await User.findById(id);
+  if (!artist) {
+    throw new ApiError(404, "No User Found");
+  }
 
-    const user = await User.findById(req.user._id);
-    if(!user){
-        throw new ApiError(404, "No User Found");
-    }
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    throw new ApiError(404, "No User Found");
+  }
 
-    const result = await Deal.create({
-        artist:id,
-        user: req.user_id,  
-        ...req.body
-    });
+  const result = await Deal.create({
+    artist: id,
+    user: req.user_id,
+    ...req.body,
+  });
 
-    const message = {
-        messageType: "Deal",
-        deal: result,
-        sender: req.user._id,
-        conversationId: req.body.conversationId
-    }
+  const message = {
+    messageType: "Deal",
+    deal: result,
+    sender: req.user._id,
+    conversationId: req.body.conversationId,
+  };
 
+  const newMessage = await Message.create(message);
 
-    
-
-
-    const newMessage = await Message.create(message);
-
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: "Deal Make successfully",
-        data: newMessage
-    })
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Deal Make successfully",
+    data: newMessage,
+  });
 });
 
 exports.getDealByUserId= catchAsync(async(req, res, next)=>{
@@ -72,26 +68,32 @@ exports.getDealDetailsByID= catchAsync(async(req, res, next)=>{
         data: deal
     })
 
-})
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: false,
+    message: "Deal retrive by user ID",
+    data: totalDeal,
+  });
+});
 
-exports.changeDealStatusToDB = catchAsync(async(req, res, next)=>{
-    const { id } = req.params;
-    const { type } = req.query;
+exports.changeDealStatusToDB = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const { type } = req.query;
 
-    const deal = await Deal.findById(id);
-    if(!deal){
-        throw new ApiError(404, "No Deal Found This Id");
-    }
+  const deal = await Deal.findById(id);
+  if (!deal) {
+    throw new ApiError(404, "No Deal Found This Id");
+  }
 
-    const result = await Deal.findOneAndUpdate(
-        {_id: id}, 
-        {$set: {status : type}},
-        {new: true}
-    )
-    return sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: `Deal ${type} Successful`,
-        data: result
-    })
+  const result = await Deal.findOneAndUpdate(
+    { _id: id },
+    { $set: { status: type } },
+    { new: true }
+  );
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `Deal ${type} Successful`,
+    data: result,
+  });
 });

@@ -2,16 +2,7 @@ const { Schema, model } = require("mongoose");
 
 const notificationSchema = new Schema(
   {
-    userInfo: {
-      name: {
-        type: String,
-        required: true,
-      },
-      image: {
-        type: String,
-        required: true,
-      },
-    },
+    user: { type: Schema.Types.ObjectId, ref: "User" },
     type: {
       type: String,
       enum: ["comment", "wishlist"],
@@ -24,7 +15,7 @@ const notificationSchema = new Schema(
       enum: ["USER", "ARTIST", "ADMIN"],
       default: "USER",
     },
-    user: { type: Schema.Types.ObjectId, ref: "User" },
+    recipient: { type: Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
 );
