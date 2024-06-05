@@ -19,6 +19,7 @@ const communityRoutes = require("./routes/community.routes");
 const globalErrorHandler = require("./middlewares/globalErrorHandler");
 const paymentRoutes = require("./routes/payment.routes");
 const notificationRoutes = require("./routes/notification.route");
+const OrderRoutes = require("./routes/order.route");
 
 //parser
 app.use(cors());
@@ -44,6 +45,7 @@ app.use("/api/faq/", fagRouter);
 app.use("/api/community", communityRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/notification", notificationRoutes);
+app.use("/api/order", OrderRoutes);
 
 //image get
 app.use(express.static("uploads"));

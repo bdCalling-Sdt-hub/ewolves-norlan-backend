@@ -2,7 +2,12 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    fullName: {
+    firstName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    lastName: {
       type: String,
       required: true,
       trim: true,
@@ -67,24 +72,47 @@ const userSchema = new mongoose.Schema(
     ratings: {
       rate: {
         type: String,
-        default: "0" // Default value for rate
+        default: "0", // Default value for rate
       },
       count: {
         type: Number,
-        default: 0 // Default value for count
-      }
+        default: 0, // Default value for count
+      },
     },
     color: {
-      type:
-       String,
-       default:"0XFFFFFFFF"
-      },
+      type: String,
+      default: "0XFFFFFFFF",
+    },
     interest: {
-      type: Array
-    }
+      type: Array,
+    },
+    accountInformation: {
+      status: {
+        type: Boolean,
+        default: false,
+      },
+      stripeAccountId: {
+        type: String,
+      },
+      externalAccountId: {
+        type: String,
+      },
+    },
   },
   { timestamps: true }
 );
+
+//user check
+userSchema.statics.isExistUser = async (id) => {
+  const isExistUser = await User.findById(id);
+  return isExistUser;
+};
+
+//account check
+userSchema.statics.isAccountCreated = async (id) => {
+  const isUserExist = await User.findById(id);
+  return isUserExist.accountInformation.status;
+};
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;

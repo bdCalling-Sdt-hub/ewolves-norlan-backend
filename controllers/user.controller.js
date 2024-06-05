@@ -13,10 +13,24 @@ const pick = require("../shared/pick");
 const paginationCalculate = require("../helper/paginationHelper");
 
 exports.userRegister = catchAsync(async (req, res, next) => {
-  const { fullName, email, password, confirmPass, termAndCondition, role } =
-    req.body;
+  const {
+    firstName,
+    lastName,
+    email,
+    password,
+    confirmPass,
+    termAndCondition,
+    role,
+  } = req.body;
 
-  if (!fullName && !email && !password && !confirmPass && !termAndCondition) {
+  if (
+    !firstName &&
+    !lastName &&
+    !email &&
+    !password &&
+    !confirmPass &&
+    !termAndCondition
+  ) {
     throw new ApiError(400, "All Field are required");
   }
 
@@ -39,7 +53,8 @@ exports.userRegister = catchAsync(async (req, res, next) => {
   const emailVerifyCode = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
 
   const user = await User.create({
-    fullName,
+    firstName,
+    lastName,
     email,
     password: hashPassword,
     termAndCondition: JSON.parse(termAndCondition),
@@ -74,7 +89,7 @@ exports.userRegister = catchAsync(async (req, res, next) => {
     email,
     subject: "Account Activation Email",
     html: `
-                <h1>Hello, ${user?.fullName}</h1>
+                <h1>Hello, ${user?.firstName}</h1>
                 <p>Your email verified code is <h3>${emailVerifyCode}</h3> to verify your email</p>
                 <small>This Code is valid for 3 minutes</small>
               `,
@@ -90,14 +105,14 @@ exports.userRegister = catchAsync(async (req, res, next) => {
 
 exports.verifyEmail = catchAsync(async (req, res, next) => {
   const { emailVerifyCode, email } = req.body;
-  console.log(emailVerifyCode, email)
+  console.log(emailVerifyCode, email);
 
   if (!emailVerifyCode && !email) {
     throw new ApiError(400, "All Field are required");
   }
 
   const user = await User.findOne({ email: email });
-  console.log(user)
+  console.log(user);
   if (!user) {
     throw new ApiError(404, "User Not Found");
   }
@@ -149,7 +164,7 @@ exports.userLogin = catchAsync(async (req, res) => {
     user: {
       role: user.role,
       id: user._id,
-      interest: user.interest
+      interest: user.interest,
     },
     token: token,
   });
@@ -158,7 +173,6 @@ exports.userLogin = catchAsync(async (req, res) => {
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
-
   if (!user) {
     throw new ApiError(400, "User doesn't exists");
   }
@@ -176,7 +190,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     email,
     subject: "Password Reset Email",
     html: `
-        <h1>Hello, ${user.fullName}</h1>
+        <h1>Hello, ${user.firstName}</h1>
         <p>Your Email verified Code is <h3>${emailVerifyCode}</h3> to reset your password</p>
         <small>This Code is valid for 3 minutes</small>
       `,
@@ -222,7 +236,6 @@ exports.otpVerify = catchAsync(async (req, res, next) => {
     await user.save();
   }
 
-
   const token = jwt.sign(
     { _id: user._id, role: user.role },
     process.env.JWT_SECRET,
@@ -238,9 +251,9 @@ exports.otpVerify = catchAsync(async (req, res, next) => {
     user: {
       role: user.role,
       id: user._id,
-      interest: user.interest
+      interest: user.interest,
     },
-    token: token
+    token: token,
   });
 });
 
@@ -315,8 +328,16 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
   if (!user) {
     return sendResponse(res, 204, "No User Found", user);
   }
-  const { fullName, email, mobileNumber, location, about, profession,color } = req.body;
-  console.log(req.body)
+  const {
+    firstName,
+    lastName,
+    email,
+    mobileNumber,
+    location,
+    about,
+    profession,
+    color,
+  } = req.body;
 
   let imageFileName = "";
   if (req.files && req.files.image && req.files.image[0]) {
@@ -329,7 +350,8 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
     fs.unlinkSync(filePath);
   }
 
-  user.fullName = fullName ? fullName : user.fullName;
+  user.firstName = firstName ? firstName : user.firstName;
+  user.lastName = lastName ? lastName : user.lastName;
   user.email = email ? email : user?.email;
   user.mobileNumber = mobileNumber ? mobileNumber : user.mobileNumber;
   user.location = location ? location : user.location;
@@ -342,7 +364,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Profile Updated Successfully"
+    message: "Profile Updated Successfully",
   });
 });
 
@@ -391,8 +413,12 @@ exports.makeInterest = catchAsync(async (req, res, next) => {
   const { interest } = req.body;
 
   // Add interest to the user's interest array
-  const user = await User.findOneAndUpdate({_id:req.user._id}, {interest: [...interest]},{new:true})
-  
+  const user = await User.findOneAndUpdate(
+    { _id: req.user._id },
+    { interest: [...interest] },
+    { new: true }
+  );
+
   if (!user) {
     throw new ApiError(404, "User doesn't exist!");
   }
@@ -401,14 +427,15 @@ exports.makeInterest = catchAsync(async (req, res, next) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "Make interest Successfully",
-    data: user
+    data: user,
   });
 });
 
-
-exports.getProfileFromDB = catchAsync( async (req, res, next) =>{
-  const user = await User.findById(req.user._id).populate("followers").populate("following");
-  if(!user){
+exports.getProfileFromDB = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user._id)
+    .populate("followers")
+    .populate("following");
+  if (!user) {
     throw new ApiError(404, "Your are not a valid User");
   }
 
@@ -416,14 +443,16 @@ exports.getProfileFromDB = catchAsync( async (req, res, next) =>{
     statusCode: httpStatus.OK,
     success: true,
     message: "Retrieve Data",
-    user: user
-  })
-})
+    user: user,
+  });
+});
 
-exports.getProfileByIDFromDB = catchAsync( async (req, res, next) =>{
+exports.getProfileByIDFromDB = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const user = await User.findById(id).populate("followers").populate("following");
-  if(!user){
+  const user = await User.findById(id)
+    .populate("followers")
+    .populate("following");
+  if (!user) {
     throw new ApiError(404, "Your are not a valid User");
   }
 
@@ -431,28 +460,27 @@ exports.getProfileByIDFromDB = catchAsync( async (req, res, next) =>{
     statusCode: httpStatus.OK,
     success: true,
     message: "Retrieve Data",
-    user: user
-  })
-})
+    user: user,
+  });
+});
 
-exports.getTopArtistFromDB = catchAsync( async (req, res, next)=>{
+exports.getTopArtistFromDB = catchAsync(async (req, res, next) => {
   const { interest } = await User.findById(req.user._id);
   const artists = await User.find({
     role: "ARTIST",
-    interest: { $in : interest },
-    "ratings.rate" : { $gt : 0 }
-  }).sort({ "ratings.rate" : -1})
+    interest: { $in: interest },
+    "ratings.rate": { $gt: 0 },
+  }).sort({ "ratings.rate": -1 });
 
-  return sendResponse(res,{
+  return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Retrieve Data",
-    data: artists
-  })
-})
+    data: artists,
+  });
+});
 
-exports.getAllArtistFromDB = catchAsync( async (req, res, next)=>{
-
+exports.getAllArtistFromDB = catchAsync(async (req, res, next) => {
   const paginationOptions = pick(req.query, ["limit", "page"]);
   const { limit, page, skip } = paginationCalculate(paginationOptions);
 
@@ -471,16 +499,15 @@ exports.getAllArtistFromDB = catchAsync( async (req, res, next)=>{
           $regex: searchQuery,
           $options: "i",
         },
-      }
-    ]
-   
-  }
+      },
+    ],
+  };
 
-  const artists = await User.find({role: "ARTIST", query})
-  .skip(skip)
-  .limit(limit)
+  const artists = await User.find({ role: "ARTIST", query })
+    .skip(skip)
+    .limit(limit);
 
-  const total = await User.countDocuments({role: "ARTIST"});
+  const total = await User.countDocuments({ role: "ARTIST" });
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -492,4 +519,4 @@ exports.getAllArtistFromDB = catchAsync( async (req, res, next)=>{
     },
     data: artists,
   });
-})
+});

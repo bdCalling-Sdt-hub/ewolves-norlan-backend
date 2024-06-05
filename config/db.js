@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const color = require("colors");
 
 const dbConnection = async (DB_URL) => {
   try {
@@ -6,7 +7,7 @@ const dbConnection = async (DB_URL) => {
       dbName: "norlan",
     };
     await mongoose.connect(DB_URL, DB_OPTIONS);
-    console.log("🚀 Database connected successfully");
+    console.log(color.bgGreen("🚀 Database connected successfully"));
   } catch (error) {
     console.log(error);
   }

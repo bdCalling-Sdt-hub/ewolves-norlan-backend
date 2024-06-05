@@ -1,45 +1,41 @@
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
 const configureFileUpload = () => {
+  const uploadDir = path.join(process.cwd(), "uploads", "media");
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+
   const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      if (
-        file.mimetype === "image/jpeg" ||
-        file.mimetype === "image/png" ||
-        file.mimetype === "image/jpg" ||
-        file.mimetype === "video/mp4"
-      ) {
-        cb(null, path.join(__dirname, "../uploads/media"));
-      } else {
-        cb(new Error("Invalid file type"));
-      }
+    destination: (req, file, cb) => {
+      cb(null, uploadDir);
     },
-    filename: function (req, file, cb) {
-      const name = Date.now() + "-" + file.originalname;
-      cb(null, name);
+    filename: (req, file, cb) => {
+      const fileExt = path.extname(file.originalname);
+      const fileName =
+        file.originalname
+          .replace(fileExt, "")
+          .toLowerCase()
+          .split(" ")
+          .join("-") +
+        "-" +
+        Date.now();
+      cb(null, fileName + fileExt);
     },
   });
 
   const fileFilter = (req, file, cb) => {
-    const allowedFieldnames = ["image", "slider", "media", "thumbnail"];
-
-    if (file.fieldname === undefined) {
-      // Allow requests without any files
+    if (
+      file.mimetype === "image/jpeg" ||
+      file.mimetype === "image/png" ||
+      file.mimetype === "image/jpg" ||
+      file.mimetype === "video/mp4"
+    ) {
       cb(null, true);
-    } else if (allowedFieldnames.includes(file.fieldname)) {
-      if (
-        file.mimetype === "image/jpeg" ||
-        file.mimetype === "image/png" ||
-        file.mimetype === "image/jpg" ||
-        file.mimetype === "video/mp4"
-      ) {
-        cb(null, true);
-      } else {
-        cb(new Error("Invalid file type"));
-      }
     } else {
-      cb(new Error("Invalid fieldname"));
+      cb(new Error("Invalid file type"));
     }
   };
 
@@ -51,6 +47,7 @@ const configureFileUpload = () => {
     { name: "slider", maxCount: 3 },
     { name: "media", maxCount: 1 },
     { name: "thumbnail", maxCount: 1 },
+    { name: "KYC", maxCount: 2 },
   ]);
 
   return upload;
