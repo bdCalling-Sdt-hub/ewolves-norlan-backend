@@ -412,6 +412,7 @@ exports.deleteAccount = catchAsync(async (req, res, next) => {
 exports.makeInterest = catchAsync(async (req, res, next) => {
   const { interest } = req.body;
 
+
   // Add interest to the user's interest array
   const user = await User.findOneAndUpdate(
     { _id: req.user._id },

@@ -46,7 +46,7 @@ exports.makeDeal= catchAsync(async(req, res, next)=>{
 });
 
 exports.getDealByUserId= catchAsync(async(req, res, next)=>{
-    const {id} = req.params;
+    const { id } = req.user;
     const { type } = req.query;
     const filter = type === "user" ? {user: id} : {artist: id};
 
@@ -55,10 +55,10 @@ exports.getDealByUserId= catchAsync(async(req, res, next)=>{
         throw new ApiError(404, "No Deals Found By this ID");
     }
 
-    return sendResponse(res, {
+    sendResponse(res, {
         statusCode: httpStatus.OK,
         success: false,
-        message: "Deal retrive by user ID",
+        message: "Deal retrieved by user ID",
         data: deals
     })
 
@@ -78,10 +78,10 @@ exports.changeDealStatusToDB = catchAsync(async(req, res, next)=>{
         {$set: {status : type}},
         {new: true}
     )
-    return sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: `Deal ${type} Successful`,
-        data: result
+    sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `Deal ${type} Successful`,
+    data: result
     })
 });

@@ -15,6 +15,11 @@ const tokenSchema = new Schema(
   { timestamps: true }
 );
 
+
+tokenSchema.statics.isExistToken = async (token) => {
+ return await Token.findOne({ token: token });
+}
+
 const Token = model("Token", tokenSchema);
 
 module.exports = Token;

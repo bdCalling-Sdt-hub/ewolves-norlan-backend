@@ -34,5 +34,9 @@ const orderSchema = new Schema(
   { timestamps: true }
 );
 
+orderSchema.statics.isOrderExist = async (id) => {
+ return await Order.findById(id)
+}
+
 const Order = model("Order", orderSchema);
 module.exports = Order;

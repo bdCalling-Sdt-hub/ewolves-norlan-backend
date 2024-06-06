@@ -4,6 +4,8 @@ const ApiError = require("../errors/ApiError");
 const httpStatus = require("http-status");
 const fs = require("fs");
 const User = require("../models/user.model");
+const Token = require("../models/token.model");
+const Order = require("../models/order.model");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 //create payment intent
@@ -155,11 +157,8 @@ exports.createConnectedAccount = catchAsync(async (req, res) => {
 
 exports.transferAndPayouts = catchAsync(async (req, res) => {
   const user = req.user;
-  const { token } = req.body;
-
-  if (!token) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "You provide not data");
-  }
+  const { QRdata } = req.body;
+  //artist check
   const isExistUser = await User.isExistUser(user._id);
   if (!isExistUser) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Artist doesn't exist!");
@@ -169,25 +168,91 @@ exports.transferAndPayouts = catchAsync(async (req, res) => {
   if (!(await User.isAccountCreated(user._id))) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      "Sorry, you didn't provide your bank information. Please create an account first, then scan."
+      "Sorry, you didn't provide your bank information. Please create an account first, then scan again"
     );
   }
 
+  //body data token check
+  if (!QRdata) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "QR code scan data is missing from the request."
+    );
+  }
+
+  //token check from db
+  const isExistToken = await Token.isExistToken(QRdata);
+  if (!isExistToken) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "You provided Invalid QR Data");
+  }
+
+  //check order data
+  const isExistOrder = await Order.isOrderExist(isExistToken.orderId);
+  if (!isExistOrder) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "User has not completed the payment."
+    );
+  }
+
+  //check completed payment and artist transfer
+  if (
+    isExistOrder.orderStatus === "completed" &&
+    isExistOrder.paymentStatus === "transferred_to_artist"
+  ) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "The payment has already been transferred to your account."
+    );
+  }
+
+  const { stripeAccountId, externalAccountId } = isExistUser.accountInformation;
+  const { price } = isExistOrder;
+
+  const charge = (parseInt(price) * 10) / 100;
+  const amount = parseInt(price) - charge;
+
   const transfer = await stripe.transfers.create({
-    amount: 5 * 100,
+    amount: amount * 100,
     currency: "eur",
-    destination: "acct_1PNun0GdZpO2byQu",
+    destination: stripeAccountId,
   });
 
   const payouts = await stripe.payouts.create(
     {
-      amount: 5 * 100,
+      amount: amount * 100,
       currency: "eur",
-      //method: "instant",
-      destination: "ba_1PNun1GdZpO2byQuR0sML48a",
+      destination: externalAccountId,
     },
     {
-      stripeAccount: "acct_1PNun0GdZpO2byQu",
+      stripeAccount: stripeAccountId,
     }
   );
+
+  console.log("transfer", transfer);
+  console.log("payouts", payouts);
+
+  if (transfer.id && payouts.id) {
+    isExistOrder.orderStatus = "completed";
+    isExistOrder.paymentStatus = "transferred_to_artist";
+    await isExistOrder.save();
+  }
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Transfer and payouts successfully",
+    data: {
+      transfer: {
+        id: transfer.id,
+        transactionId: transfer.balance_transaction,
+        amount: transfer.amount,
+      },
+      payouts: {
+        id: payouts.id,
+        transactionId: payouts.balance_transaction,
+        amount: payouts.amount,
+      },
+    },
+  });
 });

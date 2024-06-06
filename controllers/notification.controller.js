@@ -10,20 +10,31 @@ exports.addNotification = async (payload) => {
 };
 
 exports.getNotification = catchAsync(async (req, res) => {
-  const id = req.user;
-  console.log(id);
-
-  const notificationCheck = await Notification.findOne({ user: id });
-  if (!notificationCheck) {
-    throw new ApiError(404, "User notifications doesn't exist on the list");
-  }
-
-  const result = await Notification.find({ user: id }).sort({ createdAt: -1 });
+  const {_id} = req.user;
+  const result = await Notification.find({ user: _id }).sort({ createdAt: -1 });
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Notification retrieved successfully",
     data: result,
+  });
+});
+
+
+exports.readNotifications = catchAsync(async (req, res) => {
+  const id = req.user._id;
+  await Notification.updateMany({ recipient: id, read: false }, { read: true });
+
+  const total = await Notification.countDocuments({
+    recipient: id,
+    read: false,
+  });
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Notification read successfully",
+    unreadNotifications: total,
   });
 });

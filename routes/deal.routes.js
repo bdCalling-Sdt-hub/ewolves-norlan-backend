@@ -17,7 +17,7 @@ router.post(
 );
 
 router.get(
-  "/get-deal/:id",
+  "/get-deal",
   auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
   getDealByUserId
 );
