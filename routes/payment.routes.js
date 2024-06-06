@@ -4,6 +4,7 @@ const auth = require("../middlewares/auth");
 const {
   createPaymentIntent,
   createConnectedAccount,
+  transferAndPayouts,
 } = require("../controllers/payment.controller");
 const configureFileUpload = require("../middlewares/fileUpload");
 const router = express.Router();
@@ -20,5 +21,7 @@ router.post(
   configureFileUpload(),
   createConnectedAccount
 );
+
+router.post("/transfer-payouts", auth(USER_ROLE.ARTIST), transferAndPayouts);
 
 module.exports = router;

@@ -3,6 +3,8 @@ const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");
 const Order = require("../models/order.model");
 const ApiError = require("../errors/ApiError");
+const { cryptoToken, qrCodeGenerate } = require("../util/util");
+const Token = require("../models/token.model");
 
 exports.makeOrder = catchAsync(async (req, res) => {
   const user = req.user;
@@ -20,10 +22,19 @@ exports.makeOrder = catchAsync(async (req, res) => {
     );
   }
 
+  const token = cryptoToken();
+  // Save token to the database
+  await Token.create({
+    token: token,
+    orderId: createOrder._id,
+  });
+
+  const qrCode = await qrCodeGenerate(token);
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: "Order created successfully!",
-    data: createOrder,
+    data: qrCode,
   });
 });

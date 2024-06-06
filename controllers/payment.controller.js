@@ -153,35 +153,41 @@ exports.createConnectedAccount = catchAsync(async (req, res) => {
   });
 });
 
-//transfer money
-app.post("/transfer", async (req, res) => {
-  try {
-    const transfer = await stripe.transfers.create({
+exports.transferAndPayouts = catchAsync(async (req, res) => {
+  const user = req.user;
+  const { token } = req.body;
+
+  if (!token) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "You provide not data");
+  }
+  const isExistUser = await User.isExistUser(user._id);
+  if (!isExistUser) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Artist doesn't exist!");
+  }
+
+  //check bank account
+  if (!(await User.isAccountCreated(user._id))) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Sorry, you didn't provide your bank information. Please create an account first, then scan."
+    );
+  }
+
+  const transfer = await stripe.transfers.create({
+    amount: 5 * 100,
+    currency: "eur",
+    destination: "acct_1PNun0GdZpO2byQu",
+  });
+
+  const payouts = await stripe.payouts.create(
+    {
       amount: 5 * 100,
       currency: "eur",
-      destination: "acct_1PNun0GdZpO2byQu",
-    });
-
-    const payouts = await stripe.payouts.create(
-      {
-        amount: 5 * 100,
-        currency: "eur",
-        //method: "instant",
-        destination: "ba_1PNun1GdZpO2byQuR0sML48a",
-      },
-      {
-        stripeAccount: "acct_1PNun0GdZpO2byQu",
-      }
-    );
-
-    console.log("payouts", payouts);
-    res.status(200).send({
-      message: "Transfer and payout created successfully",
-      transfer,
-      payouts,
-    });
-  } catch (error) {
-    console.log({ error: error });
-    res.status(200).send({ message: error });
-  }
+      //method: "instant",
+      destination: "ba_1PNun1GdZpO2byQuR0sML48a",
+    },
+    {
+      stripeAccount: "acct_1PNun0GdZpO2byQu",
+    }
+  );
 });
