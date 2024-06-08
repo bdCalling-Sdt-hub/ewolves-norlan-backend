@@ -267,7 +267,7 @@ exports.addRating = catchAsync(async (req, res, next) => {
     { new: true }
   );
 
-  return sendResponse(res, {
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Added Rating Successfully",
@@ -289,10 +289,12 @@ exports.gigByEventName = catchAsync(async (req, res, next) => {
     throw new ApiError(404, "Gig not Found");
   }
 
-  return sendResponse(res, {
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Retrieve Gig Data Successfully",
     data: gig,
   });
 });
+
+//

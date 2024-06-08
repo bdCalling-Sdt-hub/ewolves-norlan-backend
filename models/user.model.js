@@ -96,6 +96,9 @@ const userSchema = new mongoose.Schema(
       externalAccountId: {
         type: String,
       },
+      currency: {
+        type: String,
+      },
     },
   },
   { timestamps: true }

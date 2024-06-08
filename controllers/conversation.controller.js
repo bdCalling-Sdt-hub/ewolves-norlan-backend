@@ -4,70 +4,74 @@ const Conversation = require("../models/conversation.model");
 const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");
 
-exports.createConversationToDB  = catchAsync( async(req, res, next)=>{
+exports.createConversationToDB = catchAsync(async (req, res, next) => {
+  const existingConversation = await Conversation.findOne({
+    $or: [
+      { members: { $all: [req.body.senderId, req.body.receiverId] } },
+      { members: { $all: [req.body.receiverId, req.body.senderId] } },
+    ],
+  });
 
-    const existingConversation = await Conversation.findOne({
-        $or: [
-            { members: { $all: [req.body.senderId, req.body.receiverId] } },
-            { members: { $all: [req.body.receiverId, req.body.senderId] } }
-        ]
+  if (existingConversation) {
+    return sendResponse(res, {
+      statusCode: httpStatus.OK,
+      status: true,
+      message: "Already Exist",
+      data: existingConversation,
     });
+  }
 
-    if(existingConversation){
-        return sendResponse(res, {
-            statusCode: httpStatus.OK,
-            status: true,
-            message: "Already Exist",
-            data: existingConversation
-        });
-    }
+  const conversation = new Conversation({
+    members: [req.body.senderId, req.body.receiverId],
+  });
 
-    const conversation = new Conversation({
-        members: [ req.body.senderId, req.body.receiverId ]
-    });
+  const result = await conversation.save();
 
-    const result = await conversation.save();
-
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        status: true,
-        message: "Conversation Created Successfully!!!",
-        data: result
-    })
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    status: true,
+    message: "Conversation Created Successfully!!!",
+    data: result,
+  });
 });
 
-exports.getConversationsFromDB = catchAsync( async (req, res, next)=>{
-    const id = req.user._id;
-    const conversations = await Conversation.find({
-        members: { $in: [id] },
-    }).populate({ path: "members", select: "fullName _id image color"});
+exports.getConversationsFromDB = catchAsync(async (req, res, next) => {
+  const id = req.user._id;
+  const conversations = await Conversation.find({
+    members: { $in: [id] },
+  }).populate({
+    path: "members",
+    select: "firstName lastName _id image color",
+  });
 
-    if(!conversations){
-        throw new ApiError(404, "There is no User!");
-    }
+  if (!conversations) {
+    throw new ApiError(404, "There is no User!");
+  }
 
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        status: true,
-        message: "Conversation Retrieve Successfully",
-        data: conversations
-    })
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    status: true,
+    message: "Conversation Retrieve Successfully",
+    data: conversations,
+  });
 });
 
-exports.getSingleConversationFromDB = catchAsync( async (req, res, next)=>{
+exports.getSingleConversationFromDB = catchAsync(async (req, res, next) => {
+  const conversation = await Conversation.findOne({
+    members: { $all: [req.params.firstUserId, req.params.secondUserId] },
+  }).populate({
+    path: "members",
+    select: "firstName lastName _id image color",
+  });
 
-    const conversation = await Conversation.findOne({
-        members: { $all: [ req.params.firstUserId, req.params.secondUserId ] }
-    }).populate({ path: "members", select: "fullName _id image color"});
+  if (!conversation) {
+    throw new ApiError(404, "There is no Conversation!");
+  }
 
-    if(!conversation){
-        throw new ApiError(404, "There is no Conversation!");
-    }
-
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        status: true,
-        message: "Single Conversation Retrieve Successfully",
-        data: conversation
-    })
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    status: true,
+    message: "Single Conversation Retrieve Successfully",
+    data: conversation,
+  });
 });

@@ -49,6 +49,21 @@ exports.createConnectedAccount = catchAsync(async (req, res) => {
     bodyData;
   const dob = new Date(dateOfBirth);
 
+  console.log(bodyData);
+
+  if (
+    !dateOfBirth &&
+    !phoneNumber &&
+    !address &&
+    !bank_info &&
+    !business_profile
+  ) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Please provide the required information: date of birth, phone number, address, bank information, and business profile."
+    );
+  }
+
   //process of kyc
   const files = req.files.KYC;
   if (!files && files.length < 2) {
@@ -116,8 +131,7 @@ exports.createConnectedAccount = catchAsync(async (req, res) => {
     business_profile: {
       mcc: "5970",
       name: business_profile.business_name || isExistUser.firstName,
-      url: business_profile.website,
-      product_description: business_profile.product_description,
+      url: business_profile.website || "www.example.com",
     },
     external_account: {
       object: "bank_account",

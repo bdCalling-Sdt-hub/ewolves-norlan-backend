@@ -19,21 +19,25 @@ const dealSchema = new Schema(
       required: true,
     },
     location: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
-    artist: {
+    user1: {
       type: Schema.Types.ObjectId,
       ref: "User",
     },
-    user: {
+    user2: {
       type: Schema.Types.ObjectId,
       ref: "User",
+    },
+    messageId: {
+      type: Schema.Types.ObjectId,
+      ref: "message",
     },
     status: {
       type: String,
       required: false,
-      enum: ["Complete", "Pending", "Report" ],
+      enum: ["Complete", "Pending", "Report"],
       default: "Pending",
     },
   },
