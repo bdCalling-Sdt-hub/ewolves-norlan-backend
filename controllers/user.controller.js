@@ -320,13 +320,14 @@ exports.changePassword = catchAsync(async (req, res) => {
   });
 });
 
+//update profile
 exports.updateProfile = catchAsync(async (req, res, next) => {
   if (req.fileValidationError) {
-    return res.status(400).json({ messege: req.fileValidationError });
+    res.status(400).json({ message: req.fileValidationError });
   }
-  const user = await User.findById(req.user._id);
-  if (!user) {
-    return sendResponse(res, 204, "No User Found", user);
+  const isExistUser = await User.findById(req.user._id);
+  if (!isExistUser) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "User doesn't exist!");
   }
   const {
     firstName,
@@ -337,6 +338,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
     about,
     profession,
     color,
+    instagram,
   } = req.body;
 
   let imageFileName = "";
@@ -344,53 +346,65 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
     imageFileName = `/media/${req.files.image[0].filename}`;
   }
 
-  const fileName = user?.image?.split("/").pop();
+  //unlink file here
+  const fileName = isExistUser?.image?.split("/").pop();
   const filePath = path.join(__dirname, "..", "uploads", "media", fileName);
   if (fs.existsSync(filePath)) {
     fs.unlinkSync(filePath);
   }
 
-  user.firstName = firstName ? firstName : user.firstName;
-  user.lastName = lastName ? lastName : user.lastName;
-  user.email = email ? email : user?.email;
-  user.mobileNumber = mobileNumber ? mobileNumber : user.mobileNumber;
-  user.location = location ? location : user.location;
-  user.color = color ? color : user.color;
-  user.about = about ? about : user.about;
-  user.profession = profession ? profession : user.profession;
-  user.image = imageFileName ? imageFileName : user.image;
-  await user.save();
+  isExistUser.firstName = firstName ? firstName : isExistUser.firstName;
+  isExistUser.lastName = lastName ? lastName : isExistUser.lastName;
+  isExistUser.instagramLink = instagram ? instagram : isExistUser.instagramLink;
+  isExistUser.email = email ? email : isExistUser?.email;
+  isExistUser.mobileNumber = mobileNumber
+    ? mobileNumber
+    : isExistUser.mobileNumber;
+  isExistUser.location = location ? location : isExistUser.location;
+  isExistUser.color = color ? color : isExistUser.color;
+  isExistUser.about = about ? about : isExistUser.about;
+  isExistUser.profession = profession ? profession : isExistUser.profession;
+  isExistUser.image = imageFileName ? imageFileName : isExistUser.image;
+  await isExistUser.save();
 
-  return sendResponse(res, {
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Profile Updated Successfully",
   });
 });
 
+//following and follower
 exports.makeFollower = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-
-  const followers = await User.findById(id);
-  if (!followers) {
-    throw new ApiError(204, "No User Found");
+  const targetUser = await User.findById(id);
+  if (!targetUser) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "User doesn't exist!");
   }
 
-  const following = await User.findById(req.user._id);
-  if (!following) {
-    throw new ApiError(204, "No User Found");
+  const currentUser = await User.findById(req.user._id);
+  if (!currentUser) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "User doesn't exist!");
   }
 
-  followers.followers.push(id);
-  await followers.save();
+  if (currentUser._id.toString() === id.toString()) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "You can't follow yourself");
+  }
 
-  following.following.push(id);
-  await following.save();
+  if (!targetUser.followers.includes(currentUser._id)) {
+    targetUser.followers.push(currentUser._id);
+    await targetUser.save();
+  }
 
-  return sendResponse(res, {
+  if (!currentUser.following.includes(targetUser._id)) {
+    currentUser.following.push(targetUser._id);
+    await currentUser.save();
+  }
+
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Make Following Successfully",
+    message: "Followed Successfully",
   });
 });
 
@@ -411,7 +425,6 @@ exports.deleteAccount = catchAsync(async (req, res, next) => {
 
 exports.makeInterest = catchAsync(async (req, res, next) => {
   const { interest } = req.body;
-
 
   // Add interest to the user's interest array
   const user = await User.findOneAndUpdate(

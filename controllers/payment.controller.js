@@ -229,9 +229,6 @@ exports.transferAndPayouts = catchAsync(async (req, res) => {
     }
   );
 
-  console.log("transfer", transfer);
-  console.log("payouts", payouts);
-
   if (transfer.id && payouts.id) {
     isExistOrder.orderStatus = "completed";
     isExistOrder.paymentStatus = "transferred_to_artist";

@@ -32,15 +32,14 @@ const userSchema = new mongoose.Schema(
     },
     mobileNumber: {
       type: String,
-      required: false,
       trim: true,
     },
     location: {
       type: String,
-      required: false,
-      trim: true,
     },
-    instagramLink: { type: String, trim: true, required: false },
+    instagramLink: {
+      type: String,
+    },
     accountStatus: { type: Boolean, default: false, required: false },
     profession: { type: String, trim: true, required: false },
     termAndCondition: { type: Boolean, default: false, required: false },

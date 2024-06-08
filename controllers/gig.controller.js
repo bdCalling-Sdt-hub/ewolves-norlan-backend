@@ -8,7 +8,22 @@ const paginationCalculate = require("../helper/paginationHelper");
 const Video = require("../models/video.model");
 const User = require("../models/user.model");
 
+//create gig
 exports.createGigToDB = catchAsync(async (req, res, next) => {
+  const user = req.user;
+  const isExistUser = await User.findById(user._id);
+  if (!isExistUser) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Artist doesn't exist");
+  }
+
+  //check have account information
+  if (!isExistUser.accountInformation.status) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Please provide your bank information before adding a gig."
+    );
+  }
+
   const basicPackage = {
     serviceDescription: req.body.basicDes,
     price: req.body.basicPrice,
@@ -26,18 +41,18 @@ exports.createGigToDB = catchAsync(async (req, res, next) => {
   };
 
   const value = {
+    ...req.body,
     thumbnail: `/media/${req.files.thumbnail[0].filename}`,
     basicPackage,
     standardPackage,
     premiumPackage,
-    ...req.body,
+    artist: user._id,
   };
 
   let createGig;
   if (value.thumbnail) {
     createGig = await Gig.create(value);
   }
-
   if (!createGig) {
     throw new ApiError(400, "Failed to created gig");
   }
@@ -49,7 +64,7 @@ exports.createGigToDB = catchAsync(async (req, res, next) => {
       videoDescription: createGig.about,
       price: createGig.basicPackage?.price,
       gig: createGig._id,
-      artist: createGig.artist,
+      artist: user._id,
     };
 
     const createVideo = await Video.create(videoData);
@@ -70,6 +85,7 @@ exports.createGigToDB = catchAsync(async (req, res, next) => {
   });
 });
 
+//get all gig
 exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
   const { interest } = await User.findById(req.user._id);
   const paginationOptions = pick(req.query, ["limit", "page"]);
@@ -79,7 +95,7 @@ exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
   const { searchTerm, ...filterData } = filters;
 
   const andConditions = [];
-  if (searchTerm) { 
+  if (searchTerm) {
     andConditions.push({
       $or: ["contentName", "location"].map((field) => ({
         [field]: {
@@ -120,13 +136,16 @@ exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
     });
   }
 
+  if (interest) {
+    andConditions.push({ category: { $in: interest } });
+  }
+
   const whereConditions =
     andConditions.length > 0
       ? {
           $and: andConditions,
-          searchTags: { $in: interest }
         }
-      : { searchTags: { $in: interest } };
+      : {};
 
   const result = await Gig.find(whereConditions)
     .sort()
@@ -149,6 +168,7 @@ exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
   });
 });
 
+//update git
 exports.updateGigToDB = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const gig = await Gig.findById(id);
@@ -190,6 +210,7 @@ exports.updateGigToDB = catchAsync(async (req, res, next) => {
   });
 });
 
+//find git by id
 exports.findGigByArtistId = catchAsync(async (req, res, next) => {
   const id = req.params.id;
 
@@ -203,6 +224,7 @@ exports.findGigByArtistId = catchAsync(async (req, res, next) => {
   });
 });
 
+//add rating
 exports.addRating = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const { ratings } = req.body;
@@ -253,6 +275,7 @@ exports.addRating = catchAsync(async (req, res, next) => {
   });
 });
 
+//get event
 exports.gigByEventName = catchAsync(async (req, res, next) => {
   const { event } = req.query;
   let gig;
