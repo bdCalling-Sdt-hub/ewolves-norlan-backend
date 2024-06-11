@@ -10,7 +10,7 @@ const Notification = require("../models/notification.model");
 exports.getAllVideo = catchAsync(async (req, res) => {
   const result = await Video.find({})
     .sort({ createdAt: -1 })
-    .populate({ path: "artist", select: "fullName image location" })
+    .populate({ path: "artist", select: "firstName lastName image location" })
     .lean();
 
   const modifiedResult = result.map((video) => {
@@ -48,7 +48,7 @@ exports.getSingleVideo = catchAsync(async (req, res) => {
   const id = req.params.id;
   const result = await Video.findById(id, { comments: 0 })
     .sort({ createdAt: -1 })
-    .populate({ path: "artist", select: "fullName image location" });
+    .populate({ path: "artist", select: "firstName lastName image location" });
 
   // Sending response for video metadata
   sendResponse(res, {
@@ -97,10 +97,10 @@ exports.createComment = catchAsync(async (req, res, next) => {
 
   const videoOwner = await User.findById(video.artist);
 
-  const notificationMessage = `${user.fullName} is comment on your video ${comment}`;
+  const notificationMessage = `${user.firstName} is comment on your video ${comment}`;
   //save to notification model
   const notification = await Notification.create({
-    userInfo: { name: user.fullName, image: user.image },
+    userInfo: { name: user.firstName, image: user.image },
     message: notificationMessage,
     role: videoOwner.role,
     user: videoOwner._id,
@@ -121,7 +121,7 @@ exports.createComment = catchAsync(async (req, res, next) => {
 exports.getVideoComments = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const video = await Video.findById(id)
-    .populate({ path: "comments.user", select: "fullName image" })
+    .populate({ path: "comments.user", select: "firstName lastName image" })
     .select("comments");
   if (!video) {
     throw new ApiError(httpStatus.OK, "Video doesn't exist!");

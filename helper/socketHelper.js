@@ -1,4 +1,3 @@
-const Deal = require("../models/deal.model");
 const Message = require("../models/message.model");
 
 const socketHandler = (io) => {
@@ -24,14 +23,6 @@ const socketHandler = (io) => {
         };
 
         const response = await Message.create(message);
-        if (type === "Deal") {
-          const payload = {
-            ...deal,
-            messageId: response._id,
-          };
-          await Deal.create(payload);
-        }
-
         io.to(conversationId).emit("getMessage", response);
       }
     );
@@ -42,7 +33,6 @@ const socketHandler = (io) => {
         { "deal.status": status },
         { new: true }
       );
-      await Deal.findOneAndUpdate({ messageId: messageId }, { status: status });
 
       //send dynamic response to app
       io.to(conversationId).emit("getMessage", message);

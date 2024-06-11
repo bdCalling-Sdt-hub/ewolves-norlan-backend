@@ -18,11 +18,17 @@ exports.createPaymentIntent = catchAsync(async (req, res) => {
     payment_method_types: ["card"],
   });
 
+  const paymentIntentAmount = paymentIntent.amount / 100;
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: "Payment created successfully",
-    data: paymentIntent.client_secret,
+    data: {
+      clientSecret: paymentIntent.client_secret,
+      transactionId: paymentIntent.id,
+      price: paymentIntentAmount,
+    },
   });
 });
 

@@ -8,5 +8,6 @@ exports.cryptoToken = () => {
 
 exports.qrCodeGenerate = async (token) => {
   const qrCode = await QRCode.toDataURL(token);
-  return qrCode;
+  const base64Data = qrCode.replace(/^data:image\/png;base64,/, "");
+  return base64Data;
 };

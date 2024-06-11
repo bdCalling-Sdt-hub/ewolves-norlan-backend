@@ -1,5 +1,4 @@
 const { Schema, model } = require("mongoose");
-const Deal = require("./deal.model");
 
 const MessageSchema = new Schema(
   {

@@ -1,3 +1,4 @@
+const httpStatus = require("http-status");
 const ApiError = require("../errors/ApiError");
 const handleValidationError = require("../errors/handleValidationError");
 const handleValidation = require("../errors/handleValidationError");
@@ -7,13 +8,25 @@ const globalErrorHandler = (error, req, res, next) => {
   let message = "Something went wrong";
   let errorMessages = [];
 
-  console.log("fd", error)
+  console.log("fd", error);
 
   if (error?.name === "ValidationError") {
     const simplifiedError = handleValidationError(error);
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
     errorMessages = simplifiedError.errorMessages;
+  } else if (error?.name === "TokenExpiredError") {
+    statusCode = httpStatus.UNAUTHORIZED;
+    message = "Session Expired";
+    (message = error?.message),
+      (errorMessages = error?.message
+        ? [
+            {
+              path: "",
+              message: "Session Expired,Please login again then continue.",
+            },
+          ]
+        : []);
   } else if (error instanceof Error) {
     (message = error?.message),
       (errorMessages = error?.message
@@ -25,7 +38,6 @@ const globalErrorHandler = (error, req, res, next) => {
           ]
         : []);
   } else if (error instanceof ApiError) {
-    console.log("api error",error)
     statusCode = error?.statusCode;
     (message = error?.message),
       (errorMessages = error?.message
@@ -37,8 +49,6 @@ const globalErrorHandler = (error, req, res, next) => {
           ]
         : []);
   }
-
-
 
   res.status(statusCode).json({
     success: false,
