@@ -227,6 +227,7 @@ exports.findGigByArtistId = catchAsync(async (req, res, next) => {
 //add rating
 exports.addRating = catchAsync(async (req, res, next) => {
   const { id } = req.params;
+  console.log("gig id rating", id);
   const { ratings } = req.body;
   const gig = await Gig.findById(id).populate("artist");
 

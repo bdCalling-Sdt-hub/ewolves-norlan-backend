@@ -10,7 +10,7 @@ const socketHandler = (io) => {
     //send and get message
     socket.on(
       "sendMessage",
-      async ({ conversationId, senderId, text, deal }) => {
+      async ({ conversationId, senderId, text, deal, gigId }) => {
         const type = Object.keys(deal).length ? "Deal" : "Text";
 
         // save to DB
@@ -20,6 +20,7 @@ const socketHandler = (io) => {
           text: text,
           deal: type === "Deal" ? { ...deal, status: "Pending" } : null,
           messageType: type,
+          gigId: gigId,
         };
 
         const response = await Message.create(message);

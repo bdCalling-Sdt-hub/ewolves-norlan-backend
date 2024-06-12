@@ -252,6 +252,7 @@ exports.transferAndPayouts = catchAsync(async (req, res) => {
   if (transfer.id && payouts.id) {
     isExistOrder.orderStatus = "completed";
     isExistOrder.paymentStatus = "transferred_to_artist";
+    isExistOrder.payoutPrice = payouts.amount / 100;
     await isExistOrder.save();
 
     //real time response
@@ -263,6 +264,7 @@ exports.transferAndPayouts = catchAsync(async (req, res) => {
       message:
         "Transaction Completed: The payment has been successfully transferred.",
       data: artist,
+      gigId: isExistOrder?.gigId,
     });
   }
 
@@ -274,12 +276,12 @@ exports.transferAndPayouts = catchAsync(async (req, res) => {
       transfer: {
         id: transfer.id,
         transactionId: transfer.balance_transaction,
-        amount: transfer.amount,
+        amount: transfer.amount / 100,
       },
       payouts: {
         id: payouts.id,
         transactionId: payouts.balance_transaction,
-        amount: payouts.amount,
+        amount: payouts.amount / 100,
       },
     },
   });

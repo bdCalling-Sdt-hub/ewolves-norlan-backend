@@ -20,6 +20,10 @@ const orderSchema = new Schema(
       type: String,
       required: [true, "Price is required"],
     },
+    payoutPrice: {
+      type: String,
+      required: [true, "Price is required"],
+    },
     orderStatus: {
       type: String,
       enum: ["pending", "in_progress", "completed"],
@@ -33,6 +37,10 @@ const orderSchema = new Schema(
     messageId: {
       type: String,
       required: [true, "Message id is required"],
+    },
+    gigId: {
+      type: String,
+      ref: "Gig",
     },
     service_name: {
       type: String,

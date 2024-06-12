@@ -23,6 +23,10 @@ const MessageSchema = new Schema(
       type: String,
       required: false,
     },
+    gigId: {
+      type: String,
+      ref: "Gig",
+    },
   },
   { timestamps: true }
 );
