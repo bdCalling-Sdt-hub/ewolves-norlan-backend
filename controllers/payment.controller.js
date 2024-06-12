@@ -253,6 +253,17 @@ exports.transferAndPayouts = catchAsync(async (req, res) => {
     isExistOrder.orderStatus = "completed";
     isExistOrder.paymentStatus = "transferred_to_artist";
     await isExistOrder.save();
+
+    //real time response
+    const artist = await User.findById(isExistOrder.artist).select(
+      "_id firstName lastName color profession image"
+    );
+
+    io.emit(`scan-confirm::${isExistOrder.user}`, {
+      message:
+        "Transaction Completed: The payment has been successfully transferred.",
+      data: artist,
+    });
   }
 
   sendResponse(res, {

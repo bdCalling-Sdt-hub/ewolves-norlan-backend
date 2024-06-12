@@ -14,7 +14,7 @@ const notificationSchema = new Schema(
     },
     type: {
       type: String,
-      enum: ["comment", "wishlist"],
+      enum: ["comment", "wishlist", "transfer"],
       required: true,
     },
     message: { type: String, required: true },
