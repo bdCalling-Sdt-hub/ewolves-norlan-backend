@@ -22,7 +22,6 @@ const orderSchema = new Schema(
     },
     payoutPrice: {
       type: String,
-      required: [true, "Price is required"],
     },
     orderStatus: {
       type: String,

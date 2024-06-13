@@ -7,6 +7,8 @@ const pick = require("../shared/pick");
 const paginationCalculate = require("../helper/paginationHelper");
 const Video = require("../models/video.model");
 const User = require("../models/user.model");
+const path = require("path");
+const fs = require("fs");
 
 //create gig
 exports.createGigToDB = catchAsync(async (req, res, next) => {
@@ -171,36 +173,68 @@ exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
 //update git
 exports.updateGigToDB = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const gig = await Gig.findById(id);
-  if (!gig) {
-    throw new ApiError(204, "No Gig Found");
+  let bodyData = {};
+
+  // Parse JSON data if provided
+  if (req.body.data) {
+    try {
+      bodyData = JSON.parse(req.body.data);
+    } catch (error) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Invalid JSON data");
+    }
   }
-  const { contentName, location, skillLevel, searchTags, category, about } =
-    req.body;
 
-  let thumbnail = "";
+  const { basicPackage, standardPackage, premiumPackage, ...gigData } =
+    bodyData;
 
+  const isExistGig = await Gig.findById(id);
+  if (!isExistGig) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Gig not found");
+  }
+
+  let thumbnail;
   if (req.files && req.files.thumbnail && req.files.thumbnail[0]) {
     thumbnail = `/media/${req.files.thumbnail[0].filename}`;
   }
 
+  //unlink file
   if (thumbnail) {
-    const fileName = gig?.thumbnail?.split("/").pop();
+    const fileName = isExistGig?.thumbnail?.split("/").pop();
     const filePath = path.join(__dirname, "..", "uploads", "media", fileName);
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
     }
   }
 
-  gig.contentName = contentName ? contentName : gig.contentName;
-  gig.about = about ? about : gig.about;
-  gig.location = location ? location : gig.location;
-  gig.skillLevel = skillLevel ? skillLevel : gig.skillLevel;
-  gig.searchTags = searchTags ? searchTags : gig.searchTags;
-  gig.category = category ? category : gig.category;
-  gig.thumbnail = thumbnail ? thumbnail : gig.thumbnail;
+  const updatedData = { ...gigData, thumbnail };
 
-  const result = await gig.save();
+  //basic
+  if (basicPackage && Object.keys(basicPackage).length > 0) {
+    Object.keys(basicPackage).forEach((key) => {
+      const basicPackageKey = `basicPackage.${key}`;
+      updatedData[basicPackageKey] = basicPackage[key];
+    });
+  }
+
+  //standard
+  if (standardPackage && Object.keys(standardPackage).length > 0) {
+    Object.keys(standardPackage).forEach((key) => {
+      const standardPackageKey = `standardPackage.${key}`;
+      updatedData[standardPackageKey] = standardPackage[key];
+    });
+  }
+
+  //premium
+  if (premiumPackage && Object.keys(premiumPackage).length > 0) {
+    Object.keys(premiumPackage).forEach((key) => {
+      const premiumPackageKey = `premiumPackage.${key}`;
+      updatedData[premiumPackageKey] = premiumPackage[key];
+    });
+  }
+
+  const result = await Gig.findOneAndUpdate({ _id: id }, updatedData, {
+    new: true,
+  });
 
   return sendResponse(res, {
     statusCode: httpStatus.OK,

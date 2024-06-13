@@ -341,7 +341,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
     instagram,
   } = req.body;
 
-  let imageFileName = "";
+  let imageFileName;
   if (req.files && req.files.image && req.files.image[0]) {
     imageFileName = `/media/${req.files.image[0].filename}`;
   }
