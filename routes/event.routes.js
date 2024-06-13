@@ -28,4 +28,4 @@ router.patch(
   updateEvent
 );
 
-module.exports = router;
+exports.EventRoutes = router;

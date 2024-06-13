@@ -2,13 +2,13 @@ const httpStatus = require("http-status");
 const ApiError = require("../errors/ApiError");
 const Gig = require("../models/gig.model");
 const sendResponse = require("../shared/sendResponse");
-const catchAsync = require("../shared/catchAsync");
 const pick = require("../shared/pick");
 const paginationCalculate = require("../helper/paginationHelper");
 const Video = require("../models/video.model");
 const User = require("../models/user.model");
 const path = require("path");
 const fs = require("fs");
+const catchAsync = require("../shared/catchAsync");
 
 //create gig
 exports.createGigToDB = catchAsync(async (req, res, next) => {

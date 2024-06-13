@@ -26,4 +26,4 @@ router.patch(
   configureFileUpload(),
   updateAboutUs
 );
-module.exports = router;
+exports.AboutRoutes = router;

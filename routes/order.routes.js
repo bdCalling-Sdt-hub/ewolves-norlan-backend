@@ -25,5 +25,4 @@ router.get(
 
 router.post("/", auth(USER_ROLE.USER), makeOrder);
 
-const OrderRoutes = router;
-module.exports = OrderRoutes;
+exports.OrderRoutes = router;

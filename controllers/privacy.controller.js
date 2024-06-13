@@ -1,8 +1,8 @@
 const PrivacyModel = require("../models/privacy.model");
 const sendResponse = require("../shared/sendResponse");
-const catchAsync = require("../shared/catchAsync");
 const httpStatus = require("http-status");
 const ApiError = require("../errors/ApiError");
+const catchAsync = require("../shared/catchAsync");
 
 exports.addPrivacy = catchAsync(async (req, res, next) => {
   const { name, description } = req.body;
@@ -13,24 +13,24 @@ exports.addPrivacy = catchAsync(async (req, res, next) => {
       description: description,
     });
   }
-  return sendResponse(res,{
+  return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Created Privacy And Policy",
-    data: result
+    data: result,
   });
 });
 
 exports.getPrivacy = catchAsync(async (req, res, next) => {
-  const privacy = await PrivacyModel.findOne().sort({createdAt: -1});;
+  const privacy = await PrivacyModel.findOne().sort({ createdAt: -1 });
   if (!privacy) {
     throw new ApiError(404, "No Data Found");
   }
-  return sendResponse(res,{
+  return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Data retrive",
-    data: privacy
+    data: privacy,
   });
 });
 
@@ -45,9 +45,9 @@ exports.updatePrivacy = catchAsync(async (req, res, next) => {
   privacy.name = name ? name : privacy.name;
   privacy.description = description ? description : privacy.description;
   await privacy.save();
-  return sendResponse(res,{
+  return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Privacy Updated Successfully"
+    message: "Privacy Updated Successfully",
   });
 });

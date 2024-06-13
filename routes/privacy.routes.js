@@ -28,4 +28,4 @@ router.patch(
   updatePrivacy
 );
 
-module.exports = router;
+exports.PrivacyRoutes = router;

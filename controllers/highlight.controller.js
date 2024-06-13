@@ -1,10 +1,10 @@
 const httpStatus = require("http-status");
-const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");
 const Highlight = require("../models/highlight.model");
 const ApiError = require("../errors/ApiError");
 const fs = require("fs");
 const path = require("path");
+const catchAsync = require("../shared/catchAsync");
 
 exports.createHighlightToDB = catchAsync(async (req, res, next) => {
   let imageFile;

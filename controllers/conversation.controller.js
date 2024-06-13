@@ -1,8 +1,8 @@
 const httpStatus = require("http-status");
 const ApiError = require("../errors/ApiError");
 const Conversation = require("../models/conversation.model");
-const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");
+const catchAsync = require("../shared/catchAsync");
 
 exports.createConversationToDB = catchAsync(async (req, res, next) => {
   const existingConversation = await Conversation.findOne({

@@ -1,11 +1,11 @@
 const sendResponse = require("../shared/sendResponse");
-const catchAsync = require("../shared/catchAsync");
 const ApiError = require("../errors/ApiError");
 const httpStatus = require("http-status");
 const fs = require("fs");
 const User = require("../models/user.model");
 const Token = require("../models/token.model");
 const Order = require("../models/order.model");
+const catchAsync = require("../shared/catchAsync");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 //create payment intent

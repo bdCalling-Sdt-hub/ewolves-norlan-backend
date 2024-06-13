@@ -47,4 +47,4 @@ router.get(
   gigByEventName
 );
 
-module.exports = router;
+exports.GigRoutes = router;

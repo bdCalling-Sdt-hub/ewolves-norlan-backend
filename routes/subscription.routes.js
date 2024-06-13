@@ -4,7 +4,7 @@ const {
   addSubscription,
   getSubscription,
   updateSubscription,
-  getSingleSubscription
+  getSingleSubscription,
 } = require("../controllers/subscription.controller.js");
 const configureFileUpload = require("../middlewares/fileUpload.js");
 const auth = require("../middlewares/auth.js");
@@ -34,4 +34,4 @@ router.patch(
   updateSubscription
 );
 
-module.exports = router;
+exports.SubscriptionRoutes = router;

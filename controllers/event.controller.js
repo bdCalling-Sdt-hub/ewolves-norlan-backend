@@ -1,10 +1,10 @@
 const Event = require("../models/events.model");
 const ApiError = require("../errors/ApiError");
-const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");
 const httpStatus = require("http-status");
 const fs = require("fs");
 const path = require("path");
+const catchAsync = require("../shared/catchAsync");
 
 exports.createEvent = catchAsync(async (req, res, next) => {
   const { name, colors } = req.body;

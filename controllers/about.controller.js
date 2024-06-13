@@ -1,8 +1,8 @@
 const httpStatus = require("http-status");
 const AboutModel = require("../models/about.model");
-const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");
 const ApiError = require("../errors/ApiError");
+const catchAsync = require("../shared/catchAsync");
 
 exports.addAboutUs = catchAsync(async (req, res, next) => {
   const { name, description } = req.body;
@@ -13,18 +13,18 @@ exports.addAboutUs = catchAsync(async (req, res, next) => {
       description: description,
     });
   }
-  return sendResponse(res,{
-    statusCode : httpStatus.OK,
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
     success: true,
     message: "About Us Added Successfully",
-    data: result
+    data: result,
   });
 });
 
 exports.getAboutUs = catchAsync(async (req, res, next) => {
-  const about = await AboutModel.findOne().sort({createdAt: -1});
+  const about = await AboutModel.findOne().sort({ createdAt: -1 });
   if (!about) {
-    throw new ApiError(404, "No About Found")
+    throw new ApiError(404, "No About Found");
   }
   return sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -46,10 +46,10 @@ exports.updateAboutUs = catchAsync(async (req, res, next) => {
   about.name = name ? name : about.name;
   about.description = description ? description : about.description;
   const result = await about.save();
-  return sendResponse(res,{
-    statusCode : httpStatus.OK,
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
     success: true,
     message: "About Us Updated Successfully",
-    data: result
+    data: result,
   });
 });

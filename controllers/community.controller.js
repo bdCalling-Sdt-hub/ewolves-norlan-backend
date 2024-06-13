@@ -1,7 +1,7 @@
 const httpStatus = require("http-status");
-const catchAsync = require("../shared/catchAsync");
 const Community = require("../models/community.model");
 const sendResponse = require("../shared/sendResponse");
+const catchAsync = require("../shared/catchAsync");
 
 exports.createCommunity = catchAsync(async (req, res) => {
   const user = req.user;

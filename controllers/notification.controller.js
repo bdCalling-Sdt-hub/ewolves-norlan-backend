@@ -1,8 +1,8 @@
 const httpStatus = require("http-status");
 const Notification = require("../models/notification.model");
-const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");
 const ApiError = require("../errors/ApiError");
+const catchAsync = require("../shared/catchAsync");
 
 exports.addNotification = async (payload) => {
   const result = await Notification.create(payload);
@@ -10,7 +10,7 @@ exports.addNotification = async (payload) => {
 };
 
 exports.getNotification = catchAsync(async (req, res) => {
-  const {_id} = req.user;
+  const { _id } = req.user;
   const result = await Notification.find({ user: _id }).sort({ createdAt: -1 });
 
   sendResponse(res, {
@@ -20,7 +20,6 @@ exports.getNotification = catchAsync(async (req, res) => {
     data: result,
   });
 });
-
 
 exports.readNotifications = catchAsync(async (req, res) => {
   const id = req.user._id;

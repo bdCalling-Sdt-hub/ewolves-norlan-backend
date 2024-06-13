@@ -49,4 +49,4 @@ router.delete(
   deleteMessage
 );
 
-module.exports = router;
+exports.ChatRoutes = router;

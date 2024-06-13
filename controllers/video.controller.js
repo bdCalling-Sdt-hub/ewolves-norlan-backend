@@ -4,8 +4,8 @@ const Video = require("../models/video.model");
 const sendResponse = require("../shared/sendResponse");
 const ApiError = require("../errors/ApiError");
 const httpStatus = require("http-status");
-const catchAsync = require("../shared/catchAsync");
 const Notification = require("../models/notification.model");
+const catchAsync = require("../shared/catchAsync");
 
 exports.getAllVideo = catchAsync(async (req, res) => {
   const result = await Video.find({})

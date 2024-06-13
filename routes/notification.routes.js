@@ -14,7 +14,6 @@ router.patch(
   readNotifications
 );
 
-
 router
   .route("/")
   .get(auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER), getNotification)
@@ -23,4 +22,4 @@ router
     addNotification
   );
 
-module.exports = router;
+exports.NotificationRoutes = router;

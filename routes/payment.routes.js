@@ -24,4 +24,4 @@ router.post(
 
 router.post("/transfer-payouts", auth(USER_ROLE.ARTIST), transferAndPayouts);
 
-module.exports = router;
+exports.PaymentRoutes = router;

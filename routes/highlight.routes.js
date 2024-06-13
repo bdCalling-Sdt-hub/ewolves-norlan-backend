@@ -30,4 +30,4 @@ router.patch(
 );
 router.delete("/:id", auth(USER_ROLE.ARTIST), deleteHighlightFromDB);
 
-module.exports = router;
+exports.HighlightRoutes = router;

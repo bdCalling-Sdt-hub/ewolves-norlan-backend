@@ -36,4 +36,4 @@ router.patch(
   updateCategory
 );
 
-module.exports = router;
+exports.CategoryRoutes = router;

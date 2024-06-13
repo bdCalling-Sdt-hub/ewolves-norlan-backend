@@ -10,4 +10,4 @@ const router = express.Router();
 router.post("/create-community", auth(USER_ROLE.USER), createCommunity);
 router.get("/", auth(USER_ROLE.USER, USER_ROLE.ARTIST), getCommunity);
 
-module.exports = router;
+exports.CommunityRoutes = router;

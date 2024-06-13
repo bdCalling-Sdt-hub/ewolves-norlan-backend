@@ -1,11 +1,11 @@
 const httpStatus = require("http-status");
 const TermsModel = require("../models/terms.model");
-const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");
 const {
   addNotification,
   getAllNotifications,
 } = require("./notification.controller");
+const catchAsync = require("../shared/catchAsync");
 
 exports.addTerms = catchAsync(async (req, res, next) => {
   const { name, description } = req.body;
@@ -40,7 +40,7 @@ exports.addTerms = catchAsync(async (req, res, next) => {
 });
 
 exports.getTerms = catchAsync(async (req, res, next) => {
-  const terms = await TermsModel.findOne().sort({createdAt: -1});
+  const terms = await TermsModel.findOne().sort({ createdAt: -1 });
   if (!terms) {
     return sendResponse(res, 204, "No Data Found", terms);
   }

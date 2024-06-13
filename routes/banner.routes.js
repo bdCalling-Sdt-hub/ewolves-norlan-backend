@@ -29,4 +29,4 @@ router.patch(
 );
 router.delete("/delete-banner/:id", auth(USER_ROLE.ADMIN), deleteBanner);
 
-module.exports = router;
+exports.BannerRoutes = router;

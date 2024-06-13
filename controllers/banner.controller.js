@@ -1,10 +1,10 @@
 const Banner = require("../models/bannerSchema"); // Corrected import statement
 const fs = require("fs");
 const path = require("path");
-const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");
 const ApiError = require("../errors/ApiError");
 const httpStatus = require("http-status");
+const catchAsync = require("../shared/catchAsync");
 
 // add slider image
 exports.addBanner = catchAsync(async (req, res, next) => {

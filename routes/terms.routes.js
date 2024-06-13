@@ -27,4 +27,4 @@ router.patch(
   configureFileUpload(),
   updateTerms
 );
-module.exports = router;
+exports.TermsRoutes = router;

@@ -1,8 +1,8 @@
 const httpStatus = require("http-status");
 const Subscription = require("../models/subscriptionSchema");
-const catchAsync = require("../shared/catchAsync");
 const sendResponse = require("../shared/sendResponse");
 const ApiError = require("../errors/ApiError");
+const catchAsync = require("../shared/catchAsync");
 
 // add slider image
 exports.addSubscription = catchAsync(async (req, res, next) => {
@@ -21,11 +21,11 @@ exports.addSubscription = catchAsync(async (req, res, next) => {
     gig_count: parseInt(gig_count),
     package_features,
   });
-  return sendResponse(res,{
+  return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Created subcription Plan Successfully",
-    data: result
+    data: result,
   });
 });
 
@@ -35,11 +35,11 @@ exports.getSubscription = catchAsync(async (req, res, next) => {
   if (!subscription) {
     throw new ApiError(404, "No Subscription Found");
   }
-  return sendResponse(res,{
+  return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: " subcription retrive Successfully",
-    data: subscription
+    data: subscription,
   });
 });
 
@@ -49,11 +49,11 @@ exports.getSingleSubscription = catchAsync(async (req, res, next) => {
   if (!subscription) {
     throw new ApiError(404, "No Subscription Found");
   }
-  return sendResponse(res,{
+  return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: " subcription retrive Successfully",
-    data: subscription
+    data: subscription,
   });
 });
 
@@ -74,10 +74,10 @@ exports.updateSubscription = catchAsync(async (req, res, next) => {
   result.gig_count = gig_count ? gig_count : result.gig_count;
 
   await result.save();
-  return sendResponse(res,{
+  return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Subscription Updated Successfully",
-    data: result
+    data: result,
   });
 });

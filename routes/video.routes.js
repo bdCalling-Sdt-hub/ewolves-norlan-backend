@@ -15,7 +15,7 @@ const { USER_ROLE } = require("../enums/user.js");
 
 router.post(
   "/create-comment/:id",
-  //auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
+  auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
   configureFileUpload(),
   createComment
 );
@@ -50,4 +50,4 @@ router.get(
   getAllVideo
 );
 
-module.exports = router;
+exports.VideoRoutes = router;
