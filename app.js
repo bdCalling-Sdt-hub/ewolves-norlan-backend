@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const userRoute = require("./routes/user.routes");
 const bannerRoute = require("./routes/banner.routes");
 const categoryRoute = require("./routes/category.routes");
 const subscriptionRoute = require("./routes/subscription.routes");
@@ -19,13 +18,14 @@ const globalErrorHandler = require("./middlewares/globalErrorHandler");
 const paymentRoutes = require("./routes/payment.routes");
 const notificationRoutes = require("./routes/notification.route");
 const OrderRoutes = require("./routes/order.route");
+const { UserRoutes } = require("./routes/user.routes");
 
 //parser
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use("/api/auth", userRoute);
+app.use("/api/auth", UserRoutes);
 app.use("/api/banner", bannerRoute);
 app.use("/api/category/", categoryRoute);
 app.use("/api", subscriptionRoute);

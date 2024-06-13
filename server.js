@@ -1,9 +1,9 @@
 const port = process.env.PORT || 5000;
 const dbConnection = require("./config/db");
-const app = require("./app");
 const socketIo = require("socket.io");
 const socketHandler = require("./helper/socketHelper");
 const color = require("colors");
+const app = require("./app");
 require("dotenv").config();
 
 //db connect here
@@ -19,5 +19,6 @@ const io = socketIo(server, {
     origin: "*",
   },
 });
+
 socketHandler(io);
 global.io = io;
