@@ -5,7 +5,7 @@ const {
   addNotification,
   getAllNotifications,
 } = require("./notification.controller");
-const catchAsync = require("../shared/catchAsync");
+const catchAsync = require("../shared/CatchAsync");
 
 exports.addTerms = catchAsync(async (req, res, next) => {
   const { name, description } = req.body;

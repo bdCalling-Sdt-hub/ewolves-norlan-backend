@@ -4,7 +4,7 @@ const path = require("path");
 const sendResponse = require("../shared/sendResponse");
 const ApiError = require("../errors/ApiError");
 const httpStatus = require("http-status");
-const catchAsync = require("../shared/catchAsync");
+const catchAsync = require("../shared/CatchAsync");
 
 // add slider image
 exports.addBanner = catchAsync(async (req, res, next) => {

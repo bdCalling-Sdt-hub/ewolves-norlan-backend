@@ -4,7 +4,7 @@ const path = require("path");
 const sendResponse = require("../shared/sendResponse");
 const httpStatus = require("http-status");
 const ApiError = require("../errors/ApiError");
-const catchAsync = require("../shared/catchAsync");
+const catchAsync = require("../shared/CatchAsync");
 
 // add category
 exports.addCategory = catchAsync(async (req, res, next) => {

@@ -2,7 +2,7 @@ const httpStatus = require("http-status");
 const ApiError = require("../errors/ApiError");
 const sendResponse = require("../shared/sendResponse");
 const Message = require("../models/message.model");
-const catchAsync = require("../shared/catchAsync");
+const catchAsync = require("../shared/CatchAsync");
 
 // created message
 exports.createMessageToDB = catchAsync(async (req, res, next) => {

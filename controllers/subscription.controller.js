@@ -2,7 +2,7 @@ const httpStatus = require("http-status");
 const Subscription = require("../models/subscriptionSchema");
 const sendResponse = require("../shared/sendResponse");
 const ApiError = require("../errors/ApiError");
-const catchAsync = require("../shared/catchAsync");
+const catchAsync = require("../shared/CatchAsync");
 
 // add slider image
 exports.addSubscription = catchAsync(async (req, res, next) => {

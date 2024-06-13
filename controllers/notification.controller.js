@@ -2,7 +2,7 @@ const httpStatus = require("http-status");
 const Notification = require("../models/notification.model");
 const sendResponse = require("../shared/sendResponse");
 const ApiError = require("../errors/ApiError");
-const catchAsync = require("../shared/catchAsync");
+const catchAsync = require("../shared/CatchAsync");
 
 exports.addNotification = async (payload) => {
   const result = await Notification.create(payload);

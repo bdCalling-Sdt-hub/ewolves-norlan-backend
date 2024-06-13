@@ -5,7 +5,7 @@ const fs = require("fs");
 const User = require("../models/user.model");
 const Token = require("../models/token.model");
 const Order = require("../models/order.model");
-const catchAsync = require("../shared/catchAsync");
+const catchAsync = require("../shared/CatchAsync");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 //create payment intent

@@ -10,7 +10,7 @@ const fs = require("fs");
 const path = require("path");
 const pick = require("../shared/pick");
 const paginationCalculate = require("../helper/paginationHelper");
-const catchAsync = require("../shared/catchAsync");
+const catchAsync = require("../shared/CatchAsync");
 
 //catch async
 exports.userRegister = catchAsync(async (req, res, next) => {

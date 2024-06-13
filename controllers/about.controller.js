@@ -2,7 +2,7 @@ const httpStatus = require("http-status");
 const AboutModel = require("../models/about.model");
 const sendResponse = require("../shared/sendResponse");
 const ApiError = require("../errors/ApiError");
-const catchAsync = require("../shared/catchAsync");
+const catchAsync = require("../shared/CatchAsync");
 
 exports.addAboutUs = catchAsync(async (req, res, next) => {
   const { name, description } = req.body;

@@ -8,7 +8,7 @@ const Video = require("../models/video.model");
 const User = require("../models/user.model");
 const path = require("path");
 const fs = require("fs");
-const catchAsync = require("../shared/catchAsync");
+const catchAsync = require("../shared/CatchAsync");
 
 //create gig
 exports.createGigToDB = catchAsync(async (req, res, next) => {

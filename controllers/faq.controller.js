@@ -2,7 +2,7 @@ const FAQ = require("../models/faq.model");
 const ApiError = require("../errors/ApiError");
 const sendResponse = require("../shared/sendResponse");
 const httpStatus = require("http-status");
-const catchAsync = require("../shared/catchAsync");
+const catchAsync = require("../shared/CatchAsync");
 
 exports.createFAQToDB = catchAsync(async (req, res, next) => {
   const payload = req.body;

@@ -4,7 +4,7 @@ const Order = require("../models/order.model");
 const ApiError = require("../errors/ApiError");
 const { cryptoToken, qrCodeGenerate } = require("../util/util");
 const Token = require("../models/token.model");
-const catchAsync = require("../shared/catchAsync");
+const catchAsync = require("../shared/CatchAsync");
 
 exports.makeOrder = catchAsync(async (req, res) => {
   const user = req.user;
