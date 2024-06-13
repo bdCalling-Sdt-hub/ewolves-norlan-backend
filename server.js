@@ -1,4 +1,4 @@
-const port = process.env.PORT || 5002;
+const port = process.env.PORT || 5000;
 const dbConnection = require("./config/db");
 const app = require("./app");
 const socketIo = require("socket.io");
