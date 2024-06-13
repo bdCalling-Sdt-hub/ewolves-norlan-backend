@@ -12,6 +12,7 @@ const pick = require("../shared/pick");
 const paginationCalculate = require("../helper/paginationHelper");
 const catchAsync = require("../shared/catchAsync");
 
+//catch async
 exports.userRegister = catchAsync(async (req, res, next) => {
   const {
     firstName,
