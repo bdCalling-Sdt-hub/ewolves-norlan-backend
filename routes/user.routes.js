@@ -74,5 +74,4 @@ router.get(
   userController.getAllArtistFromDB
 );
 
-
 module.exports = router;

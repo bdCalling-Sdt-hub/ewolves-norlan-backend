@@ -5,12 +5,12 @@ const emailWithNodemailer = require("../config/email.config");
 const sendResponse = require("../shared/sendResponse");
 const ApiError = require("../errors/ApiError");
 const httpStatus = require("http-status");
-const catchAsync = require("../shared/catchAsync");
 const userTimers = new Map();
 const fs = require("fs");
 const path = require("path");
 const pick = require("../shared/pick");
 const paginationCalculate = require("../helper/paginationHelper");
+const catchAsync = require("../shared/catchAsync");
 
 exports.userRegister = catchAsync(async (req, res, next) => {
   const {
