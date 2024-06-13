@@ -5,4 +5,5 @@ const catchAsync = (fn) => async (req, res, next) => {
     next(error);
   }
 };
+
 module.exports = catchAsync;
