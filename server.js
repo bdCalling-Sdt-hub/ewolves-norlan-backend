@@ -8,7 +8,7 @@ require("dotenv").config();
 
 //db connect here
 dbConnection(process.env.DB_URL);
-const server = app.listen(port, "192.168.10.16", () => {
+const server = app.listen(port, "104.248.15.129", () => {
   console.log(color.yellow("Application running on port", port));
 });
 
