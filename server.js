@@ -4,14 +4,11 @@ const app = require("./app");
 const socketIo = require("socket.io");
 const socketHandler = require("./helper/socketHelper");
 const color = require("colors");
-const {
-  getAllNotifications,
-} = require("./controllers/notification.controller");
 require("dotenv").config();
 
 //db connect here
 dbConnection(process.env.DB_URL);
-const server = app.listen(port, "192.168.10.16", () => {
+const server = app.listen(port, "104.248.15.129", () => {
   console.log(color.yellow("Application running on port", port));
 });
 
@@ -22,5 +19,6 @@ const io = socketIo(server, {
     origin: "*",
   },
 });
+
 socketHandler(io);
 global.io = io;
