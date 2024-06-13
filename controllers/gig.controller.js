@@ -184,6 +184,8 @@ exports.updateGigToDB = catchAsync(async (req, res, next) => {
     }
   }
 
+  console.log(bodyData);
+
   const { basicPackage, standardPackage, premiumPackage, ...gigData } =
     bodyData;
 

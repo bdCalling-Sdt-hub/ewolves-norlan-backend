@@ -8,17 +8,17 @@ require("dotenv").config();
 
 //db connect here
 dbConnection(process.env.DB_URL);
-const server = app.listen(port, "104.248.15.129", () => {
+const server = app.listen(port, "192.168.10.16", () => {
   console.log(color.yellow("Application running on port", port));
 });
 
 //socket listen here
-const io = socketIo(server, {
-  pingTimeout: 60000,
-  cors: {
-    origin: "*",
-  },
-});
+// const io = socketIo(server, {
+//   pingTimeout: 60000,
+//   cors: {
+//     origin: "*",
+//   },
+// });
 
-socketHandler(io);
-global.io = io;
+// socketHandler(io);
+// global.io = io;
