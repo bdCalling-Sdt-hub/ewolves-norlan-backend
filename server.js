@@ -12,7 +12,7 @@ async function main() {
     await mongoose.connect(process.env.DB_URL);
     console.log(color.green("♻️  Database connected successfully"));
 
-    const server = app.listen(port, "104.248.15.129", () => {
+    const server = app.listen(port, "192.168.10.16", () => {
       console.log(color.yellow("🚀 Application running on port", port));
     });
 
