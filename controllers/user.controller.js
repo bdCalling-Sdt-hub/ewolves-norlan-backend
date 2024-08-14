@@ -11,6 +11,7 @@ const path = require("path");
 const pick = require("../shared/pick");
 const paginationCalculate = require("../helper/paginationHelper");
 const catchAsync = require("../shared/CatchAsync");
+const generateToken = require("../shared/generateToken");
 
 //catch async
 exports.userRegister = catchAsync(async (req, res, next) => {
@@ -106,7 +107,6 @@ exports.userRegister = catchAsync(async (req, res, next) => {
 
 exports.verifyEmail = catchAsync(async (req, res, next) => {
   const { emailVerifyCode, email } = req.body;
-  console.log(emailVerifyCode, email);
 
   if (!emailVerifyCode && !email) {
     throw new ApiError(400, "All Field are required");
@@ -132,42 +132,57 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
 });
 
 exports.userLogin = catchAsync(async (req, res) => {
-  const { email, password } = req.body;
-  if (!password && !email) {
-    throw new ApiError(400, "All Field are required");
+  const { email, password, appId, role, type } = req.body;
+
+  if (type === "social") {
+    let user = await User.findOne({ appId });
+
+    if (!user) {
+      user = await User.create({ appId, role });
+    }
+
+    const token = generateToken(user);
+
+    return sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "You are logged in successfully",
+      user: {
+        role: user.role,
+        id: user._id,
+        interest: user.interest,
+      },
+      token,
+    });
   }
 
-  const user = await User.findOne({ email: email });
+  const user = await User.findOne({ email });
+
   if (!user) {
-    throw new ApiError(400, "User not Found");
+    throw new ApiError(400, "User not found");
   }
 
   if (!user.emailVerified) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "your email is not verified");
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Your email is not verified");
   }
 
-  const ismatch = await bcrypt.compare(password, user.password);
-  if (!ismatch) {
-    throw new ApiError(401, "your credential doesn't match");
+  const isMatched = await bcrypt.compare(password, user.password);
+  if (!isMatched) {
+    throw new ApiError(401, "Your credentials don't match");
   }
 
-  const token = jwt.sign(
-    { _id: user._id, role: user.role },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: "3d",
-    }
-  );
+  const token = generateToken(user);
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Your Are logged in successfully",
+    message: "You are logged in successfully",
     user: {
       role: user.role,
       id: user._id,
       interest: user.interest,
     },
-    token: token,
+    token,
   });
 });
 
