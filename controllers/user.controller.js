@@ -143,7 +143,7 @@ exports.userLogin = catchAsync(async (req, res) => {
 
     const token = generateToken(user);
 
-    return sendResponse(res, {
+    sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: "You are logged in successfully",
@@ -156,34 +156,37 @@ exports.userLogin = catchAsync(async (req, res) => {
     });
   }
 
-  const user = await User.findOne({ email });
+  if (type === "general") {
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new ApiError(400, "User not found");
+    }
 
-  if (!user) {
-    throw new ApiError(400, "User not found");
+    if (!user.emailVerified) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, "Your email is not verified");
+    }
+
+    const isMatched = await bcrypt.compare(password, user.password);
+    if (!isMatched) {
+      throw new ApiError(401, "Your credentials don't match");
+    }
+
+    const token = generateToken(user);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "You are logged in successfully",
+      user: {
+        role: user.role,
+        id: user._id,
+        interest: user.interest,
+      },
+      token,
+    });
+
   }
 
-  if (!user.emailVerified) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "Your email is not verified");
-  }
-
-  const isMatched = await bcrypt.compare(password, user.password);
-  if (!isMatched) {
-    throw new ApiError(401, "Your credentials don't match");
-  }
-
-  const token = generateToken(user);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "You are logged in successfully",
-    user: {
-      role: user.role,
-      id: user._id,
-      interest: user.interest,
-    },
-    token,
-  });
 });
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
