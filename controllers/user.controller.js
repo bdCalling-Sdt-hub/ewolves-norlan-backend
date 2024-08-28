@@ -154,9 +154,10 @@ exports.userLogin = catchAsync(async (req, res) => {
       },
       token,
     });
+
+    return;
   }
 
-  if (type === "general") {
     const user = await User.findOne({ email });
     if (!user) {
       throw new ApiError(400, "User not found");
@@ -184,8 +185,6 @@ exports.userLogin = catchAsync(async (req, res) => {
       },
       token,
     });
-
-  }
 
 });
 
