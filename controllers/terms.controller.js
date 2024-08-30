@@ -17,20 +17,6 @@ exports.addTerms = catchAsync(async (req, res, next) => {
     });
   }
 
-  //create notification;
-  const notificationData = {
-    message: "Create term and condition",
-    image: "https://siffahim.github.io/artist-tailwind/images/02.jpg",
-    type: "term-and-conditions",
-    role: "ADMIN",
-    view: false,
-  };
-
-  await addNotification(notificationData);
-  const allNotification = await getAllNotifications();
-
-  io.emit("admin-notification", allNotification);
-
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

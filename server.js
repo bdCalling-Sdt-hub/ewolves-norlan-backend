@@ -13,8 +13,8 @@ async function main() {
     console.log(color.green("♻️  Database connected successfully"));
 
     // const server = app.listen(port, "104.248.15.129", () => {
-    const server = app.listen(port, "192.168.10.195", () => {
-      console.log(color.yellow("🚀 Application running on port", port));
+    const server = app.listen(port, process.env.IP, () => {
+      console.log(color.yellow("🚀 Application running on port:", port));
     });
 
     //socket listen here
