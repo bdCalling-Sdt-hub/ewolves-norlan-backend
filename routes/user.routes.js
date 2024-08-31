@@ -19,6 +19,7 @@ const {
   getTopArtistFromDB,
   getAllArtistFromDB,
   userLogin,
+  getAllUserFromDB,
 } = require("../controllers/user.controller.js");
 
 router.post("/register", configureFileUpload(), userRegister);
@@ -77,5 +78,6 @@ router.get(
 );
 
 router.get("/get-all-artist", auth(USER_ROLE.ADMIN), getAllArtistFromDB);
+router.get("/get-all-user", auth(USER_ROLE.ADMIN), getAllUserFromDB);
 
 exports.UserRoutes = router;
