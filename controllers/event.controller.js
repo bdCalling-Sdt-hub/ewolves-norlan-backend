@@ -7,11 +7,15 @@ const path = require("path");
 const catchAsync = require("../shared/CatchAsync");
 
 exports.createEvent = catchAsync(async (req, res, next) => {
-  const { name, colors } = req.body;
+  const { name } = req.body;
 
-  let imageFileName = "";
+  let imageFileName;
   if (req.files && req.files.image && req.files.image[0]) {
     imageFileName = `/media/${req.files.image[0].filename}`;
+  }
+  const payload = {
+    name,
+    image: imageFileName
   }
 
   const isExist = await Event.findOne({ name: name });
@@ -27,11 +31,14 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     throw new ApiError(204, "Event name already taken");
   }
 
-  const result = await Event.create({
-    name: name,
-    colors: colors,
-    image: imageFileName,
-  });
+  
+
+  
+
+  const result = await Event.create(payload);
+  if(!result){
+    throw new ApiError(204, "Failed to create Event");
+  }
 
   return sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -63,12 +70,12 @@ exports.updateEvent = catchAsync(async (req, res, next) => {
     throw new ApiError(404, "No Event found by this ID");
   }
 
-  let imageFileName = "";
+  let imageFileName;
   if (req.files && req.files.image && req.files.image[0]) {
     imageFileName = `/media/${req.files.image[0].filename}`;
   }
 
-  if (imageFileName !== "") {
+  if (imageFileName) {
     const fileName = event?.image?.split("/").pop();
     const filePath = path.join(__dirname, "..", "uploads", "media", fileName);
     if (fs.existsSync(filePath)) {
@@ -76,10 +83,12 @@ exports.updateEvent = catchAsync(async (req, res, next) => {
     }
   }
 
-  (event.name = name ? name : event.name),
-    (event.image = imageFileName ? imageFileName : image),
-    (event.colors = colors ? colors : event.colors),
-    await event.save();
+  const payload = {
+    name: name,
+    image: imageFileName
+  }
+
+  await Event.findByIdAndUpdate({_id: id}, payload, {new: true})
 
   return sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -87,3 +96,21 @@ exports.updateEvent = catchAsync(async (req, res, next) => {
     message: "Event Updated Successfully",
   });
 });
+
+
+exports.deleteEvent = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  const event = await Event.findByIdAndDelete(id);
+  if (!event) {
+    throw new ApiError(404, "No Event found by this ID");
+  }
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Event Deleted Successfully",
+  });
+});
+
+

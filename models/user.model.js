@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema(
     },
     mobileNumber: {
       type: String,
-      trim: true,
+      default: ""
     },
     location: {
       type: String,

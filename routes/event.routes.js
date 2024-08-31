@@ -5,6 +5,7 @@ const {
   createEvent,
   getEvent,
   updateEvent,
+  deleteEvent
 } = require("../controllers/event.controller.js");
 
 const auth = require("../middlewares/auth.js");
@@ -21,11 +22,15 @@ router.get(
   auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
   getEvent
 );
+
+
 router.patch(
   "/update-event/:id",
   auth(USER_ROLE.ADMIN),
   configureFileUpload(),
   updateEvent
 );
+router.delete("/delete-event/:id", auth(USER_ROLE.ADMIN), deleteEvent);
+
 
 exports.EventRoutes = router;

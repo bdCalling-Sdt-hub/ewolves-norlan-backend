@@ -516,34 +516,36 @@ exports.getAllArtistFromDB = catchAsync(async (req, res, next) => {
   const paginationOptions = pick(req.query, ["limit", "page"]);
   const { limit, page, skip } = paginationCalculate(paginationOptions);
 
-  const searchQuery = req.query.keyword;
+  const searchQuery = req.query.search;
 
-  const query = {
-    $or: [
-      {
-        name: {
-          $regex: searchQuery,
-          $options: "i",
-        },
-      },
-      {
-        email: {
-          $regex: searchQuery,
-          $options: "i",
-        },
-      },
-    ],
-  };
+  const anyConditions = [];
+  anyConditions.push({ role: "ARTIST" });
 
-  const artists = await User.find({ role: "ARTIST", query })
+  //artist search here
+  if (searchQuery) {
+    anyConditions.push({
+        $or: ["name", "email"].map((field) => ({
+            [field]: {
+                $regex: searchQuery,
+                $options: "i"
+            }
+        }))
+    });
+  }
+
+  
+
+  const whereConditions = anyConditions.length > 0 ? { $and: anyConditions } : {};
+
+  const artists = await User.find(whereConditions)
     .skip(skip)
-    .limit(limit);
+    .limit(limit).select("firstName lastName email image createdAt mobileNumber");
 
   const total = await User.countDocuments({ role: "ARTIST" });
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "All gig retrieved successfully",
+    message: "All Artist retrieved successfully",
     pagination: {
       page,
       limit,
