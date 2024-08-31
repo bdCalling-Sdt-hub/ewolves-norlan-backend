@@ -5,6 +5,10 @@ const ApiError = require("../errors/ApiError");
 const { cryptoToken, qrCodeGenerate } = require("../util/util");
 const Token = require("../models/token.model");
 const catchAsync = require("../shared/CatchAsync");
+const User = require("../models/user.model");
+const { USER_ROLE } = require("../enums/user");
+const paginationCalculate = require("../helper/paginationHelper");
+const pick = require("../shared/pick");
 
 exports.makeOrder = catchAsync(async (req, res) => {
   const user = req.user;
@@ -128,5 +132,53 @@ exports.getArchiveList = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     message: "Archive retrieve successfully!",
     data: result,
+  });
+});
+
+exports.getAllTransactionsHistory = catchAsync(async (req, res) => {
+  const paginationOptions = pick(req.query, [
+    "limit",
+    "page",
+    "sortBy",
+    "sortOrder",
+  ]);
+  const { limit, page, skip, sortBy, sortOrder } =
+    paginationCalculate(paginationOptions);
+
+  const sortConditions = {};
+  if (sortBy && sortOrder) {
+    sortConditions[sortBy] = sortOrder;
+  }
+
+  const result = await Order.find()
+    .select("-qrCode")
+    .sort(sortConditions)
+    .skip(skip)
+    .limit(limit)
+    .populate([
+      { path: "artist", select: "firstName lastName image color" },
+      { path: "user", select: "firstName lastName image color" },
+    ]);
+
+  const total = await Order.countDocuments();
+
+  const totalUsers = await User.countDocuments({ role: USER_ROLE.USER });
+  const totalArtists = await User.countDocuments({ role: USER_ROLE.ARTIST });
+  const orderAggregation = await Order.aggregate([
+    { $group: { _id: null, totalTransactions: { $sum: "$price" } } },
+  ]);
+
+  const totalTransactions = orderAggregation[0].totalTransactions;
+  const totalIncomes = totalTransactions - (totalTransactions * 20) / 100;
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Earning history retrieved successfully",
+    pagination: { page, limit, total },
+    data: {
+      overview: { totalUsers, totalArtists, totalTransactions, totalIncomes },
+      data: result,
+    },
   });
 });

@@ -17,11 +17,11 @@ const orderSchema = new Schema(
       required: [true, "Artist is required"],
     },
     price: {
-      type: String,
+      type: Number,
       required: [true, "Price is required"],
     },
     payoutPrice: {
-      type: String,
+      type: Number,
     },
     orderStatus: {
       type: String,

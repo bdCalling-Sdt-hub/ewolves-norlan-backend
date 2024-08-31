@@ -5,6 +5,7 @@ const {
   createPaymentIntent,
   createConnectedAccount,
   transferAndPayouts,
+  getAllTransactionsHistory,
 } = require("../controllers/payment.controller");
 const configureFileUpload = require("../middlewares/fileUpload");
 const router = express.Router();
