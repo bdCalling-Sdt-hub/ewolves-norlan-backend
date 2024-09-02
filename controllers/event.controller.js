@@ -7,7 +7,7 @@ const path = require("path");
 const catchAsync = require("../shared/CatchAsync");
 
 exports.createEvent = catchAsync(async (req, res, next) => {
-  const { name } = req.body;
+  const { name, colors } = req.body;
 
   let imageFileName;
   if (req.files && req.files.image && req.files.image[0]) {
@@ -15,6 +15,7 @@ exports.createEvent = catchAsync(async (req, res, next) => {
   }
   const payload = {
     name,
+    colors: colors,
     image: imageFileName
   }
 
@@ -64,7 +65,7 @@ exports.getEvent = catchAsync(async (req, res, next) => {
 
 exports.updateEvent = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const { name, colors, image } = req.body;
+  const { name, colors } = req.body;
   const event = await Event.findById(id);
   if (!event) {
     throw new ApiError(404, "No Event found by this ID");
@@ -85,6 +86,7 @@ exports.updateEvent = catchAsync(async (req, res, next) => {
 
   const payload = {
     name: name,
+    colors: colors,
     image: imageFileName
   }
 

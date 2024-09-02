@@ -6,10 +6,7 @@ const categorySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    colors: {
-      type: String,
-      required: true,
-    },
+    colors: [String],
     image: {
       type: String,
       required: true,

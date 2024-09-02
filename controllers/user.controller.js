@@ -287,11 +287,10 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     throw new ApiError(400, "Password and confirm password does not match");
   }
 
-  if (user.emailVerified === true) {
-    const salt = await bcrypt.genSalt(10);
-    const hashpassword = await bcrypt.hash(password, salt);
-    user.password = hashpassword;
-    user.emailVerifyCode = null;
+  const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(password, salt);
+    user.password = hashPassword;
+    user.emailVerified = true;
     await user.save();
 
     return sendResponse(res, {
@@ -300,7 +299,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
       message: "Password Updated Successfully",
       data: user,
     });
-  }
+
 });
 
 exports.changePassword = catchAsync(async (req, res) => {
@@ -524,7 +523,7 @@ exports.getAllArtistFromDB = catchAsync(async (req, res, next) => {
   //artist search here
   if (searchQuery) {
     anyConditions.push({
-        $or: ["name", "email"].map((field) => ({
+        $or: ["firstName", "lastName", "email"].map((field) => ({
             [field]: {
                 $regex: searchQuery,
                 $options: "i"
@@ -539,7 +538,7 @@ exports.getAllArtistFromDB = catchAsync(async (req, res, next) => {
 
   const artists = await User.find(whereConditions)
     .skip(skip)
-    .limit(limit).select("firstName lastName email image createdAt mobileNumber");
+    .limit(limit).select("firstName appId lastName email image createdAt mobileNumber");
 
   const total = await User.countDocuments({ role: "ARTIST" });
   return sendResponse(res, {
@@ -554,3 +553,47 @@ exports.getAllArtistFromDB = catchAsync(async (req, res, next) => {
     data: artists,
   });
 });
+
+exports.getAllUserFromDB = catchAsync(async (req, res, next) => {
+  const paginationOptions = pick(req.query, ["limit", "page"]);
+  const { limit, page, skip } = paginationCalculate(paginationOptions);
+
+  const searchQuery = req.query.search;
+
+  const anyConditions = [];
+  anyConditions.push({ role: "USER" });
+
+  //artist search here
+  if (searchQuery) {
+    anyConditions.push({
+        $or: ["firstName", "lastName", "email"].map((field) => ({
+            [field]: {
+                $regex: searchQuery,
+                $options: "i"
+            }
+        }))
+    });
+  }
+
+  
+
+  const whereConditions = anyConditions.length > 0 ? { $and: anyConditions } : {};
+
+  const users = await User.find(whereConditions)
+    .skip(skip)
+    .limit(limit).select("firstName appId lastName email image createdAt mobileNumber");
+
+  const total = await User.countDocuments({ role: "USER" });
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All Users retrieved successfully",
+    pagination: {
+      page,
+      limit,
+      total,
+    },
+    data: users,
+  });
+});
+

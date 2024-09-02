@@ -18,8 +18,6 @@ exports.makeOrder = catchAsync(async (req, res) => {
     ...req.body,
   };
 
-  console.log("order", payload);
-
   const createOrder = await Order.create(payload);
   if (!createOrder) {
     throw new ApiError(

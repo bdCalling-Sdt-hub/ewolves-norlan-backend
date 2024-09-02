@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      trim: true,
+      default: "https://img.freepik.com/free-photo/young-bearded-man-with-striped-shirt_273609-5677.jpg?size=626&ext=jpg&ga=GA1.1.1700460183.1708560000&semt=sph"
     },
     about: {
       type: String,
