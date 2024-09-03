@@ -166,7 +166,7 @@ exports.getAllTransactionsHistory = catchAsync(async (req, res) => {
     { $group: { _id: null, totalTransactions: { $sum: "$price" } } },
   ]);
 
-  const totalTransactions = orderAggregation[0].totalTransactions;
+  const totalTransactions = orderAggregation[0]?.totalTransactions || 0;
   const totalIncomes = totalTransactions - (totalTransactions * 20) / 100;
 
   sendResponse(res, {
