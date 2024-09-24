@@ -19,6 +19,7 @@ const { CommunityRoutes } = require("./routes/community.routes");
 const { PaymentRoutes } = require("./routes/payment.routes");
 const { NotificationRoutes } = require("./routes/notification.routes");
 const { OrderRoutes } = require("./routes/order.routes");
+const { SubCategoryRoutes } = require("./routes/subCategory.routes");
 
 //parser
 app.use(cors());
@@ -42,6 +43,7 @@ app.use("/api/community", CommunityRoutes);
 app.use("/api/payment", PaymentRoutes);
 app.use("/api/notification", NotificationRoutes);
 app.use("/api/order", OrderRoutes);
+app.use("/api/subCategory", SubCategoryRoutes);
 
 //image get
 app.use(express.static("uploads"));
