@@ -92,7 +92,7 @@ exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
   const { interest } = await User.findById(req.user._id);
   const paginationOptions = pick(req.query, ["limit", "page"]);
   const { priceMin, priceMax } = pick(req.query, ["priceMin", "priceMax"]);
-  const filters = pick(req.query, ["searchTerm", "category", "location"]);
+  const filters = pick(req.query, ["searchTerm", "category", "subCategory", "location"]);
   const { limit, page, skip } = paginationCalculate(paginationOptions);
   const { searchTerm, ...filterData } = filters;
 
@@ -120,6 +120,7 @@ exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
   if (
     Object.keys(filterData).length &&
     filterData.category !== undefined &&
+    filterData.subCategory !== undefined &&
     filterData.location !== undefined
   ) {
     andConditions.push({
@@ -139,7 +140,7 @@ exports.getAllGigFromDB = catchAsync(async (req, res, next) => {
   }
 
   if (interest) {
-    andConditions.push({ category: { $in: interest } });
+    andConditions.push({ subCategory: { $in: interest } });
   }
 
   const whereConditions =

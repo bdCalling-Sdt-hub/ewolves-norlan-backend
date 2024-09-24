@@ -85,3 +85,19 @@ exports.deleteBanner = catchAsync(async (req, res, next) => {
     });
   }
 });
+
+exports.updateStatusToDb= catchAsync(async (req, res, next) => {
+  const id = req.params.id;
+  const isExistBanner = await Banner.findById(id);
+  if(!isExistBanner){
+    throw new ApiError(404, "No Banner Found");
+  }
+  const result = await Banner.findByIdAndUpdate({_id: id}, {status: !isExistBanner?.status}, {new: true})
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Banner Status Updated Successfully",
+    data: result
+  });
+})

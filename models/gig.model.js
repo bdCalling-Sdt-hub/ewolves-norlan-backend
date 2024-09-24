@@ -89,6 +89,10 @@ const gigSchema = new Schema(
       type: String,
       required: true,
     },
+    subCategory: {
+      type: String,
+      required: true,
+    },
     event: {
       type: String,
       required: true,

@@ -5,6 +5,7 @@ const {
   deleteBanner,
   getBanner,
   updateBanner,
+  updateStatusToDb
 } = require("../controllers/banner.controller.js");
 const configureFileUpload = require("../middlewares/fileUpload.js");
 const { USER_ROLE } = require("../enums/user.js");
@@ -21,12 +22,7 @@ router.get(
   auth(USER_ROLE.ADMIN, USER_ROLE.ARTIST, USER_ROLE.USER),
   getBanner
 );
-router.patch(
-  "/update-banner/:id",
-  auth(USER_ROLE.ADMIN),
-  configureFileUpload(),
-  updateBanner
-);
 router.delete("/delete-banner/:id", auth(USER_ROLE.ADMIN), deleteBanner);
+router.patch("/:id", auth(USER_ROLE.ADMIN), updateStatusToDb);
 
 exports.BannerRoutes = router;

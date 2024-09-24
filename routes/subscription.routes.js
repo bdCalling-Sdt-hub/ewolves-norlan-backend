@@ -10,7 +10,7 @@ const configureFileUpload = require("../middlewares/fileUpload.js");
 const auth = require("../middlewares/auth.js");
 const { USER_ROLE } = require("../enums/user.js");
 
-// category
+
 router.post(
   "/create-subscription",
   auth(USER_ROLE.ADMIN),

@@ -8,7 +8,7 @@ const catchAsync = require("../shared/CatchAsync");
 
 // create sub category
 exports.createSubCategoryToDB = catchAsync(async (req, res, next) => {
-
+    console.log(req.body)
     let imageFileName = "";
     if (req.files && req.files.image && req.files.image[0]) {
         imageFileName = `/media/${req.files.image[0].filename}`;
@@ -31,8 +31,20 @@ exports.createSubCategoryToDB = catchAsync(async (req, res, next) => {
 
 // fetch  sub category data
 exports.getSubCategoriesFromDB = catchAsync(async (req, res, next) => {
-    const id = req.params.id;
-    const subCategories = await SubCategoryModel.find({category: id});
+    const subCategories = await SubCategoryModel.find();
+    
+    return sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Sub Category Data Retrieved successfully",
+        data: subCategories,
+    });
+});
+
+// fetch  sub category data
+exports.getSubCategoryByCategoryFromDB = catchAsync(async (req, res, next) => {
+    const category = req.params.category;
+    const subCategories = await SubCategoryModel.find({category: category});
     
     return sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -80,7 +92,7 @@ exports.updateSubCategoryToDB = catchAsync(async (req, res, next) => {
     }
 
     const updatedData ={
-        ...req.data,
+        ...req.body,
         image: imageFileName
     }
     
